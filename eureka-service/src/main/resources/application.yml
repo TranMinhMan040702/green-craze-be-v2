@@ -1,0 +1,39 @@
+server:
+  port: 7230
+
+spring:
+  application:
+    name: eureka-service
+  profiles:
+    active: dev
+  cloud:
+    loadbalancer:
+      enabled: true
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: "http://${eureka.instance.hostname}:${server.port}/eureka/"
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+---
+spring:
+  config:
+    activate:
+      on-profile: stag
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
