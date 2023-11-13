@@ -1,16 +1,14 @@
-package vn.com.greencraze.auth.entity;
+package vn.com.greencraze.user.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,23 +20,22 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import vn.com.greencraze.auth.enumeration.StaffType;
 
 import java.time.Instant;
 
 @Entity
-@Table(name = "staff")
+@Table(name = "review")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Staff {
+public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private String id;
+    private Long id;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -56,14 +53,31 @@ public class Staff {
     @Column(name = "updated_by")
     private String updatedBy;
 
-    @Column(name = "type", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private StaffType type;
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
 
-    @Column(name = "code", nullable = false)
-    private String code;
+    @Column(name = "order_item_id", nullable = false)
+    private Long orderItemId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false, unique = true)
-    private User user;
+    @Column(name = "title", nullable = false)
+    private String title;
+
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
+    private String content;
+
+    @Column(name = "rating", nullable = false)
+    private Integer rating;
+
+    @Column(name = "image", columnDefinition = "TEXT")
+    private String image;
+
+    @Column(name = "reply", nullable = false, columnDefinition = "TEXT")
+    private String reply;
+
+    @Column(name = "status", nullable = false)
+    private Boolean status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserProfile user;
 }
