@@ -27,14 +27,14 @@ import vn.com.greencraze.auth.enumeration.TokenType;
 import java.time.Instant;
 
 @Entity
-@Table(name = "user_token")
+@Table(name = "identity_token")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserToken {
+public class IdentityToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -59,7 +59,7 @@ public class UserToken {
     @Column(name = "token", nullable = false)
     private String token;
 
-    @Column(name = "token", nullable = false)
+    @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     private TokenType type;
 
@@ -67,6 +67,6 @@ public class UserToken {
     private Instant expiredAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "identity_id", nullable = false)
+    private Identity identity;
 }

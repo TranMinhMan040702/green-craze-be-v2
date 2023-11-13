@@ -14,78 +14,50 @@ CREATE TABLE `role`
 ALTER TABLE `role`
     ADD CONSTRAINT uc_role_name UNIQUE (name);
 
-# User
-CREATE TABLE user
+# Identity
+CREATE TABLE identity
 (
     id         VARCHAR(255) NOT NULL,
     created_at datetime     NOT NULL,
     updated_at datetime     NOT NULL,
     created_by VARCHAR(255) NULL,
     updated_by VARCHAR(255) NULL,
-    first_name VARCHAR(255) NOT NULL,
-    last_name  VARCHAR(255) NOT NULL,
-    email      VARCHAR(255) NOT NULL,
-    phone      VARCHAR(255) NOT NULL,
-    dob        datetime     NULL,
-    gender     VARCHAR(255) NOT NULL,
-    avatar     TEXT         NULL,
+    username   VARCHAR(255) NOT NULL,
     password   VARCHAR(255) NOT NULL,
     status     BIT(1)       NOT NULL,
-    CONSTRAINT pk_user PRIMARY KEY (id)
+    CONSTRAINT pk_identity PRIMARY KEY (id)
 );
 
-CREATE TABLE user_role
+CREATE TABLE identity_role
 (
-    role_id VARCHAR(255) NOT NULL,
-    user_id VARCHAR(255) NOT NULL,
-    CONSTRAINT pk_user_role PRIMARY KEY (role_id, user_id)
+    identity_id VARCHAR(255) NOT NULL,
+    role_id     VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_identity_role PRIMARY KEY (identity_id, role_id)
 );
 
-ALTER TABLE user
-    ADD CONSTRAINT uc_user_email UNIQUE (email);
+ALTER TABLE identity
+    ADD CONSTRAINT uc_identity_username UNIQUE (username);
 
-ALTER TABLE user
-    ADD CONSTRAINT uc_user_phone UNIQUE (phone);
+ALTER TABLE identity_role
+    ADD CONSTRAINT fk_iderol_on_identity FOREIGN KEY (identity_id) REFERENCES identity (id);
 
-ALTER TABLE user_role
-    ADD CONSTRAINT fk_user_role_on_role FOREIGN KEY (role_id) REFERENCES `role` (id);
+ALTER TABLE identity_role
+    ADD CONSTRAINT fk_iderol_on_role FOREIGN KEY (role_id) REFERENCES `role` (id);
 
-ALTER TABLE user_role
-    ADD CONSTRAINT fk_user_role_on_user FOREIGN KEY (user_id) REFERENCES user (id);
-
-# UserToken
-CREATE TABLE user_token
+# IdentityToken
+CREATE TABLE identity_token
 (
-    id         VARCHAR(255) NOT NULL,
-    created_at datetime     NOT NULL,
-    updated_at datetime     NOT NULL,
-    created_by VARCHAR(255) NULL,
-    updated_by VARCHAR(255) NULL,
-    token      VARCHAR(255) NOT NULL,
-    expired_at datetime     NOT NULL,
-    user_id    VARCHAR(255) NOT NULL,
-    CONSTRAINT pk_user_token PRIMARY KEY (id)
+    id          VARCHAR(255) NOT NULL,
+    created_at  datetime     NOT NULL,
+    updated_at  datetime     NOT NULL,
+    created_by  VARCHAR(255) NULL,
+    updated_by  VARCHAR(255) NULL,
+    token       VARCHAR(255) NOT NULL,
+    type        VARCHAR(255) NOT NULL,
+    expired_at  datetime     NOT NULL,
+    identity_id VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_identity_token PRIMARY KEY (id)
 );
 
-ALTER TABLE user_token
-    ADD CONSTRAINT FK_USER_TOKEN_ON_USER FOREIGN KEY (user_id) REFERENCES user (id);
-
-# Staff
-CREATE TABLE staff
-(
-    id         VARCHAR(255) NOT NULL,
-    created_at datetime     NOT NULL,
-    updated_at datetime     NOT NULL,
-    created_by VARCHAR(255) NULL,
-    updated_by VARCHAR(255) NULL,
-    type       VARCHAR(255) NOT NULL,
-    code       VARCHAR(255) NOT NULL,
-    user_id    VARCHAR(255) NOT NULL,
-    CONSTRAINT pk_staff PRIMARY KEY (id)
-);
-
-ALTER TABLE staff
-    ADD CONSTRAINT uc_staff_user UNIQUE (user_id);
-
-ALTER TABLE staff
-    ADD CONSTRAINT FK_STAFF_ON_USER FOREIGN KEY (user_id) REFERENCES user (id);
+ALTER TABLE identity_token
+    ADD CONSTRAINT FK_IDENTITY_TOKEN_ON_IDENTITY FOREIGN KEY (identity_id) REFERENCES identity (id);

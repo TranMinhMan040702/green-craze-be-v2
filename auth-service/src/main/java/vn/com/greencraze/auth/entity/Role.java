@@ -60,5 +60,5 @@ public class Role {
 
     @ManyToMany(mappedBy = "roles")
     @Builder.Default
-    private Set<User> users = new HashSet<>();
+    private Set<Identity> identities = new HashSet<>();
 }
