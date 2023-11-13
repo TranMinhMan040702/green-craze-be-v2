@@ -5,6 +5,7 @@ import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.security.Principal;
 import java.util.Optional;
 
 public interface CommonPersistenceConfig {
@@ -13,7 +14,7 @@ public interface CommonPersistenceConfig {
     default AuditorAware<String> auditorAware() {
         return () -> Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .filter(authentication -> !(authentication instanceof AnonymousAuthenticationToken))
-                .map(authentication -> authentication.getName());
+                .map(Principal::getName);
     }
 
 }

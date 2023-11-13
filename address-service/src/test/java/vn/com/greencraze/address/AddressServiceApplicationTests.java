@@ -1,10 +1,10 @@
-package vn.com.greencraze.user;
+package vn.com.greencraze.address;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class UserServiceApplicationTests {
+class AddressServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

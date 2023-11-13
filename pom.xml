@@ -20,6 +20,7 @@
         <module>user-service</module>
         <module>inventory-service</module>
         <module>post-service</module>
+        <module>address-service</module>
     </modules>
 
 </project>
