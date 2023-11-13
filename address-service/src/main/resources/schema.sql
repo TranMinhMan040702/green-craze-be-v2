@@ -54,19 +54,28 @@ ALTER TABLE ward
 # Address
 CREATE TABLE address
 (
-    id         BIGINT AUTO_INCREMENT NOT NULL,
-    created_at datetime              NOT NULL,
-    updated_at datetime              NOT NULL,
-    created_by VARCHAR(255)          NULL,
-    updated_by VARCHAR(255)          NULL,
-    user_id    BIGINT                NOT NULL,
-    province   VARCHAR(255)          NOT NULL,
-    district   VARCHAR(255)          NOT NULL,
-    ward       VARCHAR(255)          NOT NULL,
-    street     VARCHAR(255)          NOT NULL,
-    receiver   VARCHAR(255)          NOT NULL,
-    email      VARCHAR(255)          NULL,
-    phone      VARCHAR(255)          NOT NULL,
-    is_default BIT(1)                NOT NULL,
+    id          BIGINT AUTO_INCREMENT NOT NULL,
+    created_at  datetime              NOT NULL,
+    updated_at  datetime              NOT NULL,
+    created_by  VARCHAR(255)          NULL,
+    updated_by  VARCHAR(255)          NULL,
+    user_id     BIGINT                NOT NULL,
+    province_id BIGINT                NOT NULL,
+    district_id BIGINT                NOT NULL,
+    ward_id     BIGINT                NOT NULL,
+    street      VARCHAR(255)          NOT NULL,
+    receiver    VARCHAR(255)          NOT NULL,
+    email       VARCHAR(255)          NULL,
+    phone       VARCHAR(255)          NOT NULL,
+    is_default  BIT(1)                NOT NULL,
     CONSTRAINT pk_address PRIMARY KEY (id)
 );
+
+ALTER TABLE address
+    ADD CONSTRAINT FK_ADDRESS_ON_DISTRICT FOREIGN KEY (district_id) REFERENCES district (id);
+
+ALTER TABLE address
+    ADD CONSTRAINT FK_ADDRESS_ON_PROVINCE FOREIGN KEY (province_id) REFERENCES province (id);
+
+ALTER TABLE address
+    ADD CONSTRAINT FK_ADDRESS_ON_WARD FOREIGN KEY (ward_id) REFERENCES ward (id);
