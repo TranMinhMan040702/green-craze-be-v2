@@ -1,4 +1,4 @@
-package vn.com.greencraze.product.dto.response;
+package vn.com.greencraze.product.dto.response.unit;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.lang.Nullable;

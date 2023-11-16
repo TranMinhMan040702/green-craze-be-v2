@@ -11,7 +11,7 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()
-                .info(new Info().title("Green Craze auth-service API")
+                .info(new Info().title("Green Craze inventory-service API")
                         .version("v1.0.0"));
     }
 

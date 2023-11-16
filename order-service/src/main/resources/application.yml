@@ -80,6 +80,12 @@ spring:
     username: root
     password: 1234
 
+cloudinary:
+  cloud-name: dwoejm4g6
+  api-key: 531723158945791
+  api-secret: vgCHOLFDpPoPe_DXyjk653ztW1k
+  secure: true
+
 eureka:
   client:
     service-url:
@@ -95,6 +101,12 @@ spring:
     username: root
     password: 1234
 
+cloudinary:
+  cloud-name: dwoejm4g6
+  api-key: 531723158945791
+  api-secret: vgCHOLFDpPoPe_DXyjk653ztW1k
+  secure: true
+
 eureka:
   client:
     service-url:
@@ -109,6 +121,12 @@ spring:
     url: jdbc:mysql://localhost:3306/core_order
     username: root
     password: 1234
+
+cloudinary:
+  cloud-name: dwoejm4g6
+  api-key: 531723158945791
+  api-secret: vgCHOLFDpPoPe_DXyjk653ztW1k
+  secure: true
 
 eureka:
   client:
