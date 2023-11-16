@@ -66,7 +66,7 @@ public class Brand {
     @Column(name = "image", nullable = false, columnDefinition = "TEXT")
     private String image;
 
-    @Column(name = "image", nullable = false)
+    @Column(name = "status", nullable = false)
     private Boolean status;
 
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)

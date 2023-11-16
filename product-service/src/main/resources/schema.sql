@@ -10,6 +10,7 @@ CREATE TABLE brand
     code          VARCHAR(255)          NOT NULL,
     `description` TEXT                  NOT NULL,
     image         TEXT                  NOT NULL,
+    status        BIT(1)                NOT NULL,
     CONSTRAINT pk_brand PRIMARY KEY (id)
 );
 
