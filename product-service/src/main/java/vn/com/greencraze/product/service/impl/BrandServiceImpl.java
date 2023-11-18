@@ -15,7 +15,6 @@ import vn.com.greencraze.product.dto.request.brand.UpdateBrandRequest;
 import vn.com.greencraze.product.dto.response.brand.CreateBrandResponse;
 import vn.com.greencraze.product.dto.response.brand.GetListBrandResponse;
 import vn.com.greencraze.product.dto.response.brand.GetOneBrandResponse;
-import vn.com.greencraze.product.dto.response.brand.UpdateBrandResponse;
 import vn.com.greencraze.product.entity.Brand;
 import vn.com.greencraze.product.mapper.BrandMapper;
 import vn.com.greencraze.product.repository.BrandRepository;
@@ -67,7 +66,7 @@ public class BrandServiceImpl implements IBrandService {
     }
 
     @Override
-    public RestResponse<UpdateBrandResponse> updateBrand(Long id, UpdateBrandRequest request) {
+    public void updateBrand(Long id, UpdateBrandRequest request) {
         Brand brand = brandRepository.findById(id)
                 .map(b -> brandMapper.updateBrandFromUpdateUnitRequest(b, request))
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
@@ -75,7 +74,6 @@ public class BrandServiceImpl implements IBrandService {
             brand.setImage(uploadService.uploadFile(request.image()));
         }
         brandRepository.save(brand);
-        return RestResponse.ok(brandMapper.brandToUpdateBrandResponse(brand));
     }
 
     @Override

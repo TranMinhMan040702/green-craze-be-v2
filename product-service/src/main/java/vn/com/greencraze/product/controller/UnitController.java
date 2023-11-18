@@ -25,7 +25,6 @@ import vn.com.greencraze.product.dto.request.unit.UpdateUnitRequest;
 import vn.com.greencraze.product.dto.response.unit.CreateUnitResponse;
 import vn.com.greencraze.product.dto.response.unit.GetListUnitResponse;
 import vn.com.greencraze.product.dto.response.unit.GetOneUnitResponse;
-import vn.com.greencraze.product.dto.response.unit.UpdateUnitResponse;
 import vn.com.greencraze.product.service.IUnitService;
 
 import java.net.URI;
@@ -70,17 +69,14 @@ public class UnitController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PutMapping(
-            value = "/{id}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    @ResponseStatus(HttpStatus.OK)
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a unit")
-    public ResponseEntity<RestResponse<UpdateUnitResponse>> updateUnit(
+    public ResponseEntity<Void> updateUnit(
             @PathVariable Long id, @RequestBody @Valid UpdateUnitRequest request
     ) {
-        return ResponseEntity.ok(unitService.updateUnit(id, request));
+        unitService.updateUnit(id, request);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

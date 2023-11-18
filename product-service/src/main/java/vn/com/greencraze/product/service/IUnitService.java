@@ -7,7 +7,6 @@ import vn.com.greencraze.product.dto.request.unit.UpdateUnitRequest;
 import vn.com.greencraze.product.dto.response.unit.CreateUnitResponse;
 import vn.com.greencraze.product.dto.response.unit.GetListUnitResponse;
 import vn.com.greencraze.product.dto.response.unit.GetOneUnitResponse;
-import vn.com.greencraze.product.dto.response.unit.UpdateUnitResponse;
 
 import java.util.List;
 
@@ -21,7 +20,7 @@ public interface IUnitService {
 
     RestResponse<CreateUnitResponse> createUnit(CreateUnitRequest request);
 
-    RestResponse<UpdateUnitResponse> updateUnit(Long id, UpdateUnitRequest request);
+    void updateUnit(Long id, UpdateUnitRequest request);
 
     void deleteOneUnit(Long id);
 

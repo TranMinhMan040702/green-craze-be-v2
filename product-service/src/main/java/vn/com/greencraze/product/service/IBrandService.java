@@ -7,7 +7,6 @@ import vn.com.greencraze.product.dto.request.brand.UpdateBrandRequest;
 import vn.com.greencraze.product.dto.response.brand.CreateBrandResponse;
 import vn.com.greencraze.product.dto.response.brand.GetListBrandResponse;
 import vn.com.greencraze.product.dto.response.brand.GetOneBrandResponse;
-import vn.com.greencraze.product.dto.response.brand.UpdateBrandResponse;
 
 import java.util.List;
 
@@ -21,7 +20,7 @@ public interface IBrandService {
 
     RestResponse<CreateBrandResponse> createBrand(CreateBrandRequest request);
 
-    RestResponse<UpdateBrandResponse> updateBrand(Long id, UpdateBrandRequest request);
+    void updateBrand(Long id, UpdateBrandRequest request);
 
     void deleteOneBrand(Long id);
 

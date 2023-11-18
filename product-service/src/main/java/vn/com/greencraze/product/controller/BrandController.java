@@ -23,7 +23,6 @@ import vn.com.greencraze.product.dto.request.brand.CreateBrandRequest;
 import vn.com.greencraze.product.dto.request.brand.UpdateBrandRequest;
 import vn.com.greencraze.product.dto.response.brand.CreateBrandResponse;
 import vn.com.greencraze.product.dto.response.brand.GetListBrandResponse;
-import vn.com.greencraze.product.dto.response.brand.UpdateBrandResponse;
 import vn.com.greencraze.product.service.IBrandService;
 
 import java.net.URI;
@@ -63,17 +62,14 @@ public class BrandController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PutMapping(
-            value = "/{id}",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    @ResponseStatus(HttpStatus.OK)
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a brand")
-    public ResponseEntity<RestResponse<UpdateBrandResponse>> updateBrand(
+    public ResponseEntity<Void> updateBrand(
             @PathVariable Long id, @Valid UpdateBrandRequest request
     ) {
-        return ResponseEntity.ok(brandService.updateBrand(id, request));
+        brandService.updateBrand(id, request);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

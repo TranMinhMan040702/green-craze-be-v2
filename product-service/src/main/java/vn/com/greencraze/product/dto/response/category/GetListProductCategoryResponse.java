@@ -1,11 +1,11 @@
-package vn.com.greencraze.product.dto.response.brand;
+package vn.com.greencraze.product.dto.response.category;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.lang.Nullable;
 
 import java.time.Instant;
 
-public record UpdateBrandResponse(
+public record GetListProductCategoryResponse(
         Long id,
         Instant createdAt,
         Instant updatedAt,
@@ -16,8 +16,8 @@ public record UpdateBrandResponse(
         @Schema(nullable = true)
         String updatedBy,
         String name,
-        String code,
-        String description,
+        String parentName,
         String image,
+        String slug,
         Boolean status
 ) {}
