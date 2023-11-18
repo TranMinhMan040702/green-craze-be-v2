@@ -63,7 +63,8 @@ public class ProductImage {
     private String contentType;
 
     @Column(name = "is_default", nullable = false)
-    private Boolean isDefault;
+    @Builder.Default
+    private Boolean isDefault = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)

@@ -109,6 +109,7 @@ CREATE TABLE product
     `description`       TEXT                  NOT NULL,
     code                VARCHAR(255)          NOT NULL,
     quantity            BIGINT                NOT NULL,
+    actual_inventory    BIGINT                NOT NULL,
     sold                BIGINT                NULL,
     rating              DOUBLE                NOT NULL,
     slug                VARCHAR(255)          NOT NULL,

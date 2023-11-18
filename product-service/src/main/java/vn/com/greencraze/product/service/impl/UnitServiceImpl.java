@@ -18,7 +18,7 @@ import vn.com.greencraze.product.dto.response.unit.GetOneUnitResponse;
 import vn.com.greencraze.product.entity.Unit;
 import vn.com.greencraze.product.mapper.UnitMapper;
 import vn.com.greencraze.product.repository.UnitRepository;
-import vn.com.greencraze.product.repository.specification.BaseSpecification;
+import vn.com.greencraze.product.repository.specification.UnitSpecification;
 import vn.com.greencraze.product.service.IUnitService;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public class UnitServiceImpl implements IUnitService {
     public RestResponse<ListResponse<GetListUnitResponse>> getListUnit(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
     ) {
-        BaseSpecification<Unit> unitSpecification = new BaseSpecification<>();
+        UnitSpecification unitSpecification = new UnitSpecification();
         Specification<Unit> sortable = unitSpecification.sortable(isSortAscending, columnName);
         Specification<Unit> searchable = unitSpecification.searchable(SEARCH_FIELDS, search);
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);

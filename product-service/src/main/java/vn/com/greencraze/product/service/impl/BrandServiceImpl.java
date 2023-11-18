@@ -18,7 +18,7 @@ import vn.com.greencraze.product.dto.response.brand.GetOneBrandResponse;
 import vn.com.greencraze.product.entity.Brand;
 import vn.com.greencraze.product.mapper.BrandMapper;
 import vn.com.greencraze.product.repository.BrandRepository;
-import vn.com.greencraze.product.repository.specification.BaseSpecification;
+import vn.com.greencraze.product.repository.specification.BrandSpecification;
 import vn.com.greencraze.product.service.IBrandService;
 import vn.com.greencraze.product.service.IUploadService;
 
@@ -39,7 +39,7 @@ public class BrandServiceImpl implements IBrandService {
     public RestResponse<ListResponse<GetListBrandResponse>> getListBrand(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
     ) {
-        BaseSpecification<Brand> brandSpecification = new BaseSpecification<>();
+        BrandSpecification brandSpecification = new BrandSpecification();
         Specification<Brand> sortable = brandSpecification.sortable(isSortAscending, columnName);
         Specification<Brand> searchable = brandSpecification.searchable(SEARCH_FIELDS, search);
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);

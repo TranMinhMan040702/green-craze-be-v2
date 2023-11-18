@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import vn.com.greencraze.commons.exception.InvalidRequestException;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 
 import java.net.URI;
@@ -52,19 +53,19 @@ public interface CommonControllerAdvice {
                 .build();
     }
 
-//    @ExceptionHandler(AuthenticationException.class)
-//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-//    @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-//    default RestError authenticationExceptionHandler(AuthenticationException e, HttpServletRequest request) {
-//        return RestError.builder()
-//                .status(HttpStatus.UNAUTHORIZED.value())
-//                .type(URI.create("https://problems.affina.com.vn/authentication-error"))
-//                .title("Authentication error")
-//                .detail(e.getMessage())
-//                .instance(URI.create(request.getRequestURI()))
-//                .code("AUTHENTICATION_ERROR")
-//                .build();
-//    }
+    //    @ExceptionHandler(AuthenticationException.class)
+    //    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    //    @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    //    default RestError authenticationExceptionHandler(AuthenticationException e, HttpServletRequest request) {
+    //        return RestError.builder()
+    //                .status(HttpStatus.UNAUTHORIZED.value())
+    //                .type(URI.create("https://problems.affina.com.vn/authentication-error"))
+    //                .title("Authentication error")
+    //                .detail(e.getMessage())
+    //                .instance(URI.create(request.getRequestURI()))
+    //                .code("AUTHENTICATION_ERROR")
+    //                .build();
+    //    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -77,6 +78,20 @@ public interface CommonControllerAdvice {
                 .detail(e.getMessage())
                 .instance(URI.create(request.getRequestURI()))
                 .code("RESOURCE_NOT_FOUND")
+                .build();
+    }
+
+    @ExceptionHandler(InvalidRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    default RestError invalidRequestExceptionHandler(InvalidRequestException e, HttpServletRequest request) {
+        return RestError.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .type(URI.create("https://problems.greencraze.com.vn/invalid-request"))
+                .title("Invalid Request")
+                .detail(e.getMessage())
+                .instance(URI.create(request.getRequestURI()))
+                .code("INVALID_REQUEST")
                 .build();
     }
 
