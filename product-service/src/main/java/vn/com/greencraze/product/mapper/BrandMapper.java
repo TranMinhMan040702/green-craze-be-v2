@@ -8,7 +8,6 @@ import vn.com.greencraze.product.dto.request.brand.UpdateBrandRequest;
 import vn.com.greencraze.product.dto.response.brand.CreateBrandResponse;
 import vn.com.greencraze.product.dto.response.brand.GetListBrandResponse;
 import vn.com.greencraze.product.dto.response.brand.GetOneBrandResponse;
-import vn.com.greencraze.product.dto.response.brand.UpdateBrandResponse;
 import vn.com.greencraze.product.entity.Brand;
 
 @Mapper
@@ -25,7 +24,5 @@ public interface BrandMapper {
 
     @Mapping(target = "image", ignore = true)
     Brand updateBrandFromUpdateUnitRequest(@MappingTarget Brand brand, UpdateBrandRequest updateBrandRequest);
-
-    UpdateBrandResponse brandToUpdateBrandResponse(Brand brand);
 
 }

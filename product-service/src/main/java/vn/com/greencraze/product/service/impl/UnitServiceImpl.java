@@ -15,7 +15,6 @@ import vn.com.greencraze.product.dto.request.unit.UpdateUnitRequest;
 import vn.com.greencraze.product.dto.response.unit.CreateUnitResponse;
 import vn.com.greencraze.product.dto.response.unit.GetListUnitResponse;
 import vn.com.greencraze.product.dto.response.unit.GetOneUnitResponse;
-import vn.com.greencraze.product.dto.response.unit.UpdateUnitResponse;
 import vn.com.greencraze.product.entity.Unit;
 import vn.com.greencraze.product.mapper.UnitMapper;
 import vn.com.greencraze.product.repository.UnitRepository;
@@ -65,13 +64,11 @@ public class UnitServiceImpl implements IUnitService {
     }
 
     @Override
-    public RestResponse<UpdateUnitResponse> updateUnit(Long id, UpdateUnitRequest request) {
-        return unitRepository
+    public void updateUnit(Long id, UpdateUnitRequest request) {
+        unitRepository
                 .findById(id)
                 .map(unit -> unitMapper.updateUnitFromUpdateUnitRequest(unit, request))
                 .map(unitRepository::save)
-                .map(unitMapper::unitToUpdateUnitResponse)
-                .map(RestResponse::ok)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
     }
 

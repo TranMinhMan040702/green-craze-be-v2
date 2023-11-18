@@ -7,7 +7,6 @@ import vn.com.greencraze.product.dto.request.unit.UpdateUnitRequest;
 import vn.com.greencraze.product.dto.response.unit.CreateUnitResponse;
 import vn.com.greencraze.product.dto.response.unit.GetListUnitResponse;
 import vn.com.greencraze.product.dto.response.unit.GetOneUnitResponse;
-import vn.com.greencraze.product.dto.response.unit.UpdateUnitResponse;
 import vn.com.greencraze.product.entity.Unit;
 
 @Mapper
@@ -22,7 +21,5 @@ public interface UnitMapper {
     CreateUnitResponse unitToCreateUnitResponse(Unit unit);
 
     Unit updateUnitFromUpdateUnitRequest(@MappingTarget Unit unit, UpdateUnitRequest updateUnitRequest);
-
-    UpdateUnitResponse unitToUpdateUnitResponse(Unit unit);
 
 }
