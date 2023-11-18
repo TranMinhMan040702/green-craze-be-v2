@@ -76,13 +76,20 @@ public class Product {
     private String code;
 
     @Column(name = "quantity", nullable = false)
-    private Long quantity;
+    @Builder.Default
+    private Long quantity = 0L;
+
+    @Column(name = "actual_inventory", nullable = false)
+    @Builder.Default
+    private Long actualInventory = 0L;
 
     @Column(name = "sold")
-    private Long sold;
+    @Builder.Default
+    private Long sold = 0L;
 
     @Column(name = "rating", nullable = false)
-    private Double rating;
+    @Builder.Default
+    private Double rating = 5.0;
 
     @Column(name = "slug", nullable = false, unique = true)
     private String slug;
@@ -108,7 +115,7 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
-    private List<ProductImage> productImages = new ArrayList<>();
+    private List<ProductImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Variant> variants = new HashSet<>();

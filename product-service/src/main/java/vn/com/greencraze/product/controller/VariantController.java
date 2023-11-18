@@ -18,52 +18,48 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
-import vn.com.greencraze.product.dto.request.unit.CreateUnitRequest;
-import vn.com.greencraze.product.dto.request.unit.UpdateUnitRequest;
-import vn.com.greencraze.product.dto.response.unit.CreateUnitResponse;
-import vn.com.greencraze.product.dto.response.unit.GetListUnitResponse;
-import vn.com.greencraze.product.dto.response.unit.GetOneUnitResponse;
-import vn.com.greencraze.product.service.IUnitService;
+import vn.com.greencraze.product.dto.request.variant.CreateVariantRequest;
+import vn.com.greencraze.product.dto.request.variant.UpdateVariantRequest;
+import vn.com.greencraze.product.dto.response.variant.CreateVariantResponse;
+import vn.com.greencraze.product.dto.response.variant.GetListVariantResponse;
+import vn.com.greencraze.product.dto.response.variant.GetOneVariantResponse;
+import vn.com.greencraze.product.service.IVariantService;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/units")
-@Tag(name = "unit :: Unit")
+@RequestMapping("/variants")
+@Tag(name = "variant :: Variant")
 @RequiredArgsConstructor
-public class UnitController {
+public class VariantController {
 
-    private final IUnitService unitService;
+    private final IVariantService variantService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get a list of units")
-    public ResponseEntity<RestResponse<ListResponse<GetListUnitResponse>>> getListUnit(
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "true") boolean isSortAscending,
-            @RequestParam(defaultValue = "id") String columnName,
-            @RequestParam(required = false) String search,
-            @RequestParam(required = false) boolean all
+    @Operation(summary = "Get a list of variants")
+    public ResponseEntity<RestResponse<List<GetListVariantResponse>>> getListVariant(
+            @RequestParam Long productId
     ) {
-        return ResponseEntity.ok(unitService.getListUnit(page, size, isSortAscending, columnName, search, all));
+        return ResponseEntity.ok(variantService.getListVariant(productId));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get a unit")
-    public ResponseEntity<RestResponse<GetOneUnitResponse>> getOneUnit(@PathVariable Long id) {
-        return ResponseEntity.ok(unitService.getOneUnit(id));
+    @Operation(summary = "Get a variant")
+    public ResponseEntity<RestResponse<GetOneVariantResponse>> getOneVariant(@PathVariable Long id) {
+        return ResponseEntity.ok(variantService.getOneVariant(id));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Create a unit")
-    public ResponseEntity<RestResponse<CreateUnitResponse>> createUnit(@RequestBody @Valid CreateUnitRequest request) {
-        RestResponse<CreateUnitResponse> response = unitService.createUnit(request);
+    @Operation(summary = "Create a variant")
+    public ResponseEntity<RestResponse<CreateVariantResponse>> createVariant(
+            @RequestBody @Valid CreateVariantRequest request
+    ) {
+        RestResponse<CreateVariantResponse> response = variantService.creatVariant(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
         return ResponseEntity.created(location).body(response);
@@ -71,27 +67,27 @@ public class UnitController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Update a unit")
-    public ResponseEntity<Void> updateUnit(
-            @PathVariable Long id, @RequestBody @Valid UpdateUnitRequest request
+    @Operation(summary = "Update a variant")
+    public ResponseEntity<Void> updateVariant(
+            @PathVariable Long id, @RequestBody @Valid UpdateVariantRequest request
     ) {
-        unitService.updateUnit(id, request);
+        variantService.updateVariant(id, request);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Delete a unit")
+    @Operation(summary = "Delete a variant")
     public ResponseEntity<Void> deleteOneUnit(@PathVariable Long id) {
-        unitService.deleteOneUnit(id);
+        variantService.deleteOneVariant(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Delete a list of units")
+    @Operation(summary = "Delete a list of variants")
     public ResponseEntity<Void> deleteListUnit(@RequestParam List<Long> ids) {
-        unitService.deleteListUnit(ids);
+        variantService.deleteListVariant(ids);
         return ResponseEntity.noContent().build();
     }
 

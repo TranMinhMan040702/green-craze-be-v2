@@ -7,6 +7,9 @@ import org.mapstruct.TargetType;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+/*
+ * References: https://stackoverflow.com/a/65739712
+ */
 @Component
 public class ReferenceMapper {
 

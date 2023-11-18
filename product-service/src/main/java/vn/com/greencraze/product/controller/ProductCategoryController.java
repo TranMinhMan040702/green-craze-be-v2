@@ -19,28 +19,29 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
-import vn.com.greencraze.product.dto.request.brand.CreateBrandRequest;
-import vn.com.greencraze.product.dto.request.brand.UpdateBrandRequest;
-import vn.com.greencraze.product.dto.response.brand.CreateBrandResponse;
-import vn.com.greencraze.product.dto.response.brand.GetListBrandResponse;
-import vn.com.greencraze.product.dto.response.brand.GetOneBrandResponse;
-import vn.com.greencraze.product.service.IBrandService;
+import vn.com.greencraze.product.dto.request.category.CreateProductCategoryRequest;
+import vn.com.greencraze.product.dto.request.category.UpdateProductCategoryRequest;
+import vn.com.greencraze.product.dto.response.category.CreateProductCategoryResponse;
+import vn.com.greencraze.product.dto.response.category.GetListProductCategoryResponse;
+import vn.com.greencraze.product.dto.response.category.GetOneProductCategoryBySlugResponse;
+import vn.com.greencraze.product.dto.response.category.GetOneProductCategoryResponse;
+import vn.com.greencraze.product.service.IProductCategoryService;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/brands")
-@Tag(name = "brand :: Brand")
+@RequestMapping("/product-categories")
+@Tag(name = "productCategory :: ProductCategory")
 @RequiredArgsConstructor
-public class BrandController {
+public class ProductCategoryController {
 
-    private final IBrandService brandService;
+    private final IProductCategoryService productCategoryService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get a list of brands")
-    public ResponseEntity<RestResponse<ListResponse<GetListBrandResponse>>> getListBrand(
+    @Operation(summary = "Get a list of product categories")
+    public ResponseEntity<RestResponse<ListResponse<GetListProductCategoryResponse>>> getListProductCategory(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "true") boolean isSortAscending,
@@ -48,23 +49,34 @@ public class BrandController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) boolean all
     ) {
-        return ResponseEntity.ok(brandService.getListBrand(page, size, isSortAscending, columnName, search, all));
+        return ResponseEntity.ok(productCategoryService.getListProductCategory(
+                page, size, isSortAscending, columnName, search, all)
+        );
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get a brand")
-    public ResponseEntity<RestResponse<GetOneBrandResponse>> getOneBrand(@PathVariable Long id) {
-        return ResponseEntity.ok(brandService.getOneBrand(id));
+    @Operation(summary = "Get a product category")
+    public ResponseEntity<RestResponse<GetOneProductCategoryResponse>> getOneProductCategory(@PathVariable Long id) {
+        return ResponseEntity.ok(productCategoryService.getOneProductCategory(id));
+    }
+
+    @GetMapping(value = "/slug/{slug}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get a product category by slug")
+    public ResponseEntity<RestResponse<GetOneProductCategoryBySlugResponse>> getOneProductCategoryBySlug(
+            @PathVariable String slug
+    ) {
+        return ResponseEntity.ok(productCategoryService.getOneProductCategoryBySlug(slug));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Create a brand")
-    public ResponseEntity<RestResponse<CreateBrandResponse>> createBrand(
-            @Valid CreateBrandRequest request
+    @Operation(summary = "Create a product category")
+    public ResponseEntity<RestResponse<CreateProductCategoryResponse>> createProductCategory(
+            @Valid CreateProductCategoryRequest request
     ) {
-        RestResponse<CreateBrandResponse> response = brandService.createBrand(request);
+        RestResponse<CreateProductCategoryResponse> response = productCategoryService.createProductCategory(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
         return ResponseEntity.created(location).body(response);
@@ -72,27 +84,27 @@ public class BrandController {
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Update a brand")
+    @Operation(summary = "Update a product category")
     public ResponseEntity<Void> updateBrand(
-            @PathVariable Long id, @Valid UpdateBrandRequest request
+            @PathVariable Long id, @Valid UpdateProductCategoryRequest request
     ) {
-        brandService.updateBrand(id, request);
+        productCategoryService.updateProductCategory(id, request);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Delete a brand")
+    @Operation(summary = "Delete a product category")
     public ResponseEntity<Void> deleteOneBrand(@PathVariable Long id) {
-        brandService.deleteOneBrand(id);
+        productCategoryService.deleteOneProductCategory(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Delete a list of brands")
+    @Operation(summary = "Delete a list of product category")
     public ResponseEntity<Void> deleteListBrand(@RequestParam List<Long> ids) {
-        brandService.deleteListBrand(ids);
+        productCategoryService.deleteListProductCategory(ids);
         return ResponseEntity.noContent().build();
     }
 

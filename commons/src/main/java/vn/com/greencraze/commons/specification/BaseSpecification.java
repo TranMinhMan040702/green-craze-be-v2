@@ -1,4 +1,4 @@
-package vn.com.greencraze.product.repository.specification;
+package vn.com.greencraze.commons.specification;
 
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
@@ -35,7 +35,7 @@ public class BaseSpecification<T> {
                 Order order = isSortAscending ? cb.asc(path) : cb.desc(path);
                 query.orderBy(order);
             }
-            
+
             return cb.conjunction();
         };
     }
