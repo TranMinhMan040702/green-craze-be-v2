@@ -74,6 +74,8 @@ CREATE TABLE cart_item
     created_by VARCHAR(255)          NULL,
     updated_by VARCHAR(255)          NULL,
     cart_id    BIGINT                NOT NULL,
+    variant_id BIGINT                NOT NULL,
+    quantity   INT                   NOT NULL,
     CONSTRAINT pk_cart_item PRIMARY KEY (id)
 );
 

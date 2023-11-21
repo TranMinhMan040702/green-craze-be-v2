@@ -41,7 +41,7 @@ public class AddressController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get a list of deliveries")
+    @Operation(summary = "Get a list of addresses")
     public ResponseEntity<RestResponse<ListResponse<GetListAddressResponse>>> getListAddress(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size,
@@ -57,14 +57,14 @@ public class AddressController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a address")
     public ResponseEntity<RestResponse<GetOneAddressResponse>> getOneAddress(@PathVariable Long id) {
-        return ResponseEntity.ok(addressService.getOneAddress(id, ""));
+        return ResponseEntity.ok(addressService.getOneAddress(id));
     }
 
     @GetMapping(value = "/default", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a default address")
     public ResponseEntity<RestResponse<GetOneAddressResponse>> getDefaultAddress() {
-        return ResponseEntity.ok(addressService.getDefaultAddress(""));
+        return ResponseEntity.ok(addressService.getDefaultAddress());
     }
 
     @GetMapping(value = "/p", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,7 +95,7 @@ public class AddressController {
     public ResponseEntity<RestResponse<CreateAddressResponse>> createAddress(
             @Valid CreateAddressRequest request
     ) {
-        request.setUserId("");
+        request = request.setUserId("");
         RestResponse<CreateAddressResponse> response = addressService.createAddress(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
@@ -108,7 +108,7 @@ public class AddressController {
     public ResponseEntity<Void> updateAddress(
             @PathVariable Long id, @Valid UpdateAddressRequest request
     ) {
-        request.setIdAndUserId(id, "");
+        request = request.setIdAndUserId(id, "");
         addressService.updateAddress(request);
         return ResponseEntity.noContent().build();
     }
@@ -117,7 +117,7 @@ public class AddressController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Set default to address")
     public ResponseEntity<Void> setDefaultAddress(@PathVariable Long id) {
-        addressService.setAddressDefault(id, "");
+        addressService.setAddressDefault(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -125,7 +125,7 @@ public class AddressController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a address")
     public ResponseEntity<Void> deleteOneAddress(@PathVariable Long id) {
-        addressService.deleteOneAddress(id, "");
+        addressService.deleteOneAddress(id);
         return ResponseEntity.noContent().build();
     }
 

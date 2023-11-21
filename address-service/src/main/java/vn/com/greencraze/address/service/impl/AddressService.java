@@ -53,19 +53,24 @@ public class AddressService implements IAddressService {
 
     @Override
     public RestResponse<ListResponse<GetListAddressResponse>> getListAddress(Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
+        String userId = "";
+
         AddressSpecification addressSpecification = new AddressSpecification();
         Specification<Address> sortable = addressSpecification.sortable(isSortAscending, columnName);
         Specification<Address> searchable = addressSpecification.searchable(SEARCH_FIELDS, search);
+        Specification<Address> filterable = addressSpecification.filterable(userId);
+
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
         Page<GetListAddressResponse> responses = addressRepository
-                .findAll(sortable.and(searchable), pageable)
+                .findAll(sortable.and(searchable).and(filterable), pageable)
                 .map(addressMapper::addressToGetListAddressResponse);
 
         return RestResponse.ok(ListResponse.of(responses));
     }
 
     @Override
-    public RestResponse<GetOneAddressResponse> getOneAddress(Long id, String userId) {
+    public RestResponse<GetOneAddressResponse> getOneAddress(Long id) {
+        String userId = "";
         return addressRepository.findByIdAndUserId(id, userId)
                 .map(addressMapper::addressToGetOneAddressResponse)
                 .map(RestResponse::ok)
@@ -73,7 +78,8 @@ public class AddressService implements IAddressService {
     }
 
     @Override
-    public RestResponse<GetOneAddressResponse> getDefaultAddress(String userId) {
+    public RestResponse<GetOneAddressResponse> getDefaultAddress() {
+        String userId = "";
         return addressRepository.findByUserIdAndIsDefault(userId, true)
                 .map(addressMapper::addressToGetOneAddressResponse)
                 .map(RestResponse::ok)
@@ -157,7 +163,8 @@ public class AddressService implements IAddressService {
     }
 
     @Override
-    public void deleteOneAddress(Long id, String userId) {
+    public void deleteOneAddress(Long id) {
+        String userId = "";
         Address address = addressRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
         if (address.getStatus())
@@ -169,7 +176,8 @@ public class AddressService implements IAddressService {
 
     @Transactional(rollbackOn = {ResourceNotFoundException.class, InvalidRequestException.class})
     @Override
-    public void setAddressDefault(Long id, String userId) {
+    public void setAddressDefault(Long id) {
+        String userId = "";
         Address address = addressRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
         address.setStatus(true);

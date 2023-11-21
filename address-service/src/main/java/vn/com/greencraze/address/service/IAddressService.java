@@ -18,9 +18,9 @@ public interface IAddressService {
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
     );
 
-    RestResponse<GetOneAddressResponse> getOneAddress(Long id, String userId);
+    RestResponse<GetOneAddressResponse> getOneAddress(Long id);
 
-    RestResponse<GetOneAddressResponse> getDefaultAddress(String userId);
+    RestResponse<GetOneAddressResponse> getDefaultAddress();
 
     RestResponse<List<GetListProvinceResponse>> getListProvince();
 
@@ -32,9 +32,9 @@ public interface IAddressService {
 
     void updateAddress(UpdateAddressRequest request);
 
-    void deleteOneAddress(Long id, String userId);
+    void deleteOneAddress(Long id);
 
-    void setAddressDefault(Long id, String userId);
+    void setAddressDefault(Long id);
 
 
 }
