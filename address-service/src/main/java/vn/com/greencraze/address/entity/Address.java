@@ -54,7 +54,7 @@ public class Address {
     private String updatedBy;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private String userId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "province_id", nullable = false)
@@ -82,4 +82,7 @@ public class Address {
 
     @Column(name = "is_default", nullable = false)
     private Boolean isDefault;
+
+    @Column(name = "status", nullable = false)
+    private Boolean status;
 }
