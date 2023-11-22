@@ -26,7 +26,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PaymentMethodService implements IPaymentMethodService {
+public class PaymentMethodServiceImpl implements IPaymentMethodService {
     private final PaymentMethodRepository paymentMethodRepository;
     private final PaymentMethodMapper paymentMethodMapper;
     private final IUploadService uploadService;

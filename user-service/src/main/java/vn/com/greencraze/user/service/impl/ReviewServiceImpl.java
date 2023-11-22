@@ -30,7 +30,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class ReviewService implements IReviewService {
+public class ReviewServiceImpl implements IReviewService {
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
     private final UserProfileRepository userProfileRepository;

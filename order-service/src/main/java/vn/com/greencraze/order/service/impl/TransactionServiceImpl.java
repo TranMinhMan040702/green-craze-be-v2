@@ -21,7 +21,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TransactionService implements ITransactionService {
+public class TransactionServiceImpl implements ITransactionService {
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
 

@@ -20,7 +20,7 @@ import vn.com.greencraze.user.service.IUserFollowProductService;
 
 @Service
 @RequiredArgsConstructor
-public class UserFollowProductService implements IUserFollowProductService {
+public class UserFollowProductServiceImpl implements IUserFollowProductService {
     private final UserFollowProductRepository userFollowProductRepository;
     private final UserProfileRepository userProfileRepository;
     private final UserFollowProductMapper userFollowProductMapper;

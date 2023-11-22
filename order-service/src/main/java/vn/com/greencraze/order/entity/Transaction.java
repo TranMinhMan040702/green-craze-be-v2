@@ -54,8 +54,8 @@ public class Transaction {
     @Column(name = "updated_by")
     private String updatedBy;
 
-    @Column(name = "delivery_method", nullable = false)
-    private String deliveryMethod;
+    @Column(name = "payment_method", nullable = false)
+    private String paymentMethod;
 
     @Column(name = "paid_at", nullable = false)
     private Instant paidAt;

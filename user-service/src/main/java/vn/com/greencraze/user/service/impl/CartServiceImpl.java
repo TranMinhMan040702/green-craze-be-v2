@@ -27,7 +27,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CartService implements ICartService {
+public class CartServiceImpl implements ICartService {
 
     private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;

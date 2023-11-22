@@ -25,7 +25,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class OrderCancelReasonService implements IOrderCancelReasonService {
+public class OrderCancelReasonServiceImpl implements IOrderCancelReasonService {
     private final OrderCancelReasonRepository orderCancelReasonRepository;
     private final OrderCancelReasonMapper orderCancelReasonMapper;
 

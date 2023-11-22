@@ -38,7 +38,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class AddressService implements IAddressService {
+public class AddressServiceImpl implements IAddressService {
     private final AddressRepository addressRepository;
     private final ProvinceRepository provinceRepository;
     private final DistrictRepository districtRepository;

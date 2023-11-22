@@ -63,7 +63,7 @@ public class Order {
     private String updatedBy;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId;
+    private String userId;
 
     @Column(name = "address_id", nullable = false)
     private Long addressId;
@@ -92,9 +92,6 @@ public class Order {
 
     @Column(name = "payment_status", nullable = false)
     private Boolean paymentStatus;
-
-    @Column(name = "payment_type", nullable = false)
-    private String paymentType;
 
     @Column(name = "tax", nullable = false)
     private Double tax;

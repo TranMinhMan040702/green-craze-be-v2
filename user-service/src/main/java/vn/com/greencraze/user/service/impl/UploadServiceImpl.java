@@ -1,18 +1,18 @@
-package vn.com.greencraze.order.service.impl;
+package vn.com.greencraze.user.service.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import vn.com.greencraze.order.service.IUploadService;
+import vn.com.greencraze.user.service.IUploadService;
 
 import java.io.IOException;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class UploadService implements IUploadService {
+public class UploadServiceImpl implements IUploadService {
     private final Cloudinary cloudinary;
 
     @Override

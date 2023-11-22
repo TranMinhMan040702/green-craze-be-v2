@@ -26,7 +26,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class DeliveryService implements IDeliveryService {
+public class DeliveryServiceImpl implements IDeliveryService {
 
     private final DeliveryRepository deliveryRepository;
     private final DeliveryMapper deliveryMapper;
