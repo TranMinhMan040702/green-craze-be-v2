@@ -129,6 +129,7 @@ CREATE TABLE user_follow_post
     created_by VARCHAR(255) NULL,
     updated_by VARCHAR(255) NULL,
     user_id    VARCHAR(255) NOT NULL,
+    product_id BIGINT       NOT NULL,
     CONSTRAINT pk_user_follow_post PRIMARY KEY (id)
 );
 

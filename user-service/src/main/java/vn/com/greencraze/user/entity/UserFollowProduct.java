@@ -55,4 +55,7 @@ public class UserFollowProduct {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserProfile user;
+
+    @Column(name = "product_id", nullable = false)
+    private Long productId;
 }
