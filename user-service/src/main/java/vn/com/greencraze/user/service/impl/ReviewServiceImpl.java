@@ -118,7 +118,8 @@ public class ReviewServiceImpl implements IReviewService {
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "userId", userId));
 
         Review review = reviewMapper.createReviewRequestToReview(request);
-        review.setImage(uploadService.uploadFile(request.image()));
+        if (request.image() != null)
+            review.setImage(uploadService.uploadFile(request.image()));
         review.setUser(user);
         reviewRepository.save(review);
         // pub message to update product review

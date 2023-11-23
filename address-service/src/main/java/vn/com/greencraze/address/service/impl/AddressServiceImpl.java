@@ -152,12 +152,12 @@ public class AddressServiceImpl implements IAddressService {
         Ward ward = wardRepository.findById(request.wardId())
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "wardId", request.wardId()));
 
+        if (ward.getDistrict().getId() != district.getId() || district.getProvince().getId() != province.getId())
+            throw new InvalidRequestException("Cannot identify combined address, may be unexpected provinceId, districtId, wardId");
+
         Address address = addressRepository.findByIdAndUserId(request.id(), request.userId())
                 .map(a -> addressMapper.updateAddressFromUpdateAddressRequest(a, request))
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", request.id()));
-
-        if (ward.getDistrict().getId() != district.getId() || district.getProvince().getId() != province.getId())
-            throw new InvalidRequestException("Cannot identify combined address, may be unexpected provinceId, districtId, wardId");
 
         addressRepository.save(address);
     }

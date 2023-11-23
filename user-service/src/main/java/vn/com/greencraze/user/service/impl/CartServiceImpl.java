@@ -16,9 +16,11 @@ import vn.com.greencraze.user.dto.response.cart.CreateCartItemResponse;
 import vn.com.greencraze.user.dto.response.cart.GetListCartItemResponse;
 import vn.com.greencraze.user.entity.Cart;
 import vn.com.greencraze.user.entity.CartItem;
+import vn.com.greencraze.user.entity.UserProfile;
 import vn.com.greencraze.user.mapper.CartMapper;
 import vn.com.greencraze.user.repository.CartItemRepository;
 import vn.com.greencraze.user.repository.CartRepository;
+import vn.com.greencraze.user.repository.UserProfileRepository;
 import vn.com.greencraze.user.repository.specification.CartItemSpecification;
 import vn.com.greencraze.user.service.ICartService;
 
@@ -31,6 +33,7 @@ public class CartServiceImpl implements ICartService {
 
     private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;
+    private final UserProfileRepository userProfileRepository;
     private final CartMapper cartMapper;
     private static final String RESOURCE_NAME = "Cart";
 
@@ -51,7 +54,10 @@ public class CartServiceImpl implements ICartService {
     @Override
     public RestResponse<ListResponse<GetListCartItemResponse>> getCartByUser(Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
         String userId = "";
-        Cart cart = cartRepository.findByUserId(userId)
+        UserProfile user = userProfileRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "user", userId));
+        Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cart", userId));
 
         CartItemSpecification cartItemSpecification = new CartItemSpecification();
@@ -88,7 +94,10 @@ public class CartServiceImpl implements ICartService {
     @Override
     public RestResponse<CreateCartItemResponse> createCartItem(CreateCartItemRequest request) {
         String userId = "";
-        Cart cart = cartRepository.findByUserId(userId)
+        UserProfile user = userProfileRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "user", userId));
+        Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cart", userId));
 
         CartItem cartItem = cartItemRepository.findByCartAndVariantId(cart, request.variantId());
@@ -111,7 +120,10 @@ public class CartServiceImpl implements ICartService {
             throw new InvalidRequestException("Unexpected quantity, it must be a positive number");
 
         String userId = "";
-        Cart cart = cartRepository.findByUserId(userId)
+        UserProfile user = userProfileRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "user", userId));
+        Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cart", userId));
 
         CartItem cartItem = cart.getCartItems()
@@ -127,7 +139,10 @@ public class CartServiceImpl implements ICartService {
     @Override
     public void deleteOneCartItem(Long cartItemId) {
         String userId = "";
-        Cart cart = cartRepository.findByUserId(userId)
+        UserProfile user = userProfileRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "user", userId));
+        Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cart", userId));
 
         CartItem cartItem = cart.getCartItems()
@@ -141,7 +156,10 @@ public class CartServiceImpl implements ICartService {
     @Override
     public void deleteListCartItem(List<Long> ids) {
         String userId = "";
-        Cart cart = cartRepository.findByUserId(userId)
+        UserProfile user = userProfileRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "user", userId));
+        Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cart", userId));
 
         for (Long id : ids) {
@@ -152,6 +170,7 @@ public class CartServiceImpl implements ICartService {
 
             cartItemRepository.delete(cartItem);
         }
+
     }
 
 }
