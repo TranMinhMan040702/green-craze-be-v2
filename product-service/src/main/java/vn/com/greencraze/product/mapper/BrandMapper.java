@@ -27,6 +27,6 @@ public interface BrandMapper {
     CreateBrandResponse brandToCreateBrandResponse(Brand brand);
 
     @Mapping(target = "image", ignore = true)
-    Brand updateBrandFromUpdateUnitRequest(@MappingTarget Brand brand, UpdateBrandRequest updateBrandRequest);
+    Brand updateBrandFromUpdateBrandRequest(@MappingTarget Brand brand, UpdateBrandRequest updateBrandRequest);
 
 }

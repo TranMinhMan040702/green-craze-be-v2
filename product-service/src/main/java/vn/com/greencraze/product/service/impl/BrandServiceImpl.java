@@ -68,7 +68,7 @@ public class BrandServiceImpl implements IBrandService {
     @Override
     public void updateBrand(Long id, UpdateBrandRequest request) {
         Brand brand = brandRepository.findById(id)
-                .map(b -> brandMapper.updateBrandFromUpdateUnitRequest(b, request))
+                .map(b -> brandMapper.updateBrandFromUpdateBrandRequest(b, request))
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
         if (request.image() != null) {
             brand.setImage(uploadService.uploadFile(request.image()));

@@ -7,12 +7,12 @@ CREATE TABLE `role`
     created_by VARCHAR(255) NULL,
     updated_by VARCHAR(255) NULL,
     name       VARCHAR(255) NOT NULL,
-    status     BIT(1)       NOT NULL,
+    code       VARCHAR(255) NOT NULL,
     CONSTRAINT pk_role PRIMARY KEY (id)
 );
 
 ALTER TABLE `role`
-    ADD CONSTRAINT uc_role_name UNIQUE (name);
+    ADD CONSTRAINT uc_role_code UNIQUE (code);
 
 # Identity
 CREATE TABLE identity
@@ -24,7 +24,7 @@ CREATE TABLE identity
     updated_by VARCHAR(255) NULL,
     username   VARCHAR(255) NOT NULL,
     password   VARCHAR(255) NOT NULL,
-    status     BIT(1)       NOT NULL,
+    status     VARCHAR(255) NOT NULL,
     CONSTRAINT pk_identity PRIMARY KEY (id)
 );
 
@@ -52,9 +52,9 @@ CREATE TABLE identity_token
     updated_at  datetime     NOT NULL,
     created_by  VARCHAR(255) NULL,
     updated_by  VARCHAR(255) NULL,
-    token       VARCHAR(255) NOT NULL,
+    token       VARCHAR(255) NULL,
     type        VARCHAR(255) NOT NULL,
-    expired_at  datetime     NOT NULL,
+    expired_at  datetime     NULL,
     identity_id VARCHAR(255) NOT NULL,
     CONSTRAINT pk_identity_token PRIMARY KEY (id)
 );

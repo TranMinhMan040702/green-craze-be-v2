@@ -1,0 +1,28 @@
+package vn.com.greencraze.auth.util;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+import vn.com.greencraze.auth.dto.request.identity.GoogleAuthRequest;
+import vn.com.greencraze.auth.service.IAuthService;
+
+@Component
+@RequiredArgsConstructor
+public class TestRunner implements CommandLineRunner {
+
+    private final ApplicationContext context;
+    private final IAuthService authService;
+
+    @Override
+    public void run(String... args) throws Exception {
+        context.getApplicationName();
+
+        GoogleAuthRequest googleAuthRequest = GoogleAuthRequest.builder()
+                .googleToken("eyJhbGciOiJSUzI1NiIsImtpZCI6IjBlNzJkYTFkZjUwMWNhNmY3NTZiZjEwM2ZkN2M3MjAyOTQ3NzI1MDYiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI4NDE2NDIxNjE3MjYtdjNtYnBkcTE3ZWFqYWtoOGR1YXRxN2t2YWg2NWxrODMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI4NDE2NDIxNjE3MjYtdjNtYnBkcTE3ZWFqYWtoOGR1YXRxN2t2YWg2NWxrODMuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMDg0Mzg2Mzg4NTYzMzU2MzQwNjIiLCJlbWFpbCI6Im1hbnRtMDQwNzAyQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJuYmYiOjE3MDA4ODIyMDcsIm5hbWUiOiJUcmFuIE1pbmggTWFuIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0pkemxnNm5FOUl0UnRhSjFhSm1kelBjcjRCanlHV2ppZTRLbWlrNG80PXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IlRyYW4gTWluaCIsImZhbWlseV9uYW1lIjoiTWFuIiwibG9jYWxlIjoiZW4iLCJpYXQiOjE3MDA4ODI1MDcsImV4cCI6MTcwMDg4NjEwNywianRpIjoiMDVjZWVmNWM2ODhlYTJjMDZmNDM1ZTVkMTFjOTE3MTYzN2EwNGIzMiJ9.T0-mzIInffpotlMBg6O7nTT-50l9kmt0HQ7YjzaTayG9ta4gtQAM4JN3KnrOhEYV-0yq5YyHmfiJgDlEoRjy9qT8jcVTLCQ1e1KXF84fCGVzq0PbS14ll48XtI0YBtHbrJffpjRwPDVPj8MK_JiMX4AZyNSTEsty2PhTwq5pwNelMWqihDyS7AgA8ThlMRAnp4KJvNyvN6rscVVszrBNCzm1WT5w7NByMAPwFBI4BVN7jqhGQPFJTAvbs-CsTsIjaKD3WH0Ol9FhgweaH_i01mwZLBVLmquqDyqCLf3cNNIfhrAseFwSfZ8eB1ibQ7elUuuvCCQe0jToq5ak13zD0w")
+                .build();
+
+        authService.authenticateWithGoogle(googleAuthRequest);
+    }
+
+}

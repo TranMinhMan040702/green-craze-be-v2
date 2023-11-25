@@ -52,12 +52,12 @@ public class Role {
     @Column(name = "updated_by")
     private String updatedBy;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "status", nullable = false)
-    private Boolean status;
-
+    @Column(name = "code", nullable = false, unique = true)
+    private String code;
+    
     @ManyToMany(mappedBy = "roles")
     @Builder.Default
     private Set<Identity> identities = new HashSet<>();

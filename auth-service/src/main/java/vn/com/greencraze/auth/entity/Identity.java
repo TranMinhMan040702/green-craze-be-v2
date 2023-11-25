@@ -4,6 +4,9 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -21,6 +24,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import vn.com.greencraze.auth.enumeration.IdentityStatus;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -65,9 +69,10 @@ public class Identity {
     private String password;
 
     @Column(name = "status", nullable = false)
-    private Boolean status;
+    @Enumerated(EnumType.STRING)
+    private IdentityStatus status;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "identity_role",
             joinColumns = @JoinColumn(name = "identity_id", nullable = false),

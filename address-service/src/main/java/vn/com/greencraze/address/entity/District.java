@@ -36,10 +36,10 @@ public class District {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "code", nullable = false, unique = true)
+    @Column(name = "code", nullable = false)
     private String code;
 
     @ManyToOne(fetch = FetchType.LAZY)
