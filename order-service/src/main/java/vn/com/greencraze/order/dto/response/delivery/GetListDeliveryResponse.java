@@ -3,6 +3,7 @@ package vn.com.greencraze.order.dto.response.delivery;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.lang.Nullable;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 public record GetListDeliveryResponse(
@@ -16,7 +17,8 @@ public record GetListDeliveryResponse(
         @Schema(nullable = true)
         String updatedBy,
         String name,
-        String code,
+        String description,
+        BigDecimal price,
         String image,
         Boolean status
 ) {

@@ -67,7 +67,7 @@ public class Transaction {
     private Instant completedAt;
 
     @Column(name = "paypal_order_id", nullable = false)
-    private Long paypalOrderId;
+    private String paypalOrderId;
 
     @Column(name = "paypal_order_status", nullable = false)
     private String paypalOrderStatus;

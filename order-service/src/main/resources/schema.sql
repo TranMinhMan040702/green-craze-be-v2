@@ -1,15 +1,16 @@
 # Delivery
 CREATE TABLE delivery
 (
-    id         BIGINT AUTO_INCREMENT NOT NULL,
-    created_at datetime              NOT NULL,
-    updated_at datetime              NOT NULL,
-    created_by VARCHAR(255)          NULL,
-    updated_by VARCHAR(255)          NULL,
-    name       VARCHAR(255)          NOT NULL,
-    code       VARCHAR(255)          NOT NULL,
-    image      TEXT                  NOT NULL,
-    status     BIT(1)                NOT NULL,
+    id          BIGINT AUTO_INCREMENT NOT NULL,
+    created_at  datetime              NOT NULL,
+    updated_at  datetime              NOT NULL,
+    created_by  VARCHAR(255)          NULL,
+    updated_by  VARCHAR(255)          NULL,
+    name        VARCHAR(255)          NOT NULL,
+    description VARCHAR(255)          NOT NULL,
+    price       DECIMAL               NOT NULL,
+    image       TEXT                  NOT NULL,
+    status      BIT(1)                NOT NULL,
     CONSTRAINT pk_delivery PRIMARY KEY (id)
 );
 
@@ -117,7 +118,7 @@ CREATE TABLE transaction
     paid_at             datetime              NOT NULL,
     total_pay           DECIMAL               NOT NULL,
     completed_at        datetime              NOT NULL,
-    paypal_order_id     BIGINT                NOT NULL,
+    paypal_order_id     VARCHAR(255)          NOT NULL,
     paypal_order_status VARCHAR(255)          NOT NULL,
     order_id            BIGINT                NOT NULL,
     CONSTRAINT pk_transaction PRIMARY KEY (id)
