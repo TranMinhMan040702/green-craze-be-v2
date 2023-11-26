@@ -38,7 +38,7 @@ public class IdentityToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    private String id;
+    private Long id;
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -56,14 +56,14 @@ public class IdentityToken {
     @Column(name = "updated_by")
     private String updatedBy;
 
-    @Column(name = "token", nullable = false)
+    @Column(name = "token")
     private String token;
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)
     private TokenType type;
 
-    @Column(name = "expired_at", nullable = false)
+    @Column(name = "expired_at")
     private Instant expiredAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
