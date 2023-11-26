@@ -41,7 +41,7 @@ CREATE TABLE address
     updated_at  datetime              NOT NULL,
     created_by  VARCHAR(255)          NULL,
     updated_by  VARCHAR(255)          NULL,
-    user_id     BIGINT                NOT NULL,
+    user_id     VARCHAR(255)          NOT NULL,
     province_id BIGINT                NOT NULL,
     district_id BIGINT                NOT NULL,
     ward_id     BIGINT                NOT NULL,
@@ -50,6 +50,7 @@ CREATE TABLE address
     email       VARCHAR(255)          NULL,
     phone       VARCHAR(255)          NOT NULL,
     is_default  BIT(1)                NOT NULL,
+    status      BIT(1)                NOT NULL,
     CONSTRAINT pk_address PRIMARY KEY (id)
 );
 

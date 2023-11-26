@@ -1,15 +1,16 @@
 # Delivery
 CREATE TABLE delivery
 (
-    id         BIGINT AUTO_INCREMENT NOT NULL,
-    created_at datetime              NOT NULL,
-    updated_at datetime              NOT NULL,
-    created_by VARCHAR(255)          NULL,
-    updated_by VARCHAR(255)          NULL,
-    name       VARCHAR(255)          NOT NULL,
-    code       VARCHAR(255)          NOT NULL,
-    image      TEXT                  NOT NULL,
-    status     BIT(1)                NOT NULL,
+    id          BIGINT AUTO_INCREMENT NOT NULL,
+    created_at  datetime              NOT NULL,
+    updated_at  datetime              NOT NULL,
+    created_by  VARCHAR(255)          NULL,
+    updated_by  VARCHAR(255)          NULL,
+    name        VARCHAR(255)          NOT NULL,
+    description VARCHAR(255)          NOT NULL,
+    price       DECIMAL               NOT NULL,
+    image       TEXT                  NOT NULL,
+    status      BIT(1)                NOT NULL,
     CONSTRAINT pk_delivery PRIMARY KEY (id)
 );
 
@@ -65,7 +66,7 @@ CREATE TABLE `order`
     updated_at             datetime              NOT NULL,
     created_by             VARCHAR(255)          NULL,
     updated_by             VARCHAR(255)          NULL,
-    user_id                BIGINT                NOT NULL,
+    user_id                VARCHAR(255)          NOT NULL,
     address_id             BIGINT                NOT NULL,
     total_amount           DECIMAL               NOT NULL,
     order_cancel_reason_id BIGINT                NULL,
@@ -75,7 +76,6 @@ CREATE TABLE `order`
     delivery_method        VARCHAR(255)          NOT NULL,
     shipping_cost          DECIMAL               NOT NULL,
     payment_status         BIT(1)                NOT NULL,
-    payment_type           VARCHAR(255)          NOT NULL,
     tax                    DOUBLE                NOT NULL,
     status                 VARCHAR(255)          NOT NULL,
     CONSTRAINT pk_order PRIMARY KEY (id)
@@ -114,11 +114,11 @@ CREATE TABLE transaction
     updated_at          datetime              NOT NULL,
     created_by          VARCHAR(255)          NULL,
     updated_by          VARCHAR(255)          NULL,
-    delivery_method     VARCHAR(255)          NOT NULL,
+    payment_method      VARCHAR(255)          NOT NULL,
     paid_at             datetime              NOT NULL,
     total_pay           DECIMAL               NOT NULL,
     completed_at        datetime              NOT NULL,
-    paypal_order_id     BIGINT                NOT NULL,
+    paypal_order_id     VARCHAR(255)          NOT NULL,
     paypal_order_status VARCHAR(255)          NOT NULL,
     order_id            BIGINT                NOT NULL,
     CONSTRAINT pk_transaction PRIMARY KEY (id)

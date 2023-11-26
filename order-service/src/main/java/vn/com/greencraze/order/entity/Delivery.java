@@ -18,6 +18,7 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
@@ -53,8 +54,11 @@ public class Delivery {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @Column(name = "code", nullable = false, unique = true)
-    private String code;
+    @Column(name = "description", nullable = false)
+    private String description;
+
+    @Column(name = "price", nullable = false)
+    private BigDecimal price;
 
     @Column(name = "image", nullable = false, columnDefinition = "TEXT")
     private String image;
