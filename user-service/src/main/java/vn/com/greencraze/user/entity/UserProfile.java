@@ -6,8 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -16,11 +16,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import vn.com.greencraze.user.entity.view.IdentityView;
 import vn.com.greencraze.user.enumeration.GenderType;
 
 import java.time.Instant;
@@ -37,7 +39,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class UserProfile {
     @Id
-    @GeneratedValue
+    @UuidGenerator
     @Column(name = "id", nullable = false)
     private String id;
 
@@ -57,8 +59,12 @@ public class UserProfile {
     @Column(name = "updated_by")
     private String updatedBy;
 
-    @Column(name = "identity_id", nullable = false, unique = true)
-    private String identityId;
+    //    @Column(name = "identity_id", nullable = false, unique = true)
+    //    private String identityId;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "identity_id", referencedColumnName = "id")
+    private IdentityView identity;
 
     @Column(name = "first_name", nullable = false)
     private String firstName;
@@ -69,7 +75,7 @@ public class UserProfile {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "phone", nullable = false, unique = true)
+    @Column(name = "phone", unique = true)
     private String phone;
 
     @Column(name = "dob")
@@ -82,13 +88,10 @@ public class UserProfile {
     @Column(name = "avatar", columnDefinition = "TEXT")
     private String avatar;
 
-    @Column(name = "status", nullable = false)
-    private Boolean status;
-
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Staff staff;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Cart cart;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

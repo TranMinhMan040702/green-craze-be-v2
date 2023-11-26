@@ -10,11 +10,10 @@ CREATE TABLE user_profile
     first_name  VARCHAR(255) NOT NULL,
     last_name   VARCHAR(255) NOT NULL,
     email       VARCHAR(255) NOT NULL,
-    phone       VARCHAR(255) NOT NULL,
+    phone       VARCHAR(255) NULL,
     dob         datetime     NULL,
     gender      VARCHAR(255) NOT NULL,
     avatar      TEXT         NULL,
-    status      BIT(1)       NOT NULL,
     CONSTRAINT pk_user_profile PRIMARY KEY (id)
 );
 
@@ -96,8 +95,8 @@ CREATE TABLE review
     content       TEXT                  NOT NULL,
     rating        INT                   NOT NULL,
     image         TEXT                  NULL,
-    reply         TEXT                  NOT NULL,
-    status        BIT(1)                NOT NULL,
+    reply         TEXT                  NULL,
+    status        BIT(1)                NULL,
     user_id       VARCHAR(255)          NOT NULL,
     CONSTRAINT pk_review PRIMARY KEY (id)
 );
@@ -108,12 +107,12 @@ ALTER TABLE review
 # UserFollowProduct
 CREATE TABLE user_follow_product
 (
-    id         BIGINT       NOT NULL,
-    created_at datetime     NOT NULL,
-    updated_at datetime     NOT NULL,
-    created_by VARCHAR(255) NULL,
-    updated_by VARCHAR(255) NULL,
-    user_id    VARCHAR(255) NOT NULL,
+    id         BIGINT AUTO_INCREMENT NOT NULL,
+    created_at datetime              NOT NULL,
+    updated_at datetime              NOT NULL,
+    created_by VARCHAR(255)          NULL,
+    updated_by VARCHAR(255)          NULL,
+    user_id    VARCHAR(255)          NOT NULL,
     CONSTRAINT pk_user_follow_product PRIMARY KEY (id)
 );
 
@@ -123,13 +122,12 @@ ALTER TABLE user_follow_product
 # UserFollowPost
 CREATE TABLE user_follow_post
 (
-    id         BIGINT       NOT NULL,
-    created_at datetime     NOT NULL,
-    updated_at datetime     NOT NULL,
-    created_by VARCHAR(255) NULL,
-    updated_by VARCHAR(255) NULL,
-    user_id    VARCHAR(255) NOT NULL,
-    product_id BIGINT       NOT NULL,
+    id         BIGINT AUTO_INCREMENT NOT NULL,
+    created_at datetime              NOT NULL,
+    updated_at datetime              NOT NULL,
+    created_by VARCHAR(255)          NULL,
+    updated_by VARCHAR(255)          NULL,
+    user_id    VARCHAR(255)          NOT NULL,
     CONSTRAINT pk_user_follow_post PRIMARY KEY (id)
 );
 

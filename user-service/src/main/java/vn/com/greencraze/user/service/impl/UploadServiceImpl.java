@@ -13,6 +13,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class UploadServiceImpl implements IUploadService {
+
     private final Cloudinary cloudinary;
 
     @Override
@@ -27,4 +28,5 @@ public class UploadServiceImpl implements IUploadService {
             throw new RuntimeException("Image upload fail");
         }
     }
+
 }
