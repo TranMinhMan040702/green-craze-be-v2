@@ -11,22 +11,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.auth.config.property.AppProperties;
 import vn.com.greencraze.auth.config.security.JwtManager;
-import vn.com.greencraze.auth.dto.request.identity.AuthenticateRequest;
-import vn.com.greencraze.auth.dto.request.identity.ForgotPasswordRequest;
-import vn.com.greencraze.auth.dto.request.identity.GoogleAuthRequest;
-import vn.com.greencraze.auth.dto.request.identity.RefreshTokenRequest;
-import vn.com.greencraze.auth.dto.request.identity.RegisterRequest;
-import vn.com.greencraze.auth.dto.request.identity.ResendOTPRequest;
-import vn.com.greencraze.auth.dto.request.identity.ResetPasswordRequest;
-import vn.com.greencraze.auth.dto.request.identity.VerifyOTPRequest;
-import vn.com.greencraze.auth.dto.response.identity.AuthenticateResponse;
-import vn.com.greencraze.auth.dto.response.identity.ForgotPasswordResponse;
-import vn.com.greencraze.auth.dto.response.identity.GoogleAuthResponse;
-import vn.com.greencraze.auth.dto.response.identity.RefreshTokenResponse;
-import vn.com.greencraze.auth.dto.response.identity.RegisterResponse;
-import vn.com.greencraze.auth.dto.response.identity.ResendOTPResponse;
-import vn.com.greencraze.auth.dto.response.identity.ResetPasswordResponse;
-import vn.com.greencraze.auth.dto.response.identity.VerifyOTPResponse;
+import vn.com.greencraze.auth.dto.request.auth.AuthenticateRequest;
+import vn.com.greencraze.auth.dto.request.auth.ForgotPasswordRequest;
+import vn.com.greencraze.auth.dto.request.auth.GoogleAuthRequest;
+import vn.com.greencraze.auth.dto.request.auth.RefreshTokenRequest;
+import vn.com.greencraze.auth.dto.request.auth.RegisterRequest;
+import vn.com.greencraze.auth.dto.request.auth.ResendOTPRequest;
+import vn.com.greencraze.auth.dto.request.auth.ResetPasswordRequest;
+import vn.com.greencraze.auth.dto.request.auth.VerifyOTPRequest;
+import vn.com.greencraze.auth.dto.response.auth.AuthenticateResponse;
+import vn.com.greencraze.auth.dto.response.auth.ForgotPasswordResponse;
+import vn.com.greencraze.auth.dto.response.auth.GoogleAuthResponse;
+import vn.com.greencraze.auth.dto.response.auth.RefreshTokenResponse;
+import vn.com.greencraze.auth.dto.response.auth.RegisterResponse;
+import vn.com.greencraze.auth.dto.response.auth.ResendOTPResponse;
+import vn.com.greencraze.auth.dto.response.auth.ResetPasswordResponse;
+import vn.com.greencraze.auth.dto.response.auth.VerifyOTPResponse;
 import vn.com.greencraze.auth.entity.Identity;
 import vn.com.greencraze.auth.entity.IdentityToken;
 import vn.com.greencraze.auth.enumeration.IdentityStatus;
@@ -87,6 +87,7 @@ public class AuthServiceImpl implements IAuthService {
 
         if (identityToken == null) {
             identity.getIdentityTokens().add(IdentityToken.builder()
+                    .identity(identity)
                     .token(refreshToken)
                     .expiredAt(refreshTokenExpiredTime)
                     .type(TokenType.REFRESH_TOKEN)
@@ -189,9 +190,7 @@ public class AuthServiceImpl implements IAuthService {
         if (identityOption.isPresent()) {
             identity = identityOption.get();
             switch (identity.getStatus()) {
-                case INACTIVE -> {
-                    // TODO: create new password
-                }
+                case INACTIVE -> throw new InactivatedUserException();
                 case UNCONFIRMED -> throw new UnconfirmedUserException();
                 case ACTIVE -> throw new ExistedUserException();
                 case BLOCK -> throw new BlockedUserException();

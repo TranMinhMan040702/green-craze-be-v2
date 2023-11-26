@@ -47,15 +47,15 @@ ALTER TABLE identity_role
 # IdentityToken
 CREATE TABLE identity_token
 (
-    id          VARCHAR(255) NOT NULL,
-    created_at  datetime     NOT NULL,
-    updated_at  datetime     NOT NULL,
-    created_by  VARCHAR(255) NULL,
-    updated_by  VARCHAR(255) NULL,
-    token       VARCHAR(255) NULL,
-    type        VARCHAR(255) NOT NULL,
-    expired_at  datetime     NULL,
-    identity_id VARCHAR(255) NOT NULL,
+    id          BIGINT AUTO_INCREMENT NOT NULL,
+    created_at  datetime              NOT NULL,
+    updated_at  datetime              NOT NULL,
+    created_by  VARCHAR(255)          NULL,
+    updated_by  VARCHAR(255)          NULL,
+    token       VARCHAR(255)          NULL,
+    type        VARCHAR(255)          NOT NULL,
+    expired_at  datetime              NULL,
+    identity_id VARCHAR(255)          NOT NULL,
     CONSTRAINT pk_identity_token PRIMARY KEY (id)
 );
 

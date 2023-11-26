@@ -13,23 +13,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import vn.com.greencraze.auth.dto.request.identity.AuthenticateRequest;
-import vn.com.greencraze.auth.dto.request.identity.ForgotPasswordRequest;
-import vn.com.greencraze.auth.dto.request.identity.GoogleAuthRequest;
-import vn.com.greencraze.auth.dto.request.identity.RefreshTokenRequest;
-import vn.com.greencraze.auth.dto.request.identity.RegisterRequest;
-import vn.com.greencraze.auth.dto.request.identity.ResendOTPRequest;
-import vn.com.greencraze.auth.dto.request.identity.ResetPasswordRequest;
-import vn.com.greencraze.auth.dto.request.identity.VerifyOTPRequest;
-import vn.com.greencraze.auth.dto.response.identity.AuthenticateResponse;
-import vn.com.greencraze.auth.dto.response.identity.ForgotPasswordResponse;
-import vn.com.greencraze.auth.dto.response.identity.GoogleAuthResponse;
-import vn.com.greencraze.auth.dto.response.identity.RefreshTokenResponse;
-import vn.com.greencraze.auth.dto.response.identity.RegisterResponse;
-import vn.com.greencraze.auth.dto.response.identity.ResendOTPResponse;
-import vn.com.greencraze.auth.dto.response.identity.ResetPasswordResponse;
-import vn.com.greencraze.auth.dto.response.identity.VerifyOTPResponse;
+import vn.com.greencraze.auth.dto.request.auth.AuthenticateRequest;
+import vn.com.greencraze.auth.dto.request.auth.ForgotPasswordRequest;
+import vn.com.greencraze.auth.dto.request.auth.GoogleAuthRequest;
+import vn.com.greencraze.auth.dto.request.auth.RefreshTokenRequest;
+import vn.com.greencraze.auth.dto.request.auth.RegisterRequest;
+import vn.com.greencraze.auth.dto.request.auth.ResendOTPRequest;
+import vn.com.greencraze.auth.dto.request.auth.ResetPasswordRequest;
+import vn.com.greencraze.auth.dto.request.auth.VerifyOTPRequest;
+import vn.com.greencraze.auth.dto.response.auth.AuthenticateResponse;
+import vn.com.greencraze.auth.dto.response.auth.ForgotPasswordResponse;
+import vn.com.greencraze.auth.dto.response.auth.GoogleAuthResponse;
+import vn.com.greencraze.auth.dto.response.auth.RefreshTokenResponse;
+import vn.com.greencraze.auth.dto.response.auth.RegisterResponse;
+import vn.com.greencraze.auth.dto.response.auth.ResendOTPResponse;
+import vn.com.greencraze.auth.dto.response.auth.ResetPasswordResponse;
+import vn.com.greencraze.auth.dto.response.auth.VerifyOTPResponse;
 import vn.com.greencraze.auth.service.IAuthService;
+import vn.com.greencraze.auth.service.ISystemService;
 import vn.com.greencraze.commons.api.RestResponse;
 
 import java.io.IOException;
@@ -42,6 +43,17 @@ import java.security.GeneralSecurityException;
 public class AuthController {
 
     private final IAuthService authService;
+    private final ISystemService systemService;
+
+    @PostMapping(
+            value = "/account-admin"
+    )
+    public ResponseEntity<Void> createAccountAdmin() {
+        systemService.createAccountAdmin();
+
+        return ResponseEntity.noContent().build();
+    }
+
 
     @PostMapping(
             value = "/login",

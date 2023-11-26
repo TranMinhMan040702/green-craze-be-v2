@@ -3,7 +3,6 @@ package vn.com.greencraze.auth.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
@@ -12,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -32,7 +32,7 @@ import java.util.Set;
 @AllArgsConstructor
 public class Role {
     @Id
-    @GeneratedValue
+    @UuidGenerator
     @Column(name = "id", nullable = false)
     private String id;
 
@@ -57,7 +57,7 @@ public class Role {
 
     @Column(name = "code", nullable = false, unique = true)
     private String code;
-    
+
     @ManyToMany(mappedBy = "roles")
     @Builder.Default
     private Set<Identity> identities = new HashSet<>();

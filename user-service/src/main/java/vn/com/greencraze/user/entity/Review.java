@@ -71,10 +71,10 @@ public class Review {
     @Column(name = "image", columnDefinition = "TEXT")
     private String image;
 
-    @Column(name = "reply", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "reply", columnDefinition = "TEXT")
     private String reply;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     private Boolean status;
 
     @ManyToOne(fetch = FetchType.LAZY)

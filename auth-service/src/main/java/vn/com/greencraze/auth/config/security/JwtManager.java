@@ -9,8 +9,11 @@ import org.springframework.stereotype.Component;
 import vn.com.greencraze.auth.config.property.AppProperties;
 import vn.com.greencraze.auth.entity.Identity;
 import vn.com.greencraze.auth.entity.Role;
+import vn.com.greencraze.auth.entity.view.UserProfileView;
 import vn.com.greencraze.auth.exception.TokenCreationException;
 import vn.com.greencraze.auth.exception.TokenValidationException;
+import vn.com.greencraze.auth.repository.view.UserProfileViewRepository;
+import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -21,9 +24,12 @@ import java.util.stream.Collectors;
 public class JwtManager {
 
     private final AppProperties appProperties;
+    private final UserProfileViewRepository userProfileViewRepository;
 
     public String generateToken(@NotNull Identity identity) {
         try {
+            UserProfileView userProfileView = userProfileViewRepository.findByIdentity(identity)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "identityId", ""));
             Instant now = Instant.now();
 
             return JWT.create()
@@ -32,7 +38,7 @@ public class JwtManager {
                     .withIssuedAt(now)
                     .withExpiresAt(now.plusMillis(appProperties.accessTokenExpirationMillis()))
                     .withJWTId(UUID.randomUUID().toString())
-                    .withClaim("userId", identity.getId())
+                    .withClaim("userId", userProfileView.getId())
                     .withClaim("email", identity.getUsername())
                     .withClaim(
                             "roles",
