@@ -115,7 +115,7 @@ public class CartServiceImpl implements ICartService {
     }
 
     @Override
-    public void updateCartItem(UpdateCartItemRequest request) {
+    public void updateCartItem(Long id, UpdateCartItemRequest request) {
         if (request.quantity() <= 0)
             throw new InvalidRequestException("Unexpected quantity, it must be a positive number");
 
@@ -129,7 +129,7 @@ public class CartServiceImpl implements ICartService {
         CartItem cartItem = cart.getCartItems()
                 .stream().filter(x -> x.getCart().getId() == cart.getId())
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cartItem", request.cartItemId()));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cartItem", id));
 
         cartItem.setQuantity(request.quantity() + cartItem.getQuantity());
 

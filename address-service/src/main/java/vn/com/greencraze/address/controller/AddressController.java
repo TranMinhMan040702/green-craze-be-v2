@@ -95,7 +95,6 @@ public class AddressController {
     public ResponseEntity<RestResponse<CreateAddressResponse>> createAddress(
             @Valid CreateAddressRequest request
     ) {
-        request = request.setUserId("");
         RestResponse<CreateAddressResponse> response = addressService.createAddress(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
@@ -108,8 +107,7 @@ public class AddressController {
     public ResponseEntity<Void> updateAddress(
             @PathVariable Long id, @Valid UpdateAddressRequest request
     ) {
-        request = request.setIdAndUserId(id, "");
-        addressService.updateAddress(request);
+        addressService.updateAddress(id, request);
         return ResponseEntity.noContent().build();
     }
 

@@ -144,7 +144,8 @@ public class AddressServiceImpl implements IAddressService {
     }
 
     @Override
-    public void updateAddress(UpdateAddressRequest request) {
+    public void updateAddress(Long id, UpdateAddressRequest request) {
+        String userId = "";
         Province province = provinceRepository.findById(request.provinceId())
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "provinceId", request.provinceId()));
         District district = districtRepository.findById(request.districtId())
@@ -155,9 +156,9 @@ public class AddressServiceImpl implements IAddressService {
         if (ward.getDistrict().getId() != district.getId() || district.getProvince().getId() != province.getId())
             throw new InvalidRequestException("Cannot identify combined address, may be unexpected provinceId, districtId, wardId");
 
-        Address address = addressRepository.findByIdAndUserId(request.id(), request.userId())
+        Address address = addressRepository.findByIdAndUserId(id, userId)
                 .map(a -> addressMapper.updateAddressFromUpdateAddressRequest(a, request))
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", request.id()));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
 
         addressRepository.save(address);
     }

@@ -102,8 +102,7 @@ public class ReviewController {
     public ResponseEntity<Void> updateReview(
             @PathVariable Long id, @Valid UpdateReviewRequest request
     ) {
-        request = request.setId(id);
-        reviewService.updateReview(request);
+        reviewService.updateReview(id, request);
 
         return ResponseEntity.noContent().build();
     }
@@ -125,8 +124,7 @@ public class ReviewController {
     public ResponseEntity<Void> replyReview(
             @PathVariable Long id, @Valid ReplyReviewRequest request
     ) {
-        request = request.setId(id);
-        reviewService.replyReview(request);
+        reviewService.replyReview(id, request);
 
         return ResponseEntity.noContent().build();
     }

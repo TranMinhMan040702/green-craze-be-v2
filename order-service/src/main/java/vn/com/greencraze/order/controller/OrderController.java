@@ -70,7 +70,7 @@ public class OrderController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a list of user order")
     public ResponseEntity<RestResponse<List<GetListOrderResponse>>> getTop5OrderLatest() {
-        return ResponseEntity.ok(orderService.getTop5OrderLastest());
+        return ResponseEntity.ok(orderService.getTop5OrderLatest());
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -106,8 +106,7 @@ public class OrderController {
     public ResponseEntity<Void> updateOrder(
             @PathVariable Long id, @Valid UpdateOrderRequest request
     ) {
-        request = request.setId(id);
-        orderService.updateOrder(request);
+        orderService.updateOrder(id, request);
 
         return ResponseEntity.noContent().build();
     }
@@ -118,8 +117,7 @@ public class OrderController {
     public ResponseEntity<Void> completePaypalOrder(
             @PathVariable Long id, @Valid CompletePaypalOrderRequest request
     ) {
-        request = request.setId(id);
-        orderService.completePaypalOrder(request);
+        orderService.completePaypalOrder(id, request);
 
         return ResponseEntity.noContent().build();
     }

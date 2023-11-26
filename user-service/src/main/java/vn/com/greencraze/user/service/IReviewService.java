@@ -26,9 +26,9 @@ public interface IReviewService {
 
     RestResponse<CreateReviewResponse> createReview(CreateReviewRequest request);
 
-    void updateReview(UpdateReviewRequest request);
+    void updateReview(Long id, UpdateReviewRequest request);
 
-    void replyReview(ReplyReviewRequest request);
+    void replyReview(Long id, ReplyReviewRequest request);
 
     void deleteOneReview(Long id);
 

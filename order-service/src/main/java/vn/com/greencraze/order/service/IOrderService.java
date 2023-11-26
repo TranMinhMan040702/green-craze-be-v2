@@ -20,7 +20,7 @@ public interface IOrderService {
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all, String status
     );
 
-    RestResponse<List<GetListOrderResponse>> getTop5OrderLastest();
+    RestResponse<List<GetListOrderResponse>> getTop5OrderLatest();
 
     RestResponse<GetOneOrderResponse> getOneOrder(Long id);
 
@@ -28,7 +28,7 @@ public interface IOrderService {
 
     RestResponse<CreateOrderResponse> createOrder(CreateOrderRequest request);
 
-    void updateOrder(UpdateOrderRequest request);
+    void updateOrder(Long id, UpdateOrderRequest request);
 
-    void completePaypalOrder(CompletePaypalOrderRequest request);
+    void completePaypalOrder(Long id, CompletePaypalOrderRequest request);
 }

@@ -17,7 +17,7 @@ public interface ICartService {
 
     RestResponse<CreateCartItemResponse> createCartItem(CreateCartItemRequest request);
 
-    void updateCartItem(UpdateCartItemRequest request);
+    void updateCartItem(Long id, UpdateCartItemRequest request);
 
     void deleteOneCartItem(Long cartItemId);
 

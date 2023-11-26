@@ -129,10 +129,10 @@ public class ReviewServiceImpl implements IReviewService {
 
     @Transactional(rollbackOn = {ResourceNotFoundException.class})
     @Override
-    public void updateReview(UpdateReviewRequest request) {
-        Review review = reviewRepository.findById(request.id())
+    public void updateReview(Long id, UpdateReviewRequest request) {
+        Review review = reviewRepository.findById(id)
                 .map(b -> reviewMapper.updateReviewRequestToReview(b, request))
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", request.id()));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
 
         if (request.image() != null) {
             review.setImage(uploadService.uploadFile(request.image()));
@@ -145,9 +145,9 @@ public class ReviewServiceImpl implements IReviewService {
     }
 
     @Override
-    public void replyReview(ReplyReviewRequest request) {
-        Review review = reviewRepository.findById(request.id())
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", request.id()));
+    public void replyReview(Long id, ReplyReviewRequest request) {
+        Review review = reviewRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
 
         review.setReply(request.reply());
 

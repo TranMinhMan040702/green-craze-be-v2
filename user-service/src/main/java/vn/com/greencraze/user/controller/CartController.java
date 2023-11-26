@@ -75,7 +75,7 @@ public class CartController {
     public ResponseEntity<Void> updateAddress(
             @PathVariable Long id, @Valid UpdateCartItemRequest request
     ) {
-        cartService.updateCartItem(request);
+        cartService.updateCartItem(id, request);
 
         return ResponseEntity.noContent().build();
     }

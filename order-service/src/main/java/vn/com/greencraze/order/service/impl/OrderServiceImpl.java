@@ -92,7 +92,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public RestResponse<List<GetListOrderResponse>> getTop5OrderLastest() {
+    public RestResponse<List<GetListOrderResponse>> getTop5OrderLatest() {
         OrderSpecification orderSpecification = new OrderSpecification();
         Specification<Order> sortable = orderSpecification.sortable(false, "createdAt");
         Pageable pageable = PageRequest.of(1, 5);
@@ -229,9 +229,9 @@ public class OrderServiceImpl implements IOrderService {
 
     @Transactional(rollbackOn = {ResourceNotFoundException.class})
     @Override
-    public void updateOrder(UpdateOrderRequest request) {
-        Order order = orderRepository.findById(request.id())
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", request.id()));
+    public void updateOrder(Long id, UpdateOrderRequest request) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
         // check if current user is not in admin role --> find by userid and id --> in case user want to cancel order
 
         if (order.getStatus() == OrderStatus.NOT_PROCESSED
@@ -281,10 +281,10 @@ public class OrderServiceImpl implements IOrderService {
 
     @Transactional(rollbackOn = {ResourceNotFoundException.class})
     @Override
-    public void completePaypalOrder(CompletePaypalOrderRequest request) {
+    public void completePaypalOrder(Long id, CompletePaypalOrderRequest request) {
         String userId = "";
-        Order order = orderRepository.findByIdAndUserId(request.id(), userId)
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", request.id()));
+        Order order = orderRepository.findByIdAndUserId(id, userId)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
 
         Instant now = Instant.now();
 

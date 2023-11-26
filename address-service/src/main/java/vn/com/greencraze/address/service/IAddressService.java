@@ -30,7 +30,7 @@ public interface IAddressService {
 
     RestResponse<CreateAddressResponse> createAddress(CreateAddressRequest request);
 
-    void updateAddress(UpdateAddressRequest request);
+    void updateAddress(Long id, UpdateAddressRequest request);
 
     void deleteOneAddress(Long id);
 
