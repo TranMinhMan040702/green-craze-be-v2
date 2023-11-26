@@ -35,6 +35,7 @@ import java.util.List;
 @Tag(name = "review :: reviews")
 @RequiredArgsConstructor
 public class ReviewController {
+
     private final IReviewService reviewService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -144,4 +145,5 @@ public class ReviewController {
         reviewService.deleteListReview(ids);
         return ResponseEntity.noContent().build();
     }
+
 }

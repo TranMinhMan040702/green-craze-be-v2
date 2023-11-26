@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CartItemSpecification extends BaseSpecification<CartItem> {
+
     public Specification<CartItem> filterable(Cart cart) {
         List<Predicate> wheres = new ArrayList<>();
         return (root, query, cb) -> {
@@ -20,4 +21,5 @@ public class CartItemSpecification extends BaseSpecification<CartItem> {
             return cb.and(wheres.toArray(new Predicate[0]));
         };
     }
+
 }

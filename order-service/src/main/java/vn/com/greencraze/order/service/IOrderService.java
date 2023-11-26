@@ -12,6 +12,7 @@ import vn.com.greencraze.order.dto.response.order.GetOneOrderResponse;
 import java.util.List;
 
 public interface IOrderService {
+
     RestResponse<ListResponse<GetListOrderResponse>> getListOrder(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all, String status
     );
@@ -31,4 +32,5 @@ public interface IOrderService {
     void updateOrder(Long id, UpdateOrderRequest request);
 
     void completePaypalOrder(Long id, CompletePaypalOrderRequest request);
+
 }

@@ -34,6 +34,7 @@ import java.util.List;
 @Tag(name = "orderCancelReason :: OrderCancelReason")
 @RequiredArgsConstructor
 public class OrderCancelReasonController {
+
     private final IOrderCancelReasonService orderCancelReasonService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -98,4 +99,5 @@ public class OrderCancelReasonController {
 
         return ResponseEntity.noContent().build();
     }
+
 }

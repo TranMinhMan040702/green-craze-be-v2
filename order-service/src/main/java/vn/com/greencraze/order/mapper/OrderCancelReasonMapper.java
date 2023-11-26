@@ -13,6 +13,7 @@ import vn.com.greencraze.order.entity.OrderCancelReason;
 
 @Mapper(uses = {ReferenceMapper.class})
 public interface OrderCancelReasonMapper {
+
     @Mapping(target = "id", ignore = true)
     OrderCancelReason idToOrderCancelReason(String id);
 
@@ -25,4 +26,5 @@ public interface OrderCancelReasonMapper {
     CreateOrderCancelReasonResponse orderCancelReasonToCreateOrderCancelReasonResponse(OrderCancelReason orderCancelReason);
 
     OrderCancelReason updateOrderCancelReasonFromUpdateOrderCancelReasonRequest(@MappingTarget OrderCancelReason orderCancelReason, UpdateOrderCancelReasonRequest updateOrderCancelReasonRequest);
+
 }

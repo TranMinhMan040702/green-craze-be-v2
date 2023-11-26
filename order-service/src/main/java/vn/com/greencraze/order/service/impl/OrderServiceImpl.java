@@ -47,6 +47,7 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class OrderServiceImpl implements IOrderService {
+
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final PaymentMethodRepository paymentMethodRepository;
@@ -159,9 +160,9 @@ public class OrderServiceImpl implements IOrderService {
             // Variant
 
             OrderItem orderItem = orderItemMapper.createOrderItemRequestToOrderItem(oi);
-//            orderItem.setUnitPrice();
-//            orderItem.setTotalPrice();
-//            totalAmount = totalAmount.add();
+            //            orderItem.setUnitPrice();
+            //            orderItem.setTotalPrice();
+            //            totalAmount = totalAmount.add();
             orderItems.add(orderItem);
         }
         BigDecimal tax = totalAmount.multiply(OrderConstants.ORDER_TAX);
@@ -172,7 +173,7 @@ public class OrderServiceImpl implements IOrderService {
         transaction.setTotalPay(totalAmount);
 
         Order order = new Order();
-//        order.setCode();
+        //        order.setCode();
         order.setUserId(userId);
         order.setAddressId(addressId);
         order.setDeliveryMethod(delivery.getName());
@@ -299,4 +300,5 @@ public class OrderServiceImpl implements IOrderService {
         //pub message to create notify
         createNotify();
     }
+
 }

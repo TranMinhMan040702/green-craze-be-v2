@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OrderSpecification extends BaseSpecification<Order> {
+
     public Specification<Order> filterable(String userId, String status) {
         List<Predicate> wheres = new ArrayList<>();
         return (root, query, cb) -> {
@@ -23,4 +24,5 @@ public class OrderSpecification extends BaseSpecification<Order> {
             return cb.and(wheres.toArray(new Predicate[0]));
         };
     }
+
 }

@@ -22,6 +22,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements ITransactionService {
+
     private final TransactionRepository transactionRepository;
     private final TransactionMapper transactionMapper;
 
@@ -60,4 +61,5 @@ public class TransactionServiceImpl implements ITransactionService {
                 .map(RestResponse::ok)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
     }
+
 }

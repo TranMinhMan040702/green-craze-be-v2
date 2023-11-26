@@ -34,6 +34,7 @@ import java.util.List;
 @Tag(name = "order :: Order")
 @RequiredArgsConstructor
 public class OrderController {
+
     private final IOrderService orderService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -121,4 +122,5 @@ public class OrderController {
 
         return ResponseEntity.noContent().build();
     }
+
 }

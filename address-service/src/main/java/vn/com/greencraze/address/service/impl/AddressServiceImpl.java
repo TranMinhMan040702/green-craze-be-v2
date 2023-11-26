@@ -39,6 +39,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AddressServiceImpl implements IAddressService {
+
     private final AddressRepository addressRepository;
     private final ProvinceRepository provinceRepository;
     private final DistrictRepository districtRepository;
@@ -190,4 +191,5 @@ public class AddressServiceImpl implements IAddressService {
 
         addressRepository.save(address);
     }
+
 }

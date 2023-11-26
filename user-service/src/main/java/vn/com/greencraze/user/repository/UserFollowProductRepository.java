@@ -11,7 +11,9 @@ import java.util.Optional;
 
 public interface UserFollowProductRepository extends JpaRepository<UserFollowProduct, Long>,
         JpaSpecificationExecutor<UserFollowProduct> {
+
     Page<UserFollowProduct> findAllByUser(UserProfile user, Pageable pageable);
 
     Optional<UserFollowProduct> findByUserAndProductId(UserProfile user, Long productId);
+
 }

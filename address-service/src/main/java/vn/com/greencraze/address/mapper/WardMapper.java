@@ -11,6 +11,7 @@ import java.util.List;
 
 @Mapper(uses = {ReferenceMapper.class})
 public interface WardMapper {
+
     @Mapping(target = "id", ignore = true)
     Ward idToWard(String id);
 
@@ -19,4 +20,5 @@ public interface WardMapper {
     GetOneWardResponse wardToGetOneWardResponse(Ward ward);
 
     List<GetListWardResponse> listWardToGetListWardResponse(List<Ward> wards);
+
 }

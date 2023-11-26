@@ -23,6 +23,7 @@ import vn.com.greencraze.order.service.ITransactionService;
 @Tag(name = "transaction :: Transaction")
 @RequiredArgsConstructor
 public class TransactionController {
+
     private final ITransactionService transactionService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -38,7 +39,7 @@ public class TransactionController {
     ) {
         return ResponseEntity.ok(transactionService.getListTransaction(page, size, isSortAscending, columnName, search, all));
     }
-    
+
     @GetMapping(value = "/top5-tracsaction-latest", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a top 5 latest of transactions")
@@ -52,4 +53,5 @@ public class TransactionController {
     public ResponseEntity<RestResponse<GetOneTransactionResponse>> getOneTransaction(@PathVariable Long id) {
         return ResponseEntity.ok(transactionService.getOneTransaction(id));
     }
+
 }

@@ -13,6 +13,7 @@ import vn.com.greencraze.order.entity.Delivery;
 
 @Mapper(uses = {ReferenceMapper.class})
 public interface DeliveryMapper {
+
     @Mapping(target = "id", ignore = true)
     Delivery idToDelivery(String id);
 

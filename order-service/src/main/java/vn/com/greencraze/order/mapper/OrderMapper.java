@@ -9,9 +9,11 @@ import vn.com.greencraze.order.entity.Order;
 
 @Mapper(uses = {ReferenceMapper.class})
 public interface OrderMapper {
+
     GetListOrderResponse orderToGetListOrderResponse(Order order);
 
     GetOneOrderResponse orderToGetOneOrderResponse(Order order);
 
     CreateOrderResponse orderToCreateOrderResponse(Order order);
+
 }

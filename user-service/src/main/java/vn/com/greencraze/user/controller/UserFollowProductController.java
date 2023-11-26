@@ -28,6 +28,7 @@ import java.net.URI;
 @Tag(name = "userFollowProduct :: UserFollowProducts")
 @RequiredArgsConstructor
 public class UserFollowProductController {
+
     private final IUserFollowProductService userFollowProductService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

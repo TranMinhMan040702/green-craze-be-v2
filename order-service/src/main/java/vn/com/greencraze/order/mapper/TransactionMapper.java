@@ -9,6 +9,7 @@ import vn.com.greencraze.order.entity.Transaction;
 
 @Mapper(uses = {ReferenceMapper.class})
 public interface TransactionMapper {
+
     @Mapping(target = "id", ignore = true)
     Transaction idToTransaction(String id);
 
@@ -17,4 +18,5 @@ public interface TransactionMapper {
 
     @Mapping(source = "order.code", target = "orderCode")
     GetOneTransactionResponse transactionToGetOneTransactionResponse(Transaction transaction);
+
 }

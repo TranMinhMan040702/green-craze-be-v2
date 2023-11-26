@@ -34,6 +34,7 @@ import java.util.List;
 @Tag(name = "paymentMethod :: PaymentMethod")
 @RequiredArgsConstructor
 public class PaymentMethodController {
+
     private final IPaymentMethodService paymentMethodService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -95,7 +96,8 @@ public class PaymentMethodController {
     @Operation(summary = "Delete a list of paymentMethods")
     public ResponseEntity<Void> deleteListPaymentMethod(@RequestParam List<Long> ids) {
         paymentMethodService.deleteListPaymentMethod(ids);
-        
+
         return ResponseEntity.noContent().build();
     }
+
 }

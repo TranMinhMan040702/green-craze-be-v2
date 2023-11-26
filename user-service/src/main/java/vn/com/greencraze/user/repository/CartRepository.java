@@ -8,5 +8,7 @@ import vn.com.greencraze.user.entity.UserProfile;
 import java.util.Optional;
 
 public interface CartRepository extends JpaRepository<Cart, Long>, JpaSpecificationExecutor<Cart> {
+
     Optional<Cart> findByUser(UserProfile user);
+
 }

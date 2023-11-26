@@ -13,6 +13,7 @@ import vn.com.greencraze.order.entity.PaymentMethod;
 
 @Mapper(uses = {ReferenceMapper.class})
 public interface PaymentMethodMapper {
+
     @Mapping(target = "id", ignore = true)
     PaymentMethod idToPaymentMethod(String id);
 
@@ -27,4 +28,5 @@ public interface PaymentMethodMapper {
 
     @Mapping(target = "image", ignore = true)
     PaymentMethod updatePaymentMethodFromUpdatePaymentMethodRequest(@MappingTarget PaymentMethod paymentMethod, UpdatePaymentMethodRequest updatePaymentMethodRequest);
+
 }

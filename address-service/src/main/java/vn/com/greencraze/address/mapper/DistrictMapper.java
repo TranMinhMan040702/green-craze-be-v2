@@ -11,6 +11,7 @@ import java.util.List;
 
 @Mapper(uses = {ReferenceMapper.class})
 public interface DistrictMapper {
+
     @Mapping(target = "id", ignore = true)
     District idToDistrict(String id);
 
@@ -19,4 +20,5 @@ public interface DistrictMapper {
     GetOneDistrictResponse districtToGetOneDistrictResponse(District district);
 
     List<GetListDistrictResponse> listDistrictToGetListDistrictResponse(List<District> districts);
+
 }

@@ -11,6 +11,7 @@ import vn.com.greencraze.order.dto.response.orderCancelReason.GetOneOrderCancelR
 import java.util.List;
 
 public interface IOrderCancelReasonService {
+
     RestResponse<ListResponse<GetListOrderCancelReasonResponse>> getListOrderCancelReason(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
     );
@@ -24,4 +25,5 @@ public interface IOrderCancelReasonService {
     void deleteOneOrderCancelReason(Long id);
 
     void deleteListOrderCancelReason(List<Long> ids);
+
 }

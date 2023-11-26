@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewSpecification extends BaseSpecification<Review> {
+
     public Specification<Review> filterable(Long productId, Long rating, Boolean status) {
         List<Predicate> wheres = new ArrayList<>();
         return (root, query, cb) -> {
@@ -30,4 +31,5 @@ public class ReviewSpecification extends BaseSpecification<Review> {
             return cb.and(wheres.toArray(new Predicate[0]));
         };
     }
+
 }

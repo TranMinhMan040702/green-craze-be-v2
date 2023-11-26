@@ -14,6 +14,7 @@ import vn.com.greencraze.commons.api.RestResponse;
 import java.util.List;
 
 public interface IAddressService {
+
     RestResponse<ListResponse<GetListAddressResponse>> getListAddress(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
     );
@@ -35,6 +36,5 @@ public interface IAddressService {
     void deleteOneAddress(Long id);
 
     void setAddressDefault(Long id);
-
 
 }

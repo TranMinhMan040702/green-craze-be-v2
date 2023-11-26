@@ -27,6 +27,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PaymentMethodServiceImpl implements IPaymentMethodService {
+
     private final PaymentMethodRepository paymentMethodRepository;
     private final PaymentMethodMapper paymentMethodMapper;
     private final IUploadService uploadService;
@@ -95,4 +96,5 @@ public class PaymentMethodServiceImpl implements IPaymentMethodService {
             paymentMethodRepository.save(paymentMethod);
         }
     }
+
 }

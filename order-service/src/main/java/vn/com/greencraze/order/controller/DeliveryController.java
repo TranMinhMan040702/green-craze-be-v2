@@ -34,6 +34,7 @@ import java.util.List;
 @Tag(name = "delivery :: Delivery")
 @RequiredArgsConstructor
 public class DeliveryController {
+
     private final IDeliveryService deliveryService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -94,4 +95,5 @@ public class DeliveryController {
         deliveryService.deleteListDelivery(ids);
         return ResponseEntity.noContent().build();
     }
+
 }
