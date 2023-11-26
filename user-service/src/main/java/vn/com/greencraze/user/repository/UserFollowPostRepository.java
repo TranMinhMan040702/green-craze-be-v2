@@ -5,5 +5,4 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import vn.com.greencraze.user.entity.UserFollowPost;
 
 public interface UserFollowPostRepository extends JpaRepository<UserFollowPost, Long>,
-        JpaSpecificationExecutor<UserFollowPost> {
-}
+        JpaSpecificationExecutor<UserFollowPost> {}

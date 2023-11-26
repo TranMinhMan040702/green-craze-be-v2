@@ -9,5 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface WardRepository extends JpaRepository<Ward, Long>, JpaSpecificationExecutor<Ward> {
+
     Optional<List<Ward>> findAllByDistrict(District district);
+
 }

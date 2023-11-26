@@ -25,4 +25,5 @@ public interface IDeliveryService {
     void deleteOneDelivery(Long id);
 
     void deleteListDelivery(List<Long> ids);
+
 }

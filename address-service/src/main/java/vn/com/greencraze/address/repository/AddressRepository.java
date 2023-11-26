@@ -7,9 +7,11 @@ import vn.com.greencraze.address.entity.Address;
 import java.util.Optional;
 
 public interface AddressRepository extends JpaRepository<Address, Long>, JpaSpecificationExecutor<Address> {
+
     Optional<Address> findByIdAndUserId(Long id, String userId);
 
     Optional<Address> findByIdAndUserIdAndIsDefault(Long id, String userId, Boolean isDefault);
 
     Optional<Address> findByUserIdAndIsDefault(String userId, Boolean isDefault);
+
 }

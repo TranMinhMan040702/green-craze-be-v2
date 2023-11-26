@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AddressSpecification extends BaseSpecification<Address> {
+
     public Specification<Address> filterable(String userId) {
         List<Predicate> wheres = new ArrayList<>();
         return (root, query, cb) -> {
@@ -19,4 +20,5 @@ public class AddressSpecification extends BaseSpecification<Address> {
             return cb.and(wheres.toArray(new Predicate[0]));
         };
     }
+
 }

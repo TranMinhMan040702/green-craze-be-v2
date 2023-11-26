@@ -13,6 +13,7 @@ import vn.com.greencraze.user.entity.Review;
 
 @Mapper(uses = {ReferenceMapper.class})
 public interface ReviewMapper {
+
     GetListReviewResponse reviewToGetListReviewResponse(Review review);
 
     GetOneReviewResponse reviewToGetOneReviewResponse(Review review);

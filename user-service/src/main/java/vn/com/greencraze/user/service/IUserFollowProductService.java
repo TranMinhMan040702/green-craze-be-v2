@@ -7,6 +7,7 @@ import vn.com.greencraze.user.dto.response.userFollowProduct.CreateUserFollowPro
 import vn.com.greencraze.user.dto.response.userFollowProduct.GetListUserFollowProductResponse;
 
 public interface IUserFollowProductService {
+
     RestResponse<CreateUserFollowProductResponse> followProduct(FollowProductRequest request);
 
     void unfollowProduct(FollowProductRequest request);
@@ -14,4 +15,5 @@ public interface IUserFollowProductService {
     RestResponse<ListResponse<GetListUserFollowProductResponse>> getListFollowingProduct(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
     );
+
 }

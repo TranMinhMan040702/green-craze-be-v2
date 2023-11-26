@@ -13,6 +13,7 @@ import vn.com.greencraze.commons.mapper.ReferenceMapper;
 
 @Mapper(uses = {ReferenceMapper.class})
 public interface AddressMapper {
+
     @Mapping(target = "id", ignore = true)
     Address idToAddress(String id);
 
@@ -24,5 +25,7 @@ public interface AddressMapper {
 
     CreateAddressResponse addressToCreateAddressResponse(Address address);
 
-    Address updateAddressFromUpdateAddressRequest(@MappingTarget Address address, UpdateAddressRequest updateAddressRequest);
+    Address updateAddressFromUpdateAddressRequest(
+            @MappingTarget Address address, UpdateAddressRequest updateAddressRequest);
+
 }

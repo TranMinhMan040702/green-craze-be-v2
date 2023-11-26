@@ -8,7 +8,11 @@ import vn.com.greencraze.user.entity.UserFollowProduct;
 
 @Mapper(uses = {ReferenceMapper.class})
 public interface UserFollowProductMapper {
-    CreateUserFollowProductResponse userFollowProductToCreateUserFollowProductResponse(UserFollowProduct userFollowProduct);
 
-    GetListUserFollowProductResponse userFollowProductToGetListFollowingProductResponse(UserFollowProduct userFollowProduct);
+    CreateUserFollowProductResponse userFollowProductToCreateUserFollowProductResponse(
+            UserFollowProduct userFollowProduct);
+
+    GetListUserFollowProductResponse userFollowProductToGetListFollowingProductResponse(
+            UserFollowProduct userFollowProduct);
+
 }

@@ -7,7 +7,9 @@ import vn.com.greencraze.order.entity.Order;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
+
     Optional<Order> findByUserIdAndCode(String userId, String code);
 
     Optional<Order> findByIdAndUserId(Long id, String userId);
+
 }

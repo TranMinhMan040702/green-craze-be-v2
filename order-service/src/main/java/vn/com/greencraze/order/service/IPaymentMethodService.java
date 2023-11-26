@@ -11,6 +11,7 @@ import vn.com.greencraze.order.dto.response.paymentMethod.GetOnePaymentMethodRes
 import java.util.List;
 
 public interface IPaymentMethodService {
+
     RestResponse<ListResponse<GetListPaymentMethodResponse>> getListPaymentMethod(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
     );
@@ -24,4 +25,5 @@ public interface IPaymentMethodService {
     void deleteOnePaymentMethod(Long id);
 
     void deleteListPaymentMethod(List<Long> ids);
+
 }

@@ -21,6 +21,7 @@ import vn.com.greencraze.user.service.IUserFollowProductService;
 @Service
 @RequiredArgsConstructor
 public class UserFollowProductServiceImpl implements IUserFollowProductService {
+
     private final UserFollowProductRepository userFollowProductRepository;
     private final UserProfileRepository userProfileRepository;
     private final UserFollowProductMapper userFollowProductMapper;
@@ -71,4 +72,5 @@ public class UserFollowProductServiceImpl implements IUserFollowProductService {
 
         return RestResponse.ok(ListResponse.of(responses));
     }
+
 }

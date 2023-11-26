@@ -6,6 +6,7 @@ import vn.com.greencraze.order.dto.response.transaction.GetListTransactionRespon
 import vn.com.greencraze.order.dto.response.transaction.GetOneTransactionResponse;
 
 public interface ITransactionService {
+
     RestResponse<ListResponse<GetListTransactionResponse>> getListTransaction(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
     );
@@ -13,4 +14,5 @@ public interface ITransactionService {
     RestResponse<ListResponse<GetListTransactionResponse>> getTop5TransactionLatest();
 
     RestResponse<GetOneTransactionResponse> getOneTransaction(Long id);
+
 }

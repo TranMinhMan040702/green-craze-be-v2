@@ -12,6 +12,7 @@ import vn.com.greencraze.user.dto.response.review.GetOneReviewResponse;
 import java.util.List;
 
 public interface IReviewService {
+
     RestResponse<ListResponse<GetListReviewResponse>> getListReview(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all,
             Long productId, Long rating, Boolean status);
@@ -35,4 +36,5 @@ public interface IReviewService {
     void toggleReview(Long id);
 
     void deleteListReview(List<Long> ids);
+
 }

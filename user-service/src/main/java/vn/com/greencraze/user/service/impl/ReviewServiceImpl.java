@@ -31,6 +31,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements IReviewService {
+
     private final ReviewRepository reviewRepository;
     private final ReviewMapper reviewMapper;
     private final UserProfileRepository userProfileRepository;
@@ -51,9 +52,7 @@ public class ReviewServiceImpl implements IReviewService {
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
 
         Page<GetListReviewResponse> responses = reviewRepository
-                .findAll(sortable
-                        .and(searchable)
-                        .and(filterable), pageable)
+                .findAll(sortable.and(searchable).and(filterable), pageable)
                 .map(reviewMapper::reviewToGetListReviewResponse);
 
         return RestResponse.ok(ListResponse.of(responses));
@@ -185,4 +184,5 @@ public class ReviewServiceImpl implements IReviewService {
             reviewRepository.save(review);
         }
     }
+
 }
