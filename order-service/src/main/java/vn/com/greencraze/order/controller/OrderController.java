@@ -49,7 +49,8 @@ public class OrderController {
             @RequestParam(required = false) boolean all,
             @RequestParam(required = false) String status
     ) {
-        return ResponseEntity.ok(orderService.getListOrder(page, size, isSortAscending, columnName, search, all, status));
+        return ResponseEntity.ok(orderService.getListOrder(
+                page, size, isSortAscending, columnName, search, all, status));
     }
 
     @GetMapping(value = "/me/list", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -64,7 +65,8 @@ public class OrderController {
             @RequestParam(required = false) boolean all,
             @RequestParam(required = false) String status
     ) {
-        return ResponseEntity.ok(orderService.getListUserOrder(page, size, isSortAscending, columnName, search, all, status));
+        return ResponseEntity.ok(orderService.getListUserOrder(
+                page, size, isSortAscending, columnName, search, all, status));
     }
 
     @GetMapping(value = "/top5-order-latest", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,42 +86,33 @@ public class OrderController {
     @GetMapping(value = "/detail/{code}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get an order by code")
-    public ResponseEntity<RestResponse<GetOneOrderResponse>> getOneOrder(@PathVariable String code) {
+    public ResponseEntity<RestResponse<GetOneOrderResponse>> getOneOrderByCode(@PathVariable String code) {
         return ResponseEntity.ok(orderService.getOneOrderByCode(code));
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create an order")
-    public ResponseEntity<RestResponse<CreateOrderResponse>> createOrder(
-            @Valid CreateOrderRequest request
-    ) {
+    public ResponseEntity<RestResponse<CreateOrderResponse>> createOrder(@Valid CreateOrderRequest request) {
         RestResponse<CreateOrderResponse> response = orderService.createOrder(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
-
         return ResponseEntity.created(location).body(response);
     }
 
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a order")
-    public ResponseEntity<Void> updateOrder(
-            @PathVariable Long id, @Valid UpdateOrderRequest request
-    ) {
+    public ResponseEntity<Void> updateOrder(@PathVariable Long id, @Valid UpdateOrderRequest request) {
         orderService.updateOrder(id, request);
-
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping(value = "/paypal/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a order")
-    public ResponseEntity<Void> completePaypalOrder(
-            @PathVariable Long id, @Valid CompletePaypalOrderRequest request
-    ) {
+    public ResponseEntity<Void> completePaypalOrder(@PathVariable Long id, @Valid CompletePaypalOrderRequest request) {
         orderService.completePaypalOrder(id, request);
-
         return ResponseEntity.noContent().build();
     }
 

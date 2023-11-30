@@ -93,7 +93,6 @@ public class ReviewController {
         RestResponse<CreateReviewResponse> response = reviewService.createReview(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
-
         return ResponseEntity.created(location).body(response);
     }
 
@@ -104,7 +103,6 @@ public class ReviewController {
             @PathVariable Long id, @Valid UpdateReviewRequest request
     ) {
         reviewService.updateReview(id, request);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -115,7 +113,6 @@ public class ReviewController {
             @PathVariable Long id
     ) {
         reviewService.toggleReview(id);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -126,7 +123,6 @@ public class ReviewController {
             @PathVariable Long id, @Valid ReplyReviewRequest request
     ) {
         reviewService.replyReview(id, request);
-
         return ResponseEntity.noContent().build();
     }
 

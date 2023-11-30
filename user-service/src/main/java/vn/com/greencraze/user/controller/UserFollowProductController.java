@@ -34,7 +34,7 @@ public class UserFollowProductController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a list of reviews")
-    public ResponseEntity<RestResponse<ListResponse<GetListUserFollowProductResponse>>> getListReview(
+    public ResponseEntity<RestResponse<ListResponse<GetListUserFollowProductResponse>>> getListFollowingProduct(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "1000") int size,
             @RequestParam(defaultValue = "true") boolean isSortAscending,
@@ -55,18 +55,14 @@ public class UserFollowProductController {
         RestResponse<CreateUserFollowProductResponse> response = userFollowProductService.followProduct(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
-
         return ResponseEntity.created(location).body(response);
     }
 
     @PostMapping(value = "/unlike")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Create a userFollowProduct")
-    public ResponseEntity<Void> unfollowProduct(
-            @Valid FollowProductRequest request
-    ) {
+    public ResponseEntity<Void> unfollowProduct(@Valid FollowProductRequest request) {
         userFollowProductService.unfollowProduct(request);
-
         return ResponseEntity.noContent().build();
     }
 

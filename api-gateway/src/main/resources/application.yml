@@ -1,0 +1,965 @@
+server:
+  port: 7168
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: api-gateway
+  main:
+    web-application-type: reactive
+  profiles:
+    active: dev
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:5173"
+            allowedHeaders: "*"
+            allowedMethods: "*"
+      routes:
+        # > SERVICE::auth
+        # > > RESOURCE::Auth
+        - id: public::auth::login
+          uri: lb://auth-service
+          predicates:
+            - Method=POST
+            - Path=/api/auths/login
+          filters:
+            - SetPath=/core/auth/auths/login
+        - id: public::auth::authenticateWithGoogle
+          uri: lb://auth-service
+          predicates:
+            - Method=POST
+            - Path=/api/auths/google-login
+          filters:
+            - SetPath=/core/auth/auths/google-login
+        - id: public::auth::register
+          uri: lb://auth-service
+          predicates:
+            - Method=POST
+            - Path=/api/auths/register
+          filters:
+            - SetPath=/core/auth/auths/register
+        - id: public::auth::verifyOTP
+          uri: lb://auth-service
+          predicates:
+            - Method=PUT
+            - Path=/api/auths/register/verify
+          filters:
+            - SetPath=/core/auth/auths/register/verify
+        - id: public::auth::resendRegisterOTP
+          uri: lb://auth-service
+          predicates:
+            - Method=PUT
+            - Path=/api/auths/register/resend
+          filters:
+            - SetPath=/core/auth/auths/register/resend
+        - id: public::auth::refreshToken
+          uri: lb://auth-service
+          predicates:
+            - Method=POST
+            - Path=/api/auths/refresh-token
+          filters:
+            - SetPath=/core/auth/auths/refresh-token
+        - id: public::auth::forgotPassword
+          uri: lb://auth-service
+          predicates:
+            - Method=PUT
+            - Path=/api/auths/forgot-password
+          filters:
+            - SetPath=/core/auth/auths/forgot-password
+        - id: public::auth::resetPassword
+          uri: lb://auth-service
+          predicates:
+            - Method=PUT
+            - Path=/api/auths/reset-password
+          filters:
+            - SetPath=/core/auth/auths/reset-password
+        - id: public::auth::resendForgotPasswordOTP
+          uri: lb://auth-service
+          predicates:
+            - Method=PUT
+            - Path=/api/auths/forgot-password/resend
+          filters:
+            - SetPath=/core/auth/auths/forgot-password/resend
+        # > SERVICE::user
+        # > > RESOURCE::User
+        - id: private::user::getListUser
+          uri: lb://user-service
+          predicates:
+            - Method=GET
+            - Path=/api/users
+          filters:
+            - SetPath=/core/user/users
+        - id: private::user::getOneUser
+          uri: lb://user-service
+          predicates:
+            - Method=GET
+            - Path=/api/users/{id}
+          filters:
+            - SetPath=/core/user/users/{id}
+        - id: private::user::getMe
+          uri: lb://user-service
+          predicates:
+            - Method=GET
+            - Path=/api/users/profile/me
+          filters:
+            - SetPath=/core/user/users/profile/me
+        - id: private::user::updateUser
+          uri: lb://user-service
+          predicates:
+            - Method=PUT
+            - Path=/api/users
+          filters:
+            - SetPath=/core/user/users
+        - id: private::user::disableUser
+          uri: lb://user-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/users/disable/{id}
+          filters:
+            - SetPath=/core/user/users/disable/{id}
+        - id: private::user::disableListUser
+          uri: lb://user-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/users/disable
+          filters:
+            - SetPath=/core/user/users/disable
+        - id: private::user::enableUser
+          uri: lb://user-service
+          predicates:
+            - Method=PUT
+            - Path=/api/users/enable/{id}
+          filters:
+            - SetPath=/core/user/users/enable/{id}
+        # > > RESOURCE::Staff
+        - id: private::user::getListStaff
+          uri: lb://user-service
+          predicates:
+            - Method=GET
+            - Path=/api/staffs
+          filters:
+            - SetPath=/core/user/staffs
+        - id: private::user::getOneStaff
+          uri: lb://user-service
+          predicates:
+            - Method=GET
+            - Path=/api/staffs/{id}
+          filters:
+            - SetPath=/core/user/staffs/{id}
+        - id: private::user::createStaff
+          uri: lb://user-service
+          predicates:
+            - Method=POST
+            - Path=/api/staffs
+          filters:
+            - SetPath=/core/user/staffs
+        - id: private::user::updateStaff
+          uri: lb://user-service
+          predicates:
+            - Method=PUT
+            - Path=/api/staffs/{id}
+          filters:
+            - SetPath=/core/user/staffs/{id}
+        - id: private::user::disableStaff
+          uri: lb://user-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/staffs/disable/{id}
+          filters:
+            - SetPath=/core/user/staffs/disable/{id}
+        - id: private::user::disableListStaff
+          uri: lb://user-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/staffs/disable
+          filters:
+            - SetPath=/core/user/staffs/disable
+        - id: private::user::enableStaff
+          uri: lb://user-service
+          predicates:
+            - Method=PUT
+            - Path=/api/staffs/enable/{id}
+          filters:
+            - SetPath=/core/user/staffs/enable/{id}
+        # > > RESOURCE::Cart
+        - id: private::user::getCartByUser
+          uri: lb://user-service
+          predicates:
+            - Method=GET
+            - Path=/api/carts
+          filters:
+            - SetPath=/core/user/carts
+        - id: private::user::getCartItemByListIds
+          uri: lb://user-service
+          predicates:
+            - Method=GET
+            - Path=/api/carts/list-ids
+          filters:
+            - SetPath=/core/user/carts/list-ids
+        - id: private::user::createCartItem
+          uri: lb://user-service
+          predicates:
+            - Method=POST
+            - Path=/api/carts
+          filters:
+            - SetPath=/core/user/carts
+        - id: private::user::updateCartItem
+          uri: lb://user-service
+          predicates:
+            - Method=PUT
+            - Path=/api/carts/{id}
+          filters:
+            - SetPath=/core/user/carts/{id}
+        - id: private::user::deleteOneCartItem
+          uri: lb://user-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/carts/{id}
+          filters:
+            - SetPath=/core/user/carts/{id}
+        - id: private::user::deleteListCartItem
+          uri: lb://user-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/carts
+          filters:
+            - SetPath=/core/user/carts
+        # > > RESOURCE::Review
+        - id: public::user::getListReview
+          uri: lb://user-service
+          predicates:
+            - Method=GET
+            - Path=/api/reviews
+          filters:
+            - SetPath=/core/user/reviews
+        - id: private::user::getOneReview
+          uri: lb://user-service
+          predicates:
+            - Method=GET
+            - Path=/api/reviews/{id}
+          filters:
+            - SetPath=/core/user/reviews/{id}
+        - id: private::user::getTop5ReviewLatest
+          uri: lb://user-service
+          predicates:
+            - Method=GET
+            - Path=/api/reviews/top5-review-latest
+          filters:
+            - SetPath=/core/user/reviews/top5-review-latest
+        - id: public::user::getCountReview
+          uri: lb://user-service
+          predicates:
+            - Method=GET
+            - Path=/api/reviews/count/{id}
+          filters:
+            - SetPath=/core/user/reviews/count/{id}
+        - id: private::user::getReviewByOrderItem
+          uri: lb://user-service
+          predicates:
+            - Method=GET
+            - Path=/api/reviews/order-item/{id}
+          filters:
+            - SetPath=/core/user/reviews/order-item/{id}
+        - id: private::user::createReview
+          uri: lb://user-service
+          predicates:
+            - Method=POST
+            - Path=/api/reviews
+          filters:
+            - SetPath=/core/user/reviews
+        - id: private::user::updateReview
+          uri: lb://user-service
+          predicates:
+            - Method=PUT
+            - Path=/api/reviews/{id}
+          filters:
+            - SetPath=/core/user/reviews/{id}
+        - id: private::user::toggleReview
+          uri: lb://user-service
+          predicates:
+            - Method=PATCH
+            - Path=/api/reviews/toggle/{id}
+          filters:
+            - SetPath=/core/user/reviews/toggle/{id}
+        - id: private::user::replyReview
+          uri: lb://user-service
+          predicates:
+            - Method=PUT
+            - Path=/api/reviews/reply/{id}
+          filters:
+            - SetPath=/core/user/reviews/reply/{id}
+        - id: private::user::deleteOneReview
+          uri: lb://user-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/reviews/{id}
+          filters:
+            - SetPath=/core/user/reviews/{id}
+        - id: private::user::deleteListReview
+          uri: lb://user-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/reviews
+          filters:
+            - SetPath=/core/user/reviews
+        # > > RESOURCE::UserFollowProducts
+        - id: private::user::getListFollowingProduct
+          uri: lb://user-service
+          predicates:
+            - Method=GET
+            - Path=/api/user-follow-products
+          filters:
+            - SetPath=/core/user/user-follow-products
+        - id: private::user::followProduct
+          uri: lb://user-service
+          predicates:
+            - Method=POST
+            - Path=/api/user-follow-products/like
+          filters:
+            - SetPath=/core/user/user-follow-products/like
+        - id: private::user::unfollowProduct
+          uri: lb://user-service
+          predicates:
+            - Method=POST
+            - Path=/api/user-follow-products/unlike
+          filters:
+            - SetPath=/core/user/user-follow-products/unlike
+        # > SERVICE::product
+        # > > RESOURCE::Brand
+        - id: public::product::getListBrand
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/brands
+          filters:
+            - SetPath=/core/product/brands
+        - id: private::product::getOneBrand
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/brands/{id}
+          filters:
+            - SetPath=/core/product/brands/{id}
+        - id: private::product::createBrand
+          uri: lb://product-service
+          predicates:
+            - Method=POST
+            - Path=/api/brands
+          filters:
+            - SetPath=/core/product/brands
+        - id: private::product::updateBrand
+          uri: lb://product-service
+          predicates:
+            - Method=PUT
+            - Path=/api/brands/{id}
+          filters:
+            - SetPath=/core/product/brands/{id}
+        - id: private::product::deleteOneBrand
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/brands/{id}
+          filters:
+            - SetPath=/core/product/brands/{id}
+        - id: private::product::deleteListBrand
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/brands
+          filters:
+            - SetPath=/core/product/brands
+        # > > RESOURCE::Unit
+        - id: private::product::getListUnit
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/units
+          filters:
+            - SetPath=/core/product/units
+        - id: private::product::getOneUnit
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/units/{id}
+          filters:
+            - SetPath=/core/product/units/{id}
+        - id: private::product::createUnit
+          uri: lb://product-service
+          predicates:
+            - Method=POST
+            - Path=/api/units
+          filters:
+            - SetPath=/core/product/units
+        - id: private::product::updateUnit
+          uri: lb://product-service
+          predicates:
+            - Method=PUT
+            - Path=/api/units/{id}
+          filters:
+            - SetPath=/core/product/units/{id}
+        - id: private::product::deleteOneUnit
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/units/{id}
+          filters:
+            - SetPath=/core/product/units/{id}
+        - id: private::product::deleteListUnit
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/units
+          filters:
+            - SetPath=/core/product/units
+        # > > RESOURCE::ProductCategory
+        - id: public::product::getListProductCategory
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/product-categories
+          filters:
+            - SetPath=/core/product/product-categories
+        - id: private::product::getOneProductCategory
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/product-categories/{id}
+          filters:
+            - SetPath=/core/product/product-categories/{id}
+        - id: public::product::getOneProductCategoryBySlug
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/product-categories/slug/{slug}
+          filters:
+            - SetPath=/core/product/product-categories/slug/{slug}
+        - id: private::product::createProductCategory
+          uri: lb://product-service
+          predicates:
+            - Method=POST
+            - Path=/api/product-categories
+          filters:
+            - SetPath=/core/product/product-categories
+        - id: private::product::updateProductCategory
+          uri: lb://product-service
+          predicates:
+            - Method=PUT
+            - Path=/api/product-categories/{id}
+          filters:
+            - SetPath=/core/product/product-categories/{id}
+        - id: private::product::deleteOneProductCategory
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/product-categories/{id}
+          filters:
+            - SetPath=/core/product/product-categories/{id}
+        - id: private::product::deleteListProductCategory
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/product-categories
+          filters:
+            - SetPath=/core/product/product-categories
+        # > > RESOURCE::Product
+        - id: public::product::getListProduct
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/products
+          filters:
+            - SetPath=/core/product/products
+        - id: private::product::getOneProduct
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/products/{id}
+          filters:
+            - SetPath=/core/product/products/{id}
+        - id: public::product::getOneProductBySlug
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/products/slug/{slug}
+          filters:
+            - SetPath=/core/product/products/slug/{slug}
+        - id: private::product::createProduct
+          uri: lb://product-service
+          predicates:
+            - Method=POST
+            - Path=/api/products
+          filters:
+            - SetPath=/core/product/products
+        - id: private::product::updateProduct
+          uri: lb://product-service
+          predicates:
+            - Method=PUT
+            - Path=/api/products/{id}
+          filters:
+            - SetPath=/core/product/products/{id}
+        - id: private::product::deleteOneProduct
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/products/{id}
+          filters:
+            - SetPath=/core/product/products/{id}
+        - id: private::product::deleteListProduct
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/products
+          filters:
+            - SetPath=/core/product/products
+        # > > RESOURCE::ProductImage
+        - id: private::product::getListProductImage
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/products/images
+          filters:
+            - SetPath=/core/product/products/images
+        - id: private::product::getOneProductImage
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/products/images/{id}
+          filters:
+            - SetPath=/core/product/products/images/{id}
+        - id: private::product::createProductImage
+          uri: lb://product-service
+          predicates:
+            - Method=POST
+            - Path=/api/products/images
+          filters:
+            - SetPath=/core/product/products/images
+        - id: private::product::updateProductImage
+          uri: lb://product-service
+          predicates:
+            - Method=PUT
+            - Path=/api/products/images/{id}
+          filters:
+            - SetPath=/core/product/products/images/{id}
+        - id: private::product::setDefaultProductImage
+          uri: lb://product-service
+          predicates:
+            - Method=PATCH
+            - Path=/api/products/images/{id}
+          filters:
+            - SetPath=/core/product/products/images/{id}
+        - id: private::product::deleteOneProductImage
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/products/images/{id}
+          filters:
+            - SetPath=/core/product/products/images/{id}
+        - id: private::product::deleteListProductImage
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/products/images
+          filters:
+            - SetPath=/core/product/products/images
+        # > > RESOURCE::Variant
+        - id: private::product::getListVariant
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/variants
+          filters:
+            - SetPath=/core/product/variants
+        - id: private::product::getOneVariant
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/variants/{id}
+          filters:
+            - SetPath=/core/product/variants/{id}
+        - id: private::product::createVariant
+          uri: lb://product-service
+          predicates:
+            - Method=POST
+            - Path=/api/variants
+          filters:
+            - SetPath=/core/product/variants
+        - id: private::product::updateVariant
+          uri: lb://product-service
+          predicates:
+            - Method=PUT
+            - Path=/api/variants/{id}
+          filters:
+            - SetPath=/core/product/variants/{id}
+        - id: private::product::deleteOneVariant
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/variants/{id}
+          filters:
+            - SetPath=/core/product/variants/{id}
+        - id: private::product::deleteListVariant
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/variants
+          filters:
+            - SetPath=/core/product/variants
+        # > SERVICE::order
+        # > > RESOURCE::Delivery
+        - id: public::order::getListDelivery
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/deliveries
+          filters:
+            - SetPath=/core/order/deliveries
+        - id: private::order::getOneDelivery
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/deliveries/{id}
+          filters:
+            - SetPath=/core/order/deliveries/{id}
+        - id: private::order::createDelivery
+          uri: lb://order-service
+          predicates:
+            - Method=POST
+            - Path=/api/deliveries
+          filters:
+            - SetPath=/core/order/deliveries
+        - id: private::order::updateDelivery
+          uri: lb://order-service
+          predicates:
+            - Method=PUT
+            - Path=/api/deliveries/{id}
+          filters:
+            - SetPath=/core/order/deliveries/{id}
+        - id: private::order::deleteOneDelivery
+          uri: lb://order-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/deliveries/{id}
+          filters:
+            - SetPath=/core/order/deliveries/{id}
+        - id: private::order::deleteListDelivery
+          uri: lb://order-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/deliveries
+          filters:
+            - SetPath=/core/order/deliveries
+        # > > RESOURCE::PaymentMethod
+        - id: public::order::getListPaymentMethod
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/payment-methods
+          filters:
+            - SetPath=/core/order/payment-methods
+        - id: private::order::getOnePaymentMethod
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/payment-methods/{id}
+          filters:
+            - SetPath=/core/order/payment-methods/{id}
+        - id: private::order::createPaymentMethod
+          uri: lb://order-service
+          predicates:
+            - Method=POST
+            - Path=/api/payment-methods
+          filters:
+            - SetPath=/core/order/payment-methods
+        - id: private::order::updatePaymentMethod
+          uri: lb://order-service
+          predicates:
+            - Method=PUT
+            - Path=/api/payment-methods/{id}
+          filters:
+            - SetPath=/core/order/payment-methods/{id}
+        - id: private::order::deleteOnePaymentMethod
+          uri: lb://order-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/payment-methods/{id}
+          filters:
+            - SetPath=/core/order/payment-methods/{id}
+        - id: private::order::deleteListPaymentMethod
+          uri: lb://order-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/payment-methods
+          filters:
+            - SetPath=/core/order/payment-methods
+        # > > RESOURCE::Transaction
+        - id: private::order::getListTransaction
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/transactions
+          filters:
+            - SetPath=/core/order/transactions
+        - id: private::order::getTop5TransactionLatest
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/transactions/top5-transaction-latest
+          filters:
+            - SetPath=/core/order/transactions/top5-transaction-latest
+        - id: private::order::getOneTransaction
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/transactions/{id}
+          filters:
+            - SetPath=/core/order/transactions/{id}
+        # > > RESOURCE::OrderCancelReason
+        - id: public::order::getListOrderCancelReason
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/order-cancel-reasons
+          filters:
+            - SetPath=/core/order/order-cancel-reasons
+        - id: private::order::getOneOrderCancelReason
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/order-cancel-reasons/{id}
+          filters:
+            - SetPath=/core/order/order-cancel-reasons/{id}
+        - id: private::order::createOrderCancelReason
+          uri: lb://order-service
+          predicates:
+            - Method=POST
+            - Path=/api/order-cancel-reasons
+          filters:
+            - SetPath=/core/order/order-cancel-reasons
+        - id: private::order::updateOrderCancelReason
+          uri: lb://order-service
+          predicates:
+            - Method=PUT
+            - Path=/api/order-cancel-reasons/{id}
+          filters:
+            - SetPath=/core/order/order-cancel-reasons/{id}
+        - id: private::order::deleteOneOrderCancelReason
+          uri: lb://order-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/order-cancel-reasons/{id}
+          filters:
+            - SetPath=/core/order/order-cancel-reasons/{id}
+        - id: private::order::deleteListOrderCancelReason
+          uri: lb://order-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/order-cancel-reasons
+          filters:
+            - SetPath=/core/order/order-cancel-reasons
+        # > > RESOURCE::Order
+        - id: private::order::getListOrder
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/orders
+          filters:
+            - SetPath=/core/order/orders
+        - id: private::order::getListUserOrder
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/orders/me/list
+          filters:
+            - SetPath=/core/order/orders/me/list
+        - id: private::order::getTop5OrderLatest
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/orders/top5-order-latest
+          filters:
+            - SetPath=/core/order/orders/top5-order-latest
+        - id: private::order::getOneOrder
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/orders/{id}
+          filters:
+            - SetPath=/core/order/orders/{id}
+        - id: private::order::getOneOrderByCode
+          uri: lb://order-service
+          predicates:
+            - Method=GET
+            - Path=/api/orders/detail/{code}
+          filters:
+            - SetPath=/core/order/orders/detail/{code}
+        - id: private::order::createOrder
+          uri: lb://order-service
+          predicates:
+            - Method=POST
+            - Path=/api/orders
+          filters:
+            - SetPath=/core/order/orders
+        - id: private::order::updateOrder
+          uri: lb://order-service
+          predicates:
+            - Method=PUT
+            - Path=/api/orders/{id}
+          filters:
+            - SetPath=/core/order/orders/{id}
+        - id: private::order::completePaypalOrder
+          uri: lb://order-service
+          predicates:
+            - Method=PUT
+            - Path=/api/orders/paypal/{id}
+          filters:
+            - SetPath=/core/order/orders/paypal/{id}
+        # > SERVICE::address
+        # > > RESOURCE::Address
+        - id: private::address::getListAddress
+          uri: lb://address-service
+          predicates:
+            - Method=GET
+            - Path=/api/addresses
+          filters:
+            - SetPath=/core/address/addresses
+        - id: private::address::getOneAddress
+          uri: lb://address-service
+          predicates:
+            - Method=GET
+            - Path=/api/addresses/{id}
+          filters:
+            - SetPath=/core/address/addresses/{id}
+        - id: private::address::getDefaultAddress
+          uri: lb://address-service
+          predicates:
+            - Method=GET
+            - Path=/api/addresses/default
+          filters:
+            - SetPath=/core/address/addresses/default
+        - id: public::address::getListProvince
+          uri: lb://address-service
+          predicates:
+            - Method=GET
+            - Path=/api/addresses/p
+          filters:
+            - SetPath=/core/address/addresses/p
+        - id: public::address::getListDistrictByProvince
+          uri: lb://address-service
+          predicates:
+            - Method=GET
+            - Path=/api/addresses/p/{id}/d
+          filters:
+            - SetPath=/core/address/addresses/p/{id}/d
+        - id: public::address::getListWardByDistrict
+          uri: lb://address-service
+          predicates:
+            - Method=GET
+            - Path=/api/addresses/p/d/{id}/w
+          filters:
+            - SetPath=/core/address/addresses/p/d/{id}/w
+        - id: private::address::createAddress
+          uri: lb://address-service
+          predicates:
+            - Method=POST
+            - Path=/api/addresses
+          filters:
+            - SetPath=/core/address/addresses
+        - id: private::address::updateAddress
+          uri: lb://address-service
+          predicates:
+            - Method=PUT
+            - Path=/api/addresses/{id}
+          filters:
+            - SetPath=/core/address/addresses/{id}
+        - id: private::address::setDefaultAddress
+          uri: lb://address-service
+          predicates:
+            - Method=PUT
+            - Path=/api/addresses/set-default/{id}
+          filters:
+            - SetPath=/core/address/addresses/set-default/{id}
+        - id: private::address::deleteOneAddress
+          uri: lb://address-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/addresses/{id}
+          filters:
+            - SetPath=/core/address/addresses/{id}
+        # > SERVICE::inventory
+        # > > RESOURCE::Docket
+
+management:
+  endpoint:
+    gateway:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    enabled: true
+    register-with-eureka: true
+    fetch-registry: true
+
+springdoc:
+  use-fqn: true
+  swagger-ui:
+    operations-sorter: method
+    tags-sorter: alpha
+    doc-expansion: none
+    display-request-duration: true
+    show-extensions: true
+    show-common-extensions: true
+    default-model-expand-depth: 10
+    default-models-expand-depth: 10
+    display-operation-id: true
+    config-url: /specs/swagger-ui-config
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7230/eureka
+
+---
+spring:
+  config:
+    activate:
+      on-profile: stag
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://green-craze-eureka-service:7230/eureka
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://green-craze-eureka-service:7230/eureka
+

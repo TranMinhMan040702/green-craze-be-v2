@@ -37,6 +37,7 @@ import vn.com.greencraze.user.enumeration.IdentityStatus;
 import vn.com.greencraze.user.mapper.UserProfileMapper;
 import vn.com.greencraze.user.repository.StaffRepository;
 import vn.com.greencraze.user.repository.UserProfileRepository;
+import vn.com.greencraze.user.repository.specification.StaffSpecification;
 import vn.com.greencraze.user.repository.specification.UserProfileSpecification;
 import vn.com.greencraze.user.repository.view.IdentityViewRepository;
 import vn.com.greencraze.user.service.IUploadService;
@@ -71,14 +72,14 @@ public class UserProfileServiceImpl implements IUserProfileService {
         Page<GetListUserResponse> responses = userProfileRepository
                 .findAll(sortable.and(searchable), pageable)
                 .map(userProfileMapper::userProfileToGetListUserResponse);
-        // TODO: set address
+        // todo: set address
 
         return RestResponse.ok(ListResponse.of(responses));
     }
 
     @Override
     public RestResponse<GetOneUserResponse> getOneUser(String id) {
-        // TODO: Set address
+        // todo: Set address
         return userProfileRepository.findById(id)
                 .map(userProfileMapper::userProfileToGetOneUserResponse)
                 .map(RestResponse::ok)
@@ -87,9 +88,8 @@ public class UserProfileServiceImpl implements IUserProfileService {
 
     @Override
     public RestResponse<GetMeResponse> getMe() {
-        String identityId = authFacade.getUserId();
-        IdentityView identityView = identityViewRepository.getReferenceById(identityId);
-        return userProfileRepository.findByIdentity(identityView)
+        String userId = authFacade.getUserId();
+        return userProfileRepository.findById(userId)
                 .map(userProfileMapper::userProfileToGetMeResponse)
                 .map(RestResponse::ok)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "identityId", ""));
@@ -108,10 +108,8 @@ public class UserProfileServiceImpl implements IUserProfileService {
 
     @Override
     public void updateUser(UpdateUserRequest request) {
-        String identityId = authFacade.getUserId();
-        IdentityView identityView = identityViewRepository.getReferenceById(identityId);
-
-        UserProfile userProfile = userProfileRepository.findByIdentity(identityView)
+        String userId = authFacade.getUserId();
+        UserProfile userProfile = userProfileRepository.findById(userId)
                 .map(u -> userProfileMapper.updateUserProfileFromUpdateUserRequest(u, request))
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "identityId", ""));
         if (request.avatar() != null) {
@@ -158,10 +156,17 @@ public class UserProfileServiceImpl implements IUserProfileService {
     }
 
     @Override
-    public RestResponse<GetListStaffResponse> getListStaff(
+    public RestResponse<ListResponse<GetListStaffResponse>> getListStaff(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
-        // TODO: search with userprofile
-        return null;
+        StaffSpecification staffSpecification = new StaffSpecification();
+        Specification<Staff> sortable = staffSpecification.sortable(isSortAscending, columnName);
+        Specification<Staff> searchable = staffSpecification.searchable(SEARCH_FIELDS, search);
+        Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
+        Page<GetListStaffResponse> responses = staffRepository
+                .findAll(sortable.and(searchable), pageable)
+                .map(userProfileMapper::userProfileToGetListStaffResponse);
+        //todo: map address
+        return RestResponse.ok(ListResponse.of(responses));
     }
 
     @Override
@@ -188,7 +193,7 @@ public class UserProfileServiceImpl implements IUserProfileService {
                 .build());
         userProfileRepository.save(userProfile);
 
-        // TODO: call address service create address for staff
+        // todo: call address service create address for staff
 
         return RestResponse.created(userProfileMapper.userProfileToCreateStaffResponse(userProfile));
     }
@@ -206,7 +211,7 @@ public class UserProfileServiceImpl implements IUserProfileService {
                 .password(request.password())
                 .build());
 
-        // TODO: call address service update address for staff
+        // todo: call address service update address for staff
     }
 
     @Transactional(rollbackOn = {ResourceNotFoundException.class})
@@ -221,6 +226,28 @@ public class UserProfileServiceImpl implements IUserProfileService {
 
         authServiceClient.disableListIdentity(DisableListIdentityRequest.builder()
                 .ids(identityIds)
+                .build());
+    }
+
+    @Override
+    public void disableStaff(Long id) {
+        Staff staff = staffRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Staff", "id", id));
+
+        authServiceClient.updateIdentityStatus(UpdateIdentityStatusRequest.builder()
+                .id(staff.getUser().getIdentity().getId())
+                .status(IdentityStatus.INACTIVE)
+                .build());
+    }
+
+    @Override
+    public void enableStaff(Long id) {
+        Staff staff = staffRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Staff", "id", id));
+
+        authServiceClient.updateIdentityStatus(UpdateIdentityStatusRequest.builder()
+                .id(staff.getUser().getIdentity().getId())
+                .status(IdentityStatus.ACTIVE)
                 .build());
     }
 
