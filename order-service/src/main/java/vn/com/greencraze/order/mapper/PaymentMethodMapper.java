@@ -27,6 +27,7 @@ public interface PaymentMethodMapper {
     CreatePaymentMethodResponse paymentMethodToCreatePaymentMethodResponse(PaymentMethod paymentMethod);
 
     @Mapping(target = "image", ignore = true)
-    PaymentMethod updatePaymentMethodFromUpdatePaymentMethodRequest(@MappingTarget PaymentMethod paymentMethod, UpdatePaymentMethodRequest updatePaymentMethodRequest);
+    PaymentMethod updatePaymentMethodFromUpdatePaymentMethodRequest(
+            @MappingTarget PaymentMethod paymentMethod, UpdatePaymentMethodRequest updatePaymentMethodRequest);
 
 }

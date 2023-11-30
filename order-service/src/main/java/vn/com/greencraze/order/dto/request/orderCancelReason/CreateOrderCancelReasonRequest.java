@@ -8,6 +8,4 @@ public record CreateOrderCancelReasonRequest(
 
         @NotBlank
         String note
-) {
-        
-}
+) {}

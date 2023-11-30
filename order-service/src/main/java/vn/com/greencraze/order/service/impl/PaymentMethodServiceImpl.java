@@ -46,7 +46,6 @@ public class PaymentMethodServiceImpl implements IPaymentMethodService {
         Page<GetListPaymentMethodResponse> responses = paymentMethodRepository
                 .findAll(sortable.and(searchable), pageable)
                 .map(paymentMethodMapper::paymentMethodToGetListPaymentMethodResponse);
-
         return RestResponse.ok(ListResponse.of(responses));
     }
 
@@ -63,7 +62,6 @@ public class PaymentMethodServiceImpl implements IPaymentMethodService {
         PaymentMethod paymentMethod = paymentMethodMapper.createPaymentMethodRequestToPaymentMethod(request);
         paymentMethod.setImage(uploadService.uploadFile(request.image()));
         paymentMethodRepository.save(paymentMethod);
-
         return RestResponse.created(paymentMethodMapper.paymentMethodToCreatePaymentMethodResponse(paymentMethod));
     }
 

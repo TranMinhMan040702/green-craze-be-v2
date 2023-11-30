@@ -13,8 +13,7 @@ import java.util.List;
 public interface IOrderCancelReasonService {
 
     RestResponse<ListResponse<GetListOrderCancelReasonResponse>> getListOrderCancelReason(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
-    );
+            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
 
     RestResponse<GetOneOrderCancelReasonResponse> getOneOrderCancelReason(Long id);
 

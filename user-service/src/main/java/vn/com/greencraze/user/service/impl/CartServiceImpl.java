@@ -80,7 +80,8 @@ public class CartServiceImpl implements ICartService {
     }
 
     @Override
-    public RestResponse<ListResponse<GetListCartItemResponse>> getCartByUser(Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
+    public RestResponse<ListResponse<GetListCartItemResponse>> getCartByUser(
+            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
         String userId = authFacade.getUserId();
         UserProfile user = userProfileRepository
                 .findById(userId)

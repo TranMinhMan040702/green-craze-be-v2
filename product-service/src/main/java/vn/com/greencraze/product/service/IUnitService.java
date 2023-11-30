@@ -13,8 +13,7 @@ import java.util.List;
 public interface IUnitService {
 
     RestResponse<ListResponse<GetListUnitResponse>> getListUnit(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
-    );
+            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
 
     RestResponse<GetOneUnitResponse> getOneUnit(Long id);
 

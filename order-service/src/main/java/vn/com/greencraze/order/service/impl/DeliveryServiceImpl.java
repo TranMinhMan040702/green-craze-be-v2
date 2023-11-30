@@ -63,7 +63,6 @@ public class DeliveryServiceImpl implements IDeliveryService {
         Delivery delivery = deliveryMapper.createDeliveryRequestToDelivery(request);
         delivery.setImage(uploadService.uploadFile(request.image()));
         deliveryRepository.save(delivery);
-
         return RestResponse.created(deliveryMapper.deliveryToCreateDeliveryResponse(delivery));
     }
 

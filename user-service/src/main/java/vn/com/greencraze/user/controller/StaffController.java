@@ -80,6 +80,7 @@ public class StaffController {
         return ResponseEntity.notFound().build();
     }
 
+    // TODO: Giữ lại toggle
     @DeleteMapping("/disable/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Disable staff")

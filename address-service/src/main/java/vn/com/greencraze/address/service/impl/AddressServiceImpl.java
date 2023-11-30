@@ -56,20 +56,17 @@ public class AddressServiceImpl implements IAddressService {
     private static final List<String> SEARCH_FIELDS = List.of("receiver", "street", "email", "phone");
 
     @Override
-    public RestResponse<ListResponse<GetListAddressResponse>> getListAddress(Integer page, Integer size, Boolean isSortAscending,
-                                                                             String columnName, String search, Boolean all) {
+    public RestResponse<ListResponse<GetListAddressResponse>> getListAddress(
+            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
         String userId = authFacade.getUserId();
-
         AddressSpecification addressSpecification = new AddressSpecification();
         Specification<Address> sortable = addressSpecification.sortable(isSortAscending, columnName);
         Specification<Address> searchable = addressSpecification.searchable(SEARCH_FIELDS, search);
         Specification<Address> filterable = addressSpecification.filterable(userId);
-
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
         Page<GetListAddressResponse> responses = addressRepository
                 .findAll(sortable.and(searchable).and(filterable), pageable)
                 .map(addressMapper::addressToGetListAddressResponse);
-
         return RestResponse.ok(ListResponse.of(responses));
     }
 
@@ -104,7 +101,6 @@ public class AddressServiceImpl implements IAddressService {
         List<GetListProvinceResponse> provinces = provinceRepository.findAll(Pageable.unpaged())
                 .map(provinceMapper::provinceToGetListProvinceResponse)
                 .getContent();
-
         return RestResponse.ok(provinces);
     }
 
@@ -112,7 +108,6 @@ public class AddressServiceImpl implements IAddressService {
     public RestResponse<List<GetListDistrictResponse>> getListDistrictByProvince(long provinceId) {
         Province province = provinceRepository.findById(provinceId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "provinceId", provinceId));
-
         return districtRepository.findAllByProvince(province)
                 .map(districtMapper::listDistrictToGetListDistrictResponse)
                 .map(RestResponse::ok)
@@ -123,7 +118,6 @@ public class AddressServiceImpl implements IAddressService {
     public RestResponse<List<GetListWardResponse>> getListWardByDistrict(long districtId) {
         District district = districtRepository.findById(districtId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "districtId", districtId));
-
         return wardRepository.findAllByDistrict(district)
                 .map(wardMapper::listWardToGetListWardResponse)
                 .map(RestResponse::ok)
@@ -160,7 +154,6 @@ public class AddressServiceImpl implements IAddressService {
     @Override
     public void updateAddress(Long id, UpdateAddressRequest request) {
         String userId = authFacade.getUserId();
-
         Province province = provinceRepository.findById(request.provinceId())
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "provinceId", request.provinceId()));
         District district = districtRepository.findById(request.districtId())
@@ -175,7 +168,6 @@ public class AddressServiceImpl implements IAddressService {
         Address address = addressRepository.findByIdAndUserId(id, userId)
                 .map(a -> addressMapper.updateAddressFromUpdateAddressRequest(a, request))
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
-
         addressRepository.save(address);
     }
 

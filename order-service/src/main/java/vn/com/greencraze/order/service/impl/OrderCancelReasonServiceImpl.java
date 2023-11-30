@@ -44,7 +44,6 @@ public class OrderCancelReasonServiceImpl implements IOrderCancelReasonService {
         Page<GetListOrderCancelReasonResponse> responses = orderCancelReasonRepository
                 .findAll(sortable.and(searchable), pageable)
                 .map(orderCancelReasonMapper::orderCancelReasonToGetListOrderCancelReasonResponse);
-
         return RestResponse.ok(ListResponse.of(responses));
     }
 
@@ -60,7 +59,6 @@ public class OrderCancelReasonServiceImpl implements IOrderCancelReasonService {
     public RestResponse<CreateOrderCancelReasonResponse> createOrderCancelReason(CreateOrderCancelReasonRequest request) {
         OrderCancelReason orderCancelReason = orderCancelReasonMapper.createOrderCancelReasonRequestToOrderCancelReason(request);
         orderCancelReasonRepository.save(orderCancelReason);
-
         return RestResponse.created(orderCancelReasonMapper.orderCancelReasonToCreateOrderCancelReasonResponse(orderCancelReason));
     }
 
@@ -69,7 +67,6 @@ public class OrderCancelReasonServiceImpl implements IOrderCancelReasonService {
         OrderCancelReason orderCancelReason = orderCancelReasonRepository.findById(id)
                 .map(b -> orderCancelReasonMapper.updateOrderCancelReasonFromUpdateOrderCancelReasonRequest(b, request))
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
-
         orderCancelReasonRepository.save(orderCancelReason);
     }
 

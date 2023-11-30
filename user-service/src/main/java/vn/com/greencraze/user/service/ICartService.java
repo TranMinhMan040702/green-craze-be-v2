@@ -12,7 +12,8 @@ import java.util.List;
 
 public interface ICartService {
 
-    RestResponse<ListResponse<GetListCartItemResponse>> getCartByUser(Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
+    RestResponse<ListResponse<GetListCartItemResponse>> getCartByUser(
+            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
 
     RestResponse<List<GetListCartItemResponse>> getCartItemByListId(List<Long> ids);
 
@@ -26,5 +27,5 @@ public interface ICartService {
 
     //call from another service
     void updateUserCart(UpdateUserCartRequest request);
-    
+
 }

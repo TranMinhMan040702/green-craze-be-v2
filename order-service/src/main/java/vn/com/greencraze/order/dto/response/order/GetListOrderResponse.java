@@ -1,6 +1,7 @@
 package vn.com.greencraze.order.dto.response.order;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.With;
 import org.springframework.lang.Nullable;
 import vn.com.greencraze.order.client.address.dto.response.GetOneAddressResponse;
 import vn.com.greencraze.order.client.user.dto.response.GetOneUserResponse;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
+@With
 public record GetListOrderResponse(
         Long id,
         Instant createdAt,
@@ -40,11 +42,4 @@ public record GetListOrderResponse(
         GetOneOrderCancelReasonResponse cancelReason,
         List<GetListOrderItemResponse> items
 ) {
-
-    public GetListOrderResponse setValues(GetOneUserResponse user, GetOneAddressResponse address, List<GetListOrderItemResponse> items) {
-        return new GetListOrderResponse(id(), createdAt(), updatedAt(), createdBy(), updatedBy(), userId(), addressId(), otherCancelReason(),
-                totalAmount(), tax(), shippingCost(), paymentStatus(), note(), status(), code(), deliveryMethod(),
-                isReview(), reviewedDate(), user, address, transaction(), cancelReason(), items);
-    }
-
 }

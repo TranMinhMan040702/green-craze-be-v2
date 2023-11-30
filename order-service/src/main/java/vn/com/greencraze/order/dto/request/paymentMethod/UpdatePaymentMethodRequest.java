@@ -8,15 +8,12 @@ import org.springframework.web.multipart.MultipartFile;
 public record UpdatePaymentMethodRequest(
         @NotBlank
         String name,
-
         @NotBlank
         String code,
-
         @Nullable
         MultipartFile image,
-
         @NotNull
         Boolean status
 ) {
-        
+
 }
