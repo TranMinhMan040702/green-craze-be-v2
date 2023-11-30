@@ -20,4 +20,5 @@ public record GetOnePaymentMethodResponse(
         String image,
         Boolean status
 ) {
+        
 }

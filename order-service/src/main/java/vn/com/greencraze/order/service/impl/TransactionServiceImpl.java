@@ -30,11 +30,14 @@ public class TransactionServiceImpl implements ITransactionService {
     private static final List<String> SEARCH_FIELDS = List.of("paymentMethod");
 
     @Override
-    public RestResponse<ListResponse<GetListTransactionResponse>> getListTransaction(Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
+    public RestResponse<ListResponse<GetListTransactionResponse>> getListTransaction(Integer page, Integer size
+            , Boolean isSortAscending, String columnName, String search, Boolean all) {
         TransactionSpecification transactionSpecification = new TransactionSpecification();
+
         Specification<Transaction> sortable = transactionSpecification.sortable(isSortAscending, columnName);
         Specification<Transaction> searchable = transactionSpecification.searchable(SEARCH_FIELDS, search);
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
+
         Page<GetListTransactionResponse> responses = transactionRepository
                 .findAll(sortable.and(searchable), pageable)
                 .map(transactionMapper::transactionToGetListTransactionResponse);
@@ -47,6 +50,7 @@ public class TransactionServiceImpl implements ITransactionService {
         TransactionSpecification transactionSpecification = new TransactionSpecification();
         Specification<Transaction> sortable = transactionSpecification.sortable(false, "createdAt");
         Pageable pageable = PageRequest.of(1, 5);
+        
         Page<GetListTransactionResponse> responses = transactionRepository
                 .findAll(sortable, pageable)
                 .map(transactionMapper::transactionToGetListTransactionResponse);

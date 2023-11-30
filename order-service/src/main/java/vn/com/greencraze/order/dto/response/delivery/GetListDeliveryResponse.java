@@ -22,4 +22,5 @@ public record GetListDeliveryResponse(
         String image,
         Boolean status
 ) {
+        
 }

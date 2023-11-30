@@ -19,4 +19,5 @@ public record GetListOrderCancelReasonResponse(
         String note,
         Boolean status
 ) {
+        
 }

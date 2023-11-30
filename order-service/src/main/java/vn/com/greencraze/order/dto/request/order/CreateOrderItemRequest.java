@@ -8,4 +8,9 @@ public record CreateOrderItemRequest(
         @NotNull
         Integer quantity
 ) {
+    
+    public CreateOrderItemRequest setQuantity(Integer quantity) {
+        return new CreateOrderItemRequest(variantId(), quantity);
+    }
+
 }

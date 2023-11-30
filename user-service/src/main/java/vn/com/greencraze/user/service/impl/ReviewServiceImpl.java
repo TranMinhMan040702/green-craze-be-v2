@@ -9,7 +9,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.auth.AuthFacade;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
+import vn.com.greencraze.user.client.product.ProductServiceClient;
+import vn.com.greencraze.user.client.product.dto.response.GetOneProductResponse;
 import vn.com.greencraze.user.dto.request.review.CreateReviewRequest;
 import vn.com.greencraze.user.dto.request.review.ReplyReviewRequest;
 import vn.com.greencraze.user.dto.request.review.UpdateReviewRequest;
@@ -36,6 +39,8 @@ public class ReviewServiceImpl implements IReviewService {
     private final ReviewMapper reviewMapper;
     private final UserProfileRepository userProfileRepository;
     private final IUploadService uploadService;
+    private final ProductServiceClient productServiceClient;
+    private final AuthFacade authFacade;
     private static final String RESOURCE_NAME = "Review";
     private static final List<String> SEARCH_FIELDS = List.of("name", "title");
 
@@ -54,6 +59,12 @@ public class ReviewServiceImpl implements IReviewService {
         Page<GetListReviewResponse> responses = reviewRepository
                 .findAll(sortable.and(searchable).and(filterable), pageable)
                 .map(reviewMapper::reviewToGetListReviewResponse);
+
+        for (GetListReviewResponse response : responses.getContent()) {
+            GetOneProductResponse productResponse = productServiceClient.getOneProduct(response.productId());
+            GetListReviewResponse.ProductResponse product = reviewMapper.productResponseToGetListReviewProductResponse(productResponse);
+            response.setProduct(product);
+        }
 
         return RestResponse.ok(ListResponse.of(responses));
     }
@@ -87,32 +98,54 @@ public class ReviewServiceImpl implements IReviewService {
                 .findAll(sortable, pageable)
                 .map(reviewMapper::reviewToGetListReviewResponse);
 
+        for (GetListReviewResponse response : responses.getContent()) {
+            GetOneProductResponse productResponse = productServiceClient.getOneProduct(response.productId());
+            GetListReviewResponse.ProductResponse product = reviewMapper.productResponseToGetListReviewProductResponse(productResponse);
+            response.setProduct(product);
+        }
+
         return RestResponse.ok(responses.getContent());
     }
 
     @Override
     public RestResponse<GetOneReviewResponse> getOneReview(Long id) {
-        return reviewRepository.findById(id)
+        RestResponse<GetOneReviewResponse> response = reviewRepository.findById(id)
                 .map(reviewMapper::reviewToGetOneReviewResponse)
                 .map(RestResponse::ok)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
+
+        Long productId = response.data().productId();
+
+        GetOneProductResponse productResponse = productServiceClient.getOneProduct(productId);
+
+        response.data().setProduct(reviewMapper.productResponseToGetOneReviewProductResponse(productResponse));
+
+        return response;
     }
 
     @Override
     public RestResponse<GetOneReviewResponse> getOneReviewByOrderItem(Long orderItemId) {
-        String userId = "";
+        String userId = authFacade.getUserId();
         UserProfile user = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "userId", userId));
 
-        return reviewRepository.findByUserAndOrderItemId(user, orderItemId)
+        RestResponse<GetOneReviewResponse> response = reviewRepository.findByUserAndOrderItemId(user, orderItemId)
                 .map(reviewMapper::reviewToGetOneReviewResponse)
                 .map(RestResponse::ok)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "orderItemId", orderItemId));
+
+        Long productId = response.data().productId();
+
+        GetOneProductResponse productResponse = productServiceClient.getOneProduct(productId);
+
+        response.data().setProduct(reviewMapper.productResponseToGetOneReviewProductResponse(productResponse));
+
+        return response;
     }
 
     @Override
     public RestResponse<CreateReviewResponse> createReview(CreateReviewRequest request) {
-        String userId = "";
+        String userId = authFacade.getUserId();
         UserProfile user = userProfileRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "userId", userId));
 

@@ -16,4 +16,5 @@ public record CreateDeliveryRequest(
         @NotNull
         MultipartFile image
 ) {
+        
 }

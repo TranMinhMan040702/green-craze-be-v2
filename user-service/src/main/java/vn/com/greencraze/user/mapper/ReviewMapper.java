@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import vn.com.greencraze.commons.mapper.ReferenceMapper;
+import vn.com.greencraze.user.client.product.dto.response.GetOneProductResponse;
 import vn.com.greencraze.user.dto.request.review.CreateReviewRequest;
 import vn.com.greencraze.user.dto.request.review.UpdateReviewRequest;
 import vn.com.greencraze.user.dto.response.review.CreateReviewResponse;
@@ -26,4 +27,7 @@ public interface ReviewMapper {
     @Mapping(target = "image", ignore = true)
     Review updateReviewRequestToReview(@MappingTarget Review review, UpdateReviewRequest updateReviewRequest);
 
+    GetListReviewResponse.ProductResponse productResponseToGetListReviewProductResponse(GetOneProductResponse productResponse);
+
+    GetOneReviewResponse.ProductResponse productResponseToGetOneReviewProductResponse(GetOneProductResponse productResponse);
 }

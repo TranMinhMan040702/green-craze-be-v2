@@ -19,7 +19,7 @@ public record GetListCartItemResponse(
         Integer quantity,
         Long variantId,
         String variantName,
-        Long variantQuantity,
+        Integer variantQuantity,
         String sku,
         BigDecimal variantPrice,
         @Nullable
@@ -33,4 +33,5 @@ public record GetListCartItemResponse(
         String productImage,
         Boolean isPromotion
 ) {
+        
 }

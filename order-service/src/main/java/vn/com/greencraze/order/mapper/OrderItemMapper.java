@@ -16,4 +16,6 @@ public interface OrderItemMapper {
 
     OrderItem createOrderItemRequestToOrderItem(CreateOrderItemRequest createOrderItemRequest);
 
+    List<CreateOrderItemRequest> orderItemToCreateOrderItemRequest(Set<OrderItem> orderItems);
+
 }

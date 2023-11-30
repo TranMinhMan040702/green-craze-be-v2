@@ -24,4 +24,5 @@ public record CreateUserFollowProductResponse(
         String reply,
         Boolean status
 ) {
+        
 }

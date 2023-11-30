@@ -19,4 +19,5 @@ public record UpdateDeliveryRequest(
         @NotNull
         Boolean status
 ) {
+        
 }

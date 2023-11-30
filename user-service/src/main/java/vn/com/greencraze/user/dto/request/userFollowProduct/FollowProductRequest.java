@@ -6,4 +6,5 @@ public record FollowProductRequest(
         @NotNull
         Long productId
 ) {
+        
 }

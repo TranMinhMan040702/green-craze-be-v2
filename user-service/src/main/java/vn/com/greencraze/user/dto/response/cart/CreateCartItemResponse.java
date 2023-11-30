@@ -18,4 +18,5 @@ public record CreateCartItemResponse(
         Long variantId,
         Integer quantity
 ) {
+        
 }

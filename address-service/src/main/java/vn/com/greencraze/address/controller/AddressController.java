@@ -37,6 +37,7 @@ import java.util.List;
 @Tag(name = "address :: Address")
 @RequiredArgsConstructor
 public class AddressController {
+    
     private final IAddressService addressService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -121,6 +122,14 @@ public class AddressController {
     public ResponseEntity<Void> deleteOneAddress(@PathVariable Long id) {
         addressService.deleteOneAddress(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // call from another service
+    @GetMapping(value = "/default/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get a default address")
+    public ResponseEntity<RestResponse<GetOneAddressResponse>> getDefaultAddress(@PathVariable String userId) {
+        return ResponseEntity.ok(addressService.getDefaultUserAddress(userId));
     }
 
 }

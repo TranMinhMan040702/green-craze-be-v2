@@ -2,6 +2,8 @@ package vn.com.greencraze.order.dto.response.order;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.lang.Nullable;
+import vn.com.greencraze.order.client.address.dto.response.GetOneAddressResponse;
+import vn.com.greencraze.order.client.user.dto.response.GetOneUserResponse;
 import vn.com.greencraze.order.dto.response.orderCancelReason.GetOneOrderCancelReasonResponse;
 import vn.com.greencraze.order.dto.response.transaction.GetOneTransactionResponse;
 
@@ -30,10 +32,17 @@ public record GetOneOrderResponse(
         String deliveryMethod,
         Boolean isReview,
         Instant reviewedDate,
-        //UserDto user,
-        //AddressDto address,
+        GetOneUserResponse user,
+        GetOneAddressResponse address,
         GetOneTransactionResponse transaction,
         GetOneOrderCancelReasonResponse cancelReason,
         List<GetListOrderItemResponse> items
 ) {
+
+    public GetOneOrderResponse setValues(GetOneUserResponse user, GetOneAddressResponse address, List<GetListOrderItemResponse> items) {
+        return new GetOneOrderResponse(id(), createdAt(), updatedAt(), createdBy(), updatedBy(), otherCancelReason(),
+                totalAmount(), tax(), shippingCost(), paymentStatus(), note(), status(), code(), deliveryMethod(),
+                isReview(), reviewedDate(), user, address, transaction(), cancelReason(), items);
+    }
+    
 }

@@ -18,4 +18,5 @@ public record UpdatePaymentMethodRequest(
         @NotNull
         Boolean status
 ) {
+        
 }

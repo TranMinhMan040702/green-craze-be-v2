@@ -26,4 +26,5 @@ public record GetListTransactionResponse(
         String paypalOrderStatus,
         String orderCode
 ) {
+        
 }

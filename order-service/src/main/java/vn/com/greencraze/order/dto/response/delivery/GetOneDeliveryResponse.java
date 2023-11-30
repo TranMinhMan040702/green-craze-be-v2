@@ -22,4 +22,5 @@ public record GetOneDeliveryResponse(
         String image,
         Boolean status
 ) {
+        
 }

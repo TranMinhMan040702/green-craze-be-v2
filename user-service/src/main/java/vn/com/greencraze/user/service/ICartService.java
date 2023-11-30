@@ -4,6 +4,7 @@ import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.user.dto.request.cart.CreateCartItemRequest;
 import vn.com.greencraze.user.dto.request.cart.UpdateCartItemRequest;
+import vn.com.greencraze.user.dto.request.cart.UpdateUserCartRequest;
 import vn.com.greencraze.user.dto.response.cart.CreateCartItemResponse;
 import vn.com.greencraze.user.dto.response.cart.GetListCartItemResponse;
 
@@ -23,4 +24,7 @@ public interface ICartService {
 
     void deleteListCartItem(List<Long> ids);
 
+    //call from another service
+    void updateUserCart(UpdateUserCartRequest request);
+    
 }

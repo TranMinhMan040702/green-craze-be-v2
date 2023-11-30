@@ -24,4 +24,5 @@ public record CreateReviewResponse(
         String reply,
         Boolean status
 ) {
+        
 }

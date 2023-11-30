@@ -25,6 +25,7 @@ import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.product.dto.request.image.CreateProductImageRequest;
 import vn.com.greencraze.product.dto.request.image.UpdateProductImageRequest;
 import vn.com.greencraze.product.dto.request.product.CreateProductRequest;
+import vn.com.greencraze.product.dto.request.product.UpdateListProductQuantityRequest;
 import vn.com.greencraze.product.dto.request.product.ExportProductRequest;
 import vn.com.greencraze.product.dto.request.product.ImportProductRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateProductRequest;
@@ -205,6 +206,16 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+    // TODO: Xem lại luồng export product
+    // call from another service
+    @PutMapping(value = "/update-quantity", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Update a product quantity")
+    public ResponseEntity<Void> updateProductQuantity(@Valid UpdateListProductQuantityRequest request) {
+        productService.updateProductQuantity(request);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update quantity and actual inventory a product after import")
@@ -220,5 +231,5 @@ public class ProductController {
         productService.exportProduct(request);
         return ResponseEntity.noContent().build();
     }
-
+  
 }
