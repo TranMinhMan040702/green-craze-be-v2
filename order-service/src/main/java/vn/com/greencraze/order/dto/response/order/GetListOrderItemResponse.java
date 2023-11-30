@@ -1,11 +1,13 @@
 package vn.com.greencraze.order.dto.response.order;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.With;
 import org.springframework.lang.Nullable;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
+@With
 public record GetListOrderItemResponse(
         Long id,
         Instant createdAt,
@@ -28,13 +30,4 @@ public record GetListOrderItemResponse(
         String productName,
         String variantName,
         Long variantQuantity
-) {
-
-    public GetListOrderItemResponse setValues(String sku, Long productId, String productSlug, String productUnit,
-                                              String productImage, String productName, String variantName, Long variantQuantity) {
-        return new GetListOrderItemResponse(id(), createdAt(), updatedAt(), createdBy(), updatedBy(), variantId(),
-                quantity(), unitPrice(), totalPrice(), sku, productId, productSlug, productUnit,
-                productImage, productName, variantName, variantQuantity);
-    }
-
-}
+) {}

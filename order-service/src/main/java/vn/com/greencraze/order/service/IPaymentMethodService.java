@@ -13,8 +13,7 @@ import java.util.List;
 public interface IPaymentMethodService {
 
     RestResponse<ListResponse<GetListPaymentMethodResponse>> getListPaymentMethod(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
-    );
+            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
 
     RestResponse<GetOnePaymentMethodResponse> getOnePaymentMethod(Long id);
 

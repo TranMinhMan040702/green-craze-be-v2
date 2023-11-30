@@ -7,12 +7,10 @@ import org.springframework.web.multipart.MultipartFile;
 public record CreatePaymentMethodRequest(
         @NotBlank
         String name,
-
         @NotBlank
         String code,
-
         @NotNull
         MultipartFile image
 ) {
-        
+
 }

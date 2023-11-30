@@ -17,14 +17,20 @@ public interface OrderCancelReasonMapper {
     @Mapping(target = "id", ignore = true)
     OrderCancelReason idToOrderCancelReason(String id);
 
-    GetListOrderCancelReasonResponse orderCancelReasonToGetListOrderCancelReasonResponse(OrderCancelReason orderCancelReason);
+    GetListOrderCancelReasonResponse orderCancelReasonToGetListOrderCancelReasonResponse(
+            OrderCancelReason orderCancelReason);
 
-    GetOneOrderCancelReasonResponse orderCancelReasonToGetOneOrderCancelReasonResponse(OrderCancelReason orderCancelReason);
+    GetOneOrderCancelReasonResponse orderCancelReasonToGetOneOrderCancelReasonResponse(
+            OrderCancelReason orderCancelReason);
 
-    OrderCancelReason createOrderCancelReasonRequestToOrderCancelReason(CreateOrderCancelReasonRequest createOrderCancelReasonRequest);
+    OrderCancelReason createOrderCancelReasonRequestToOrderCancelReason(
+            CreateOrderCancelReasonRequest createOrderCancelReasonRequest);
 
-    CreateOrderCancelReasonResponse orderCancelReasonToCreateOrderCancelReasonResponse(OrderCancelReason orderCancelReason);
+    CreateOrderCancelReasonResponse orderCancelReasonToCreateOrderCancelReasonResponse(
+            OrderCancelReason orderCancelReason);
 
-    OrderCancelReason updateOrderCancelReasonFromUpdateOrderCancelReasonRequest(@MappingTarget OrderCancelReason orderCancelReason, UpdateOrderCancelReasonRequest updateOrderCancelReasonRequest);
+    OrderCancelReason updateOrderCancelReasonFromUpdateOrderCancelReasonRequest(
+            @MappingTarget OrderCancelReason orderCancelReason,
+            UpdateOrderCancelReasonRequest updateOrderCancelReasonRequest);
 
 }

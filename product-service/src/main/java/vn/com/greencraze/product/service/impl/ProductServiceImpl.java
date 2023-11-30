@@ -13,9 +13,9 @@ import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.exception.InvalidRequestException;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.product.dto.request.product.CreateProductRequest;
-import vn.com.greencraze.product.dto.request.product.UpdateListProductQuantityRequest;
 import vn.com.greencraze.product.dto.request.product.ExportProductRequest;
 import vn.com.greencraze.product.dto.request.product.ImportProductRequest;
+import vn.com.greencraze.product.dto.request.product.UpdateListProductQuantityRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateProductRequest;
 import vn.com.greencraze.product.dto.response.product.CreateProductResponse;
 import vn.com.greencraze.product.dto.response.product.GetListProductResponse;
@@ -177,6 +177,7 @@ public class ProductServiceImpl implements IProductService {
             product.setSold(product.getSold() + item.quantity());
             productRepository.save(product);
         }
+    }
 
     @Override
     public void importProduct(ImportProductRequest request) {

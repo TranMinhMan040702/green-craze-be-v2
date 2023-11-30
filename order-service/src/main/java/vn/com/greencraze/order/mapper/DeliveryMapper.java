@@ -27,6 +27,7 @@ public interface DeliveryMapper {
     CreateDeliveryResponse deliveryToCreateDeliveryResponse(Delivery delivery);
 
     @Mapping(target = "image", ignore = true)
-    Delivery updateDeliveryFromUpdateDeliveryRequest(@MappingTarget Delivery delivery, UpdateDeliveryRequest updateDeliveryRequest);
+    Delivery updateDeliveryFromUpdateDeliveryRequest(
+            @MappingTarget Delivery delivery, UpdateDeliveryRequest updateDeliveryRequest);
 
 }

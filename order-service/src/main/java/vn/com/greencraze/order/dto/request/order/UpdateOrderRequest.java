@@ -11,6 +11,4 @@ public record UpdateOrderRequest(
         String otherCancellation,
         @NotNull
         Long orderCancellationReasonId
-) {
-        
-}
+) {}

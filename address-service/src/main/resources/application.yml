@@ -51,11 +51,11 @@ logging:
 
 eureka:
   instance:
-    prefer-ip-address: false
+    prefer-ip-address: true
   client:
-    enabled: false
-    register-with-eureka: false
-    fetch-registry: false
+    enabled: true
+    register-with-eureka: true
+    fetch-registry: true
 
 springdoc:
   use-fqn: true

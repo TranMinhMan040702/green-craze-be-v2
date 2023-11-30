@@ -82,7 +82,9 @@ public class OrderServiceImpl implements IOrderService {
     private static final List<String> SEARCH_FIELDS = List.of("code");
 
     @Override
-    public RestResponse<ListResponse<GetListOrderResponse>> getListOrder(Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all, String status) {
+    public RestResponse<ListResponse<GetListOrderResponse>> getListOrder(
+            Integer page, Integer size, Boolean isSortAscending, String columnName,
+            String search, Boolean all, String status) {
         OrderSpecification orderSpecification = new OrderSpecification();
         Specification<Order> sortable = orderSpecification.sortable(isSortAscending, columnName);
         Specification<Order> searchable = orderSpecification.searchable(SEARCH_FIELDS, search);
@@ -97,7 +99,9 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public RestResponse<ListResponse<GetListOrderResponse>> getListUserOrder(Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all, String status) {
+    public RestResponse<ListResponse<GetListOrderResponse>> getListUserOrder(
+            Integer page, Integer size, Boolean isSortAscending, String columnName,
+            String search, Boolean all, String status) {
         String userId = authFacade.getUserId();
 
         OrderSpecification orderSpecification = new OrderSpecification();
@@ -139,9 +143,7 @@ public class OrderServiceImpl implements IOrderService {
         if (address == null)
             throw new ResourceNotFoundException("Address", "addressId", order.getAddressId());
 
-        orderResponse.setValues(user, address, getOrderItemResponse(order.getOrderItems()));
-
-        return orderResponse;
+        return orderResponse.withUser(user).withAddress(address).withItems(getOrderItemResponse(order.getOrderItems()));
     }
 
     private GetOneOrderResponse mapOrderToGetOneOrderResponse(Order order) {
@@ -155,9 +157,7 @@ public class OrderServiceImpl implements IOrderService {
         if (address == null)
             throw new ResourceNotFoundException("Address", "addressId", order.getAddressId());
 
-        orderResponse.setValues(user, address, getOrderItemResponse(order.getOrderItems()));
-
-        return orderResponse;
+        return orderResponse.withUser(user).withAddress(address).withItems(getOrderItemResponse(order.getOrderItems()));
     }
 
     @Override
@@ -166,7 +166,6 @@ public class OrderServiceImpl implements IOrderService {
                 .findById(id)
                 .map(this::mapOrderToGetOneOrderResponse)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "Order", id));
-
         return RestResponse.ok(order);
     }
 
@@ -177,36 +176,48 @@ public class OrderServiceImpl implements IOrderService {
                 .findByUserIdAndCode(userId, code)
                 .map(this::mapOrderToGetOneOrderResponse)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "Order", code));
-
         return RestResponse.ok(order);
     }
 
     private List<GetListOrderItemResponse> getOrderItemResponse(Set<OrderItem> orderItems) {
-        List<GetListOrderItemResponse> orderItemResponses = orderItemMapper.setOrderItemToListGetListOrderItemResponse(orderItems);
+        List<GetListOrderItemResponse> updatedOrderItemResponses = new ArrayList<>();
+        List<GetListOrderItemResponse> orderItemResponses = orderItemMapper
+                .setOrderItemToListGetListOrderItemResponse(orderItems);
 
         for (GetListOrderItemResponse item : orderItemResponses) {
             GetOneVariantResponse variant = productServiceClient.getOneVariant(item.variantId());
-            if (variant == null)
+            if (variant == null) {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", item.variantId());
+            }
 
             GetOneProductResponse product = productServiceClient.getOneProduct(variant.productId());
-            if (product == null)
+            if (product == null) {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "productId", variant.productId());
+            }
 
-            item = item.setValues(variant.sku(), variant.productId(), product.slug(), product.unit().name(),
-                    product.images().stream().findFirst().get().image(), product.name(), variant.name(),
-                    variant.quantity().longValue());
+            updatedOrderItemResponses.add(item.withSku(variant.sku())
+                    .withProductId(variant.productId())
+                    .withProductSlug(product.slug())
+                    .withProductUnit(product.unit().name())
+                    .withProductImage(product.images().stream()
+                            .findFirst()
+                            .map(GetOneProductResponse.ProductImageResponse::image).orElse(null))
+                    .withProductName((product.name()))
+                    .withVariantName(variant.name())
+                    .withVariantQuantity(Long.valueOf(variant.quantity())));
         }
 
-        return orderItemResponses;
+        return updatedOrderItemResponses;
     }
 
     private Order initOrder(CreateOrderRequest request) {
         String userId = authFacade.getUserId();
+        Order order = new Order();
         // get default address
         GetOneAddressResponse address = addressServiceClient.getDefaultAddress(userId);
-        if (address == null)
+        if (address == null) {
             throw new ResourceNotFoundException("Address", "addressId", userId);
+        }
         Long addressId = address.id();
 
         Delivery delivery = deliveryRepository
@@ -215,20 +226,23 @@ public class OrderServiceImpl implements IOrderService {
 
         PaymentMethod paymentMethod = paymentMethodRepository
                 .findById(request.paymentMethodId())
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "paymentMethodId", request.paymentMethodId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        RESOURCE_NAME, "paymentMethodId", request.paymentMethodId()));
 
         Set<OrderItem> orderItems = new HashSet<>();
-        BigDecimal totalAmount = BigDecimal.valueOf(0);
+        BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (CreateOrderItemRequest oi : request.items()) {
             // get variant from product service
             GetOneVariantResponse variant = productServiceClient.getOneVariant(oi.variantId());
-            if (variant == null)
+            if (variant == null) {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", oi.variantId());
+            }
 
             BigDecimal variantPrice = variant.totalPrice().multiply(BigDecimal.valueOf(oi.quantity()));
 
             OrderItem orderItem = orderItemMapper.createOrderItemRequestToOrderItem(oi);
+            orderItem.setOrder(order);
             orderItem.setUnitPrice(variant.totalPrice());
             orderItem.setTotalPrice(variantPrice);
 
@@ -243,7 +257,7 @@ public class OrderServiceImpl implements IOrderService {
         transaction.setPaymentMethod(paymentMethod.getCode());
         transaction.setTotalPay(totalAmount);
 
-        Order order = Order.builder()
+        return Order.builder()
                 .code(UUID.randomUUID().toString().replace('-', ' ').toUpperCase())
                 .userId(userId)
                 .addressId(addressId)
@@ -257,8 +271,6 @@ public class OrderServiceImpl implements IOrderService {
                 .paymentStatus(false)
                 .totalAmount(totalAmount)
                 .build();
-
-        return order;
     }
 
     private void updateProduct(List<CreateOrderItemRequest> items) {
@@ -301,11 +313,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     private void createDocket(List<CreateOrderItemRequest> items, Long orderId, String type) {
-        CreateDocketRequest request = new CreateDocketRequest(
-                orderId,
-                type,
-                new ArrayList<>()
-        );
+        CreateDocketRequest request = new CreateDocketRequest(orderId, type, new ArrayList<>());
 
         for (CreateOrderItemRequest item : items) {
             GetOneVariantResponse variant = productServiceClient.getOneVariant(item.variantId());
@@ -315,11 +323,9 @@ public class OrderServiceImpl implements IOrderService {
             request.productDockets().add(
                     new CreateDocketRequest.ProductDocket(
                             variant.productId(),
-                            variant.quantity() * item.quantity()
-                    )
+                            variant.quantity() * item.quantity())
             );
         }
-
         inventoryServiceClient.createDocket(request);
     }
 
@@ -364,59 +370,50 @@ public class OrderServiceImpl implements IOrderService {
         }
 
         // Cannot update order while it's delivered
-        if (order.getStatus() == OrderStatus.DELIVERED)
+        if (order.getStatus() == OrderStatus.DELIVERED) {
             throw new InvalidRequestException("Unexpected order status, cannot update order while it's delivered");
+        }
 
-        if (order.getStatus() == OrderStatus.CANCELLED
-                && (!hasInRole("ADMIN") && !hasInRole("STAFF")))
+        if (order.getStatus() == OrderStatus.CANCELLED && (!hasInRole("ADMIN") && !hasInRole("STAFF"))) {
             throw new InvalidRequestException("Unexpected order status, user cannot update order while it's cancelled");
+        }
 
         // Customer cannot cancel order while it's processing, only admin and staff can do that
         if (order.getStatus() != OrderStatus.NOT_PROCESSED
                 && Objects.equals(status, OrderStatus.CANCELLED)
-                && (!hasInRole("ADMIN") && !hasInRole("STAFF")))
+                && (!hasInRole("ADMIN") && !hasInRole("STAFF"))) {
             throw new InvalidRequestException("Unexpected order status, cannot cancel order while it's processing");
+        }
     }
 
     private void handleChangeStatus(Order order, UpdateOrderRequest request) {
         Instant now = Instant.now();
-
         order.setStatus(request.status());
-
         if (Objects.equals(request.status(), OrderStatus.DELIVERED)) {
-
             order.setPaymentStatus(true);
             if (Objects.equals(order.getTransaction().getPaymentMethod(), PaymentCode.COD.name()))
                 order.getTransaction().setPaidAt(now);
             order.getTransaction().setCompletedAt(now);
-
         } else if (Objects.equals(request.status(), OrderStatus.CANCELLED)) {
-
             if (request.otherCancellation().isEmpty() || request.otherCancellation().isBlank()) {
                 var cancellationReason = orderCancelReasonRepository.findById(request.orderCancellationReasonId())
                         .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cancelReason",
                                 request.orderCancellationReasonId()));
                 order.setCancelReason(cancellationReason);
-
             } else {
-
                 order.setOtherCancelReason(request.otherCancellation());
-
             }
-
             // update product when cancelling order
             List<CreateOrderItemRequest> items = orderItemMapper.orderItemToCreateOrderItemRequest(order.getOrderItems());
-            items.forEach(x -> x = x.setQuantity(x.quantity() * -1));
+            items.forEach(x -> x = x.withQuantity(x.quantity() * -1));
             updateProduct(items);
 
             // create docket when cancelling order
-            createDocket(orderItemMapper.orderItemToCreateOrderItemRequest(order.getOrderItems()),
-                    order.getId(), "IMPORT");
+            createDocket(orderItemMapper.orderItemToCreateOrderItemRequest(
+                    order.getOrderItems()), order.getId(), "IMPORT");
         } else {
-
             order.setCancelReason(null);
             order.setOtherCancelReason(null);
-
         }
     }
 

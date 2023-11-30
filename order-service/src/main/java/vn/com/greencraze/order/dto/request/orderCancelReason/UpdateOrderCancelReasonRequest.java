@@ -6,12 +6,10 @@ import jakarta.validation.constraints.NotNull;
 public record UpdateOrderCancelReasonRequest(
         @NotBlank
         String name,
-
         @NotBlank
         String note,
-
         @NotNull
         Boolean status
 ) {
-        
+
 }

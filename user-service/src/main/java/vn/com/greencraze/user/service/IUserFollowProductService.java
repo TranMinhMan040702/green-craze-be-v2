@@ -13,7 +13,6 @@ public interface IUserFollowProductService {
     void unfollowProduct(FollowProductRequest request);
 
     RestResponse<ListResponse<GetListUserFollowProductResponse>> getListFollowingProduct(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
-    );
+            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
 
 }
