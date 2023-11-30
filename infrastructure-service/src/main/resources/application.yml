@@ -1,0 +1,92 @@
+server:
+  port: 7257
+  servlet:
+    context-path: /core/infrastructure
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: infrastructure-service
+  profiles:
+    active: dev
+  web:
+    resources:
+      add-mappings: false
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  mail:
+    default-encoding: UTF-8
+    host: smtp.gmail.com
+    port: 587
+    username: cristran040702@gmail.com
+    password: wxjugsquhiyajgdc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+        debug: true
+    test-connection: false
+    protocol: smtp
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+
+logging:
+  level:
+    web: trace
+    org.hibernate.orm.jdbc.bind: trace
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7230/eureka
+
+---
+spring:
+  config:
+    activate:
+      on-profile: stag
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://green_craze-core-eureka-service:7230/eureka
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://green_craze-core-eureka-service:7230/eureka

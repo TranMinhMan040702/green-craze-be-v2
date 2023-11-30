@@ -29,7 +29,9 @@ import java.util.List;
 public class BrandServiceImpl implements IBrandService {
 
     private final BrandRepository brandRepository;
+
     private final BrandMapper brandMapper;
+
     private final IUploadService uploadService;
 
     private static final String RESOURCE_NAME = "Brand";

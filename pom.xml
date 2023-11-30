@@ -21,6 +21,7 @@
         <module>inventory-service</module>
         <module>post-service</module>
         <module>address-service</module>
+        <module>infrastructure-service</module>
     </modules>
 
 </project>

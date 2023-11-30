@@ -69,6 +69,6 @@ public class Docket {
     @Column(name = "code", nullable = false, unique = true)
     private String code;
 
-    @Column(name = "type", columnDefinition = "TEXT")
+    @Column(name = "note", columnDefinition = "TEXT")
     private String note;
 }

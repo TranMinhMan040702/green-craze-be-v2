@@ -10,8 +10,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.exception.InvalidRequestException;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.product.dto.request.product.CreateProductRequest;
+import vn.com.greencraze.product.dto.request.product.ExportProductRequest;
+import vn.com.greencraze.product.dto.request.product.ImportProductRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateProductRequest;
 import vn.com.greencraze.product.dto.response.product.CreateProductResponse;
 import vn.com.greencraze.product.dto.response.product.GetListProductResponse;
@@ -41,8 +44,11 @@ public class ProductServiceImpl implements IProductService {
     private final ProductCategoryRepository productCategoryRepository;
     private final BrandRepository brandRepository;
     private final UnitRepository unitRepository;
+
     private final ProductMapper productMapper;
+
     private final IUploadService uploadService;
+
     private final ObjectMapper objectMapper;
 
     private static final String RESOURCE_NAME = "Product";
@@ -158,6 +164,27 @@ public class ProductServiceImpl implements IProductService {
             product.setStatus(ProductStatus.INACTIVE);
             productRepository.save(product);
         }
+    }
+
+    @Override
+    public void importProduct(ImportProductRequest request) {
+        Product product = productRepository.findById(request.id())
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", request.id()));
+        product.setQuantity(product.getQuantity() + request.quantity());
+        product.setActualInventory(request.actualInventory());
+        productRepository.save(product);
+    }
+
+    @Override
+    public void exportProduct(ExportProductRequest request) {
+        Product product = productRepository.findById(request.id())
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", request.id()));
+        if (product.getQuantity() < request.quantity() || product.getActualInventory() < request.quantity()) {
+            throw new InvalidRequestException("Product quantity is not enough");
+        }
+        product.setQuantity(product.getQuantity() - request.quantity());
+        product.setActualInventory(product.getActualInventory() - request.quantity());
+        productRepository.save(product);
     }
 
 }
