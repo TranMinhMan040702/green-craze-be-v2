@@ -76,9 +76,9 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:mysql://localhost:3306/core_inventory
-    username: root
-    password: 1234
+    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_inventory
+    username: avnadmin
+    password: AVNS_ICGL1LOHUwComp9Dj2e
 
 eureka:
   client:
@@ -91,9 +91,9 @@ spring:
     activate:
       on-profile: stag
   datasource:
-    url: jdbc:mysql://localhost:3306/core_inventory
-    username: root
-    password: 1234
+    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_inventory
+    username: avnadmin
+    password: AVNS_ICGL1LOHUwComp9Dj2e
 
 eureka:
   client:
@@ -106,9 +106,9 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:mysql://localhost:3306/core_inventory
-    username: root
-    password: 1234
+    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_inventory
+    username: avnadmin
+    password: AVNS_ICGL1LOHUwComp9Dj2e
 
 eureka:
   client:
