@@ -16,7 +16,7 @@ import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.order.client.address.AddressServiceClient;
 import vn.com.greencraze.order.client.address.dto.response.GetOneAddressResponse;
 import vn.com.greencraze.order.client.inventory.InventoryServiceClient;
-import vn.com.greencraze.order.client.inventory.dto.request.ExportProductRequest;
+import vn.com.greencraze.order.client.inventory.dto.request.CreateDocketRequest;
 import vn.com.greencraze.order.client.product.ProductServiceClient;
 import vn.com.greencraze.order.client.product.dto.request.UpdateListProductQuantityRequest;
 import vn.com.greencraze.order.client.product.dto.response.GetOneProductResponse;
@@ -301,7 +301,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     private void createDocket(List<CreateOrderItemRequest> items, Long orderId, String type) {
-        ExportProductRequest request = new ExportProductRequest(
+        CreateDocketRequest request = new CreateDocketRequest(
                 orderId,
                 type,
                 new ArrayList<>()
@@ -313,14 +313,14 @@ public class OrderServiceImpl implements IOrderService {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", item.variantId());
 
             request.productDockets().add(
-                    new ExportProductRequest.ProductDocket(
+                    new CreateDocketRequest.ProductDocket(
                             variant.productId(),
                             variant.quantity() * item.quantity()
                     )
             );
         }
 
-        inventoryServiceClient.exportProduct(request);
+        inventoryServiceClient.createDocket(request);
     }
 
     private void createNotify() {

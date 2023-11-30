@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
-public record ExportProductRequest(
+public record CreateDocketRequest(
         @NotNull
         Long orderId,
         @NotBlank
