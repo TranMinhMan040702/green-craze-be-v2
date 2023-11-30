@@ -13,4 +13,5 @@ public record UpdateUserCartRequest(
         @NotEmpty
         List<Long> variantItemIds
 ) {
+        
 }

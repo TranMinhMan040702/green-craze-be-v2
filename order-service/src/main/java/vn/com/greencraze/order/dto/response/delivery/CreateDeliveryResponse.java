@@ -22,4 +22,5 @@ public record CreateDeliveryResponse(
         String image,
         Boolean status
 ) {
+        
 }

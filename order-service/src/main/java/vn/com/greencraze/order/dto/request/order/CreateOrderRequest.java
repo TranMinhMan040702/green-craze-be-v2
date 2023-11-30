@@ -17,4 +17,5 @@ public record CreateOrderRequest(
         @NotNull
         List<CreateOrderItemRequest> items
 ) {
+        
 }

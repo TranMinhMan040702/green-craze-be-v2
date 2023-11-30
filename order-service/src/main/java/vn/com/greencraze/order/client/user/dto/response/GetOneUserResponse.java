@@ -29,6 +29,7 @@ public record GetOneUserResponse(
         IdentityStatus status,
         List<String> roles
 ) {
+
     public enum GenderType {
         MALE,
         FEMALE,
@@ -41,4 +42,5 @@ public record GetOneUserResponse(
         UNCONFIRMED,
         BLOCK
     }
+    
 }

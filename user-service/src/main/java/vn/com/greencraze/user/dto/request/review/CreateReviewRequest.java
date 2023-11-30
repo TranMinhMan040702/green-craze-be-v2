@@ -18,4 +18,5 @@ public record CreateReviewRequest(
         @NotNull
         MultipartFile image
 ) {
+        
 }

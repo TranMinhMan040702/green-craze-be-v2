@@ -7,8 +7,10 @@ import vn.com.greencraze.order.client.inventory.dto.request.ExportProductRequest
 
 @FeignClient("inventory-service")
 public interface InventoryServiceClient {
+
     String BASE = "/core/inventory";
 
     @PostMapping(BASE + "/inventories/export-product")
     void exportProduct(@RequestBody ExportProductRequest request);
+    
 }

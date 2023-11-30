@@ -10,6 +10,7 @@ import vn.com.greencraze.order.client.user.dto.response.GetOneUserResponse;
 
 @FeignClient("user-service")
 public interface UserServiceClient {
+    
     String BASE = "/core/user";
 
     @GetMapping(BASE + "/users/{id}")
@@ -17,4 +18,5 @@ public interface UserServiceClient {
 
     @PutMapping(BASE + "/carts/update-user-cart")
     void updateUserCart(@RequestBody UpdateUserCartRequest request);
+
 }

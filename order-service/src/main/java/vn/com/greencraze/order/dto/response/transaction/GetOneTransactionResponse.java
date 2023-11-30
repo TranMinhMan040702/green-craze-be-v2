@@ -26,4 +26,5 @@ public record GetOneTransactionResponse(
         String paypalOrderStatus,
         String orderCode
 ) {
+        
 }

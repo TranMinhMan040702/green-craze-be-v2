@@ -14,4 +14,5 @@ public record CreatePaymentMethodRequest(
         @NotNull
         MultipartFile image
 ) {
+        
 }

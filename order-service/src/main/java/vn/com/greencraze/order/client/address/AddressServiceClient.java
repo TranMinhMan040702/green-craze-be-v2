@@ -7,6 +7,7 @@ import vn.com.greencraze.order.client.address.dto.response.GetOneAddressResponse
 
 @FeignClient("address-service")
 public interface AddressServiceClient {
+
     String BASE = "/core/address";
 
     @GetMapping(BASE + "/addresses/{id}")

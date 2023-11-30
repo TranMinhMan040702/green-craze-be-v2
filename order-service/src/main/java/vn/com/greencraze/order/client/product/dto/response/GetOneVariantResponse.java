@@ -29,8 +29,10 @@ public record GetOneVariantResponse(
         VariantStatus status,
         Long productId
 ) {
+
     public enum VariantStatus {
         ACTIVE,
         INACTIVE
     }
+    
 }

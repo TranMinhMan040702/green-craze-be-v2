@@ -19,4 +19,5 @@ public record CreateOrderCancelReasonResponse(
         String note,
         Boolean status
 ) {
+        
 }

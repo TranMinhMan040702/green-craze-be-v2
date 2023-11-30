@@ -31,6 +31,7 @@ public record GetOneReviewResponse(
         ProductResponse product,
         UserProfile user
 ) {
+    
     public GetOneReviewResponse setProduct(ProductResponse product) {
         return new GetOneReviewResponse(
                 id,

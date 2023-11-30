@@ -14,13 +14,15 @@ public record ExportProductRequest(
         @NotNull
         @NotEmpty
         List<ProductDocket> productDockets
-
 ) {
+
     public record ProductDocket(
             @NotNull
             Long productId,
             @NotNull
             Integer quantity
     ) {
+
     }
+
 }

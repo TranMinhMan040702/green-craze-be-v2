@@ -13,4 +13,5 @@ public record UpdateOrderCancelReasonRequest(
         @NotNull
         Boolean status
 ) {
+        
 }

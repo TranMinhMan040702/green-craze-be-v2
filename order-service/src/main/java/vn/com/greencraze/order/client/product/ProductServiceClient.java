@@ -11,6 +11,7 @@ import vn.com.greencraze.order.client.product.dto.response.GetOneVariantResponse
 
 @FeignClient("product-service")
 public interface ProductServiceClient {
+
     String BASE = "/core/product";
 
     @GetMapping(BASE + "/products/{id}")
@@ -21,4 +22,5 @@ public interface ProductServiceClient {
 
     @PutMapping(BASE + "/products/update-quantity")
     void updateProductQuantity(@RequestBody UpdateListProductQuantityRequest request);
+    
 }

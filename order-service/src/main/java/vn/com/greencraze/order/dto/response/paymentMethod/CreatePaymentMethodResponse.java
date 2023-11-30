@@ -20,4 +20,5 @@ public record CreatePaymentMethodResponse(
         String image,
         Boolean status
 ) {
+        
 }

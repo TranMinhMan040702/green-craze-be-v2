@@ -26,4 +26,5 @@ public interface ICartService {
 
     //call from another service
     void updateUserCart(UpdateUserCartRequest request);
+    
 }

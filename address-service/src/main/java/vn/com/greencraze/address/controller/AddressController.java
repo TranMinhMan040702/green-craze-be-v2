@@ -37,6 +37,7 @@ import java.util.List;
 @Tag(name = "address :: Address")
 @RequiredArgsConstructor
 public class AddressController {
+    
     private final IAddressService addressService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)

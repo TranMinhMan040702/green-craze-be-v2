@@ -20,6 +20,7 @@ public record GetListUserFollowProductResponse(
         Long productId,
         ProductResponse product
 ) {
+
     public GetListUserFollowProductResponse setProduct(ProductResponse product) {
         return new GetListUserFollowProductResponse(
                 id,

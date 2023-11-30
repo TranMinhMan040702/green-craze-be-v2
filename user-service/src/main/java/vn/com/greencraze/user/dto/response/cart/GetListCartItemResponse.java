@@ -33,4 +33,5 @@ public record GetListCartItemResponse(
         String productImage,
         Boolean isPromotion
 ) {
+        
 }

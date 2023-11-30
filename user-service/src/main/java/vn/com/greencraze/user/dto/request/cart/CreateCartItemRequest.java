@@ -8,4 +8,5 @@ public record CreateCartItemRequest(
         @NotNull
         Integer quantity
 ) {
+        
 }

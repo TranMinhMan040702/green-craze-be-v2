@@ -38,10 +38,13 @@ public record GetListOrderResponse(
         GetOneAddressResponse address,
         GetOneTransactionResponse transaction,
         GetOneOrderCancelReasonResponse cancelReason,
-        List<GetListOrderItemResponse> items) {
+        List<GetListOrderItemResponse> items
+) {
+
     public GetListOrderResponse setValues(GetOneUserResponse user, GetOneAddressResponse address, List<GetListOrderItemResponse> items) {
         return new GetListOrderResponse(id(), createdAt(), updatedAt(), createdBy(), updatedBy(), userId(), addressId(), otherCancelReason(),
                 totalAmount(), tax(), shippingCost(), paymentStatus(), note(), status(), code(), deliveryMethod(),
                 isReview(), reviewedDate(), user, address, transaction(), cancelReason(), items);
     }
+
 }

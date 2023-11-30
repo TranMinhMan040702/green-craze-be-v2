@@ -20,4 +20,5 @@ public record GetListPaymentMethodResponse(
         String image,
         Boolean status
 ) {
+        
 }

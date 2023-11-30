@@ -34,6 +34,7 @@ public record GetOneProductResponse(
         List<ProductImageResponse> images,
         List<VariantResponse> variants
 ) {
+
     public enum ProductStatus {
         ACTIVE,
         INACTIVE,

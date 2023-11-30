@@ -56,7 +56,8 @@ public class AddressServiceImpl implements IAddressService {
     private static final List<String> SEARCH_FIELDS = List.of("receiver", "street", "email", "phone");
 
     @Override
-    public RestResponse<ListResponse<GetListAddressResponse>> getListAddress(Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
+    public RestResponse<ListResponse<GetListAddressResponse>> getListAddress(Integer page, Integer size, Boolean isSortAscending,
+                                                                             String columnName, String search, Boolean all) {
         String userId = authFacade.getUserId();
 
         AddressSpecification addressSpecification = new AddressSpecification();
