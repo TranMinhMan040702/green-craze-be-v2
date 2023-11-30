@@ -35,7 +35,7 @@ public interface IUserProfileService {
 
     void disableListUser(List<String> ids);
 
-    RestResponse<GetListStaffResponse> getListStaff(
+    RestResponse<ListResponse<GetListStaffResponse>> getListStaff(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
 
     RestResponse<GetOneStaffResponse> getOneStaff(Long id);
@@ -45,5 +45,9 @@ public interface IUserProfileService {
     void updateStaff(Long id, UpdateStaffRequest request);
 
     void disableListStaff(List<Long> ids);
+
+    void disableStaff(Long id);
+
+    void enableStaff(Long id);
 
 }

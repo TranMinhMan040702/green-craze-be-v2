@@ -20,29 +20,28 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
-import vn.com.greencraze.user.dto.request.user.CreateUserRequest;
-import vn.com.greencraze.user.dto.request.user.UpdateUserRequest;
-import vn.com.greencraze.user.dto.response.user.CreateUserResponse;
-import vn.com.greencraze.user.dto.response.user.GetListUserResponse;
-import vn.com.greencraze.user.dto.response.user.GetMeResponse;
-import vn.com.greencraze.user.dto.response.user.GetOneUserResponse;
+import vn.com.greencraze.user.dto.request.user.CreateStaffRequest;
+import vn.com.greencraze.user.dto.request.user.UpdateStaffRequest;
+import vn.com.greencraze.user.dto.response.user.CreateStaffResponse;
+import vn.com.greencraze.user.dto.response.user.GetListStaffResponse;
+import vn.com.greencraze.user.dto.response.user.GetOneStaffResponse;
 import vn.com.greencraze.user.service.IUserProfileService;
 
 import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
-@Tag(name = "user :: User")
+@RequestMapping("/staffs")
+@Tag(name = "staff :: Staff")
 @RequiredArgsConstructor
-public class UserController {
+public class StaffController {
 
     private final IUserProfileService userProfileService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get a list of users")
-    public ResponseEntity<RestResponse<ListResponse<GetListUserResponse>>> getListUser(
+    @Operation(summary = "Get a list of staffs")
+    public ResponseEntity<RestResponse<ListResponse<GetListStaffResponse>>> getListStaff(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "true") boolean isSortAscending,
@@ -50,64 +49,58 @@ public class UserController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) boolean all
     ) {
-        return ResponseEntity.ok(userProfileService.getListUser(
+        return ResponseEntity.ok(userProfileService.getListStaff(
                 page, size, isSortAscending, columnName, search, all)
         );
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get a user")
-    public ResponseEntity<RestResponse<GetOneUserResponse>> getOneUser(@PathVariable String id) {
-        return ResponseEntity.ok(userProfileService.getOneUser(id));
-    }
-
-    @GetMapping(value = "/profile/me", produces = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get a user")
-    public ResponseEntity<RestResponse<GetMeResponse>> getMe() {
-        return ResponseEntity.ok(userProfileService.getMe());
+    @Operation(summary = "Get a staff")
+    public ResponseEntity<RestResponse<GetOneStaffResponse>> getOneStaff(@PathVariable Long id) {
+        return ResponseEntity.ok(userProfileService.getOneStaff(id));
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Create user")
-    public ResponseEntity<RestResponse<CreateUserResponse>> createUser(@RequestBody @Valid CreateUserRequest request) {
-        RestResponse<CreateUserResponse> response = userProfileService.createUser(request);
+    @Operation(summary = "Create staff")
+    public ResponseEntity<RestResponse<CreateStaffResponse>> createStaff(
+            @RequestBody @Valid CreateStaffRequest request) {
+        RestResponse<CreateStaffResponse> response = userProfileService.createStaff(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
         return ResponseEntity.created(location).body(response);
     }
 
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Update user")
-    public ResponseEntity<Void> updateUser(@RequestBody @Valid UpdateUserRequest request) {
-        userProfileService.updateUser(request);
+    @Operation(summary = "Update staff")
+    public ResponseEntity<Void> updateStaff(@PathVariable Long id, @RequestBody @Valid UpdateStaffRequest request) {
+        userProfileService.updateStaff(id, request);
         return ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/disable/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Disable user")
-    public ResponseEntity<Void> disableUser(@PathVariable String id) {
-        userProfileService.disableUser(id);
+    @Operation(summary = "Disable staff")
+    public ResponseEntity<Void> disableStaff(@PathVariable Long id) {
+        userProfileService.disableStaff(id);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/disable")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Disable a list user")
-    public ResponseEntity<Void> disableListUser(@RequestParam List<String> ids) {
-        userProfileService.disableListUser(ids);
+    @Operation(summary = "Disable a list staff")
+    public ResponseEntity<Void> disableListStaff(@RequestParam List<Long> ids) {
+        userProfileService.disableListStaff(ids);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/enable/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Enable user")
-    public ResponseEntity<Void> enableUser(@PathVariable String id) {
-        userProfileService.enableUser(id);
+    @Operation(summary = "Enable staff")
+    public ResponseEntity<Void> enableStaff(@PathVariable Long id) {
+        userProfileService.enableStaff(id);
         return ResponseEntity.noContent().build();
     }
 

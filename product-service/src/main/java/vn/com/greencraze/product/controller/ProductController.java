@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -67,6 +68,11 @@ public class ProductController {
         ));
     }
 
+    // TODO: API search product
+
+    // TODO: API filter product
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a product")
@@ -81,6 +87,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getOneProductBySlug(slug));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a product")
@@ -93,6 +100,7 @@ public class ProductController {
         return ResponseEntity.created(location).body(response);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a product")
@@ -101,6 +109,7 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a product")
@@ -109,6 +118,7 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a list of products")
@@ -117,6 +127,7 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/images", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a list of product images")
@@ -126,6 +137,7 @@ public class ProductController {
         return ResponseEntity.ok(productImageService.getListProductImage(productId));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/images/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a product image")
@@ -133,6 +145,7 @@ public class ProductController {
         return ResponseEntity.ok(productImageService.getOneProductImage(id));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(
             value = "/images",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -149,6 +162,7 @@ public class ProductController {
         return ResponseEntity.created(location).body(response);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/images/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a product image")
@@ -159,6 +173,7 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PatchMapping(value = "/images/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Set default a product image")
@@ -169,18 +184,20 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/images/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a product image")
-    public ResponseEntity<Void> deleteOneUnit(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteOneProductImage(@PathVariable Long id) {
         productImageService.deleteOneProductImage(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/images")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a list of product images")
-    public ResponseEntity<Void> deleteListUnit(@RequestParam List<Long> ids) {
+    public ResponseEntity<Void> deleteListProductImage(@RequestParam List<Long> ids) {
         productImageService.deleteListProductImage(ids);
         return ResponseEntity.noContent().build();
     }

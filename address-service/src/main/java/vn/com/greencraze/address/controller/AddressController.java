@@ -92,9 +92,7 @@ public class AddressController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a address")
-    public ResponseEntity<RestResponse<CreateAddressResponse>> createAddress(
-            @Valid CreateAddressRequest request
-    ) {
+    public ResponseEntity<RestResponse<CreateAddressResponse>> createAddress(@Valid CreateAddressRequest request) {
         RestResponse<CreateAddressResponse> response = addressService.createAddress(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
@@ -104,9 +102,7 @@ public class AddressController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a address")
-    public ResponseEntity<Void> updateAddress(
-            @PathVariable Long id, @Valid UpdateAddressRequest request
-    ) {
+    public ResponseEntity<Void> updateAddress(@PathVariable Long id, @Valid UpdateAddressRequest request) {
         addressService.updateAddress(id, request);
         return ResponseEntity.noContent().build();
     }

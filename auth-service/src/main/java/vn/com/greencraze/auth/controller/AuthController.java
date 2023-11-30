@@ -20,6 +20,7 @@ import vn.com.greencraze.auth.dto.request.auth.RefreshTokenRequest;
 import vn.com.greencraze.auth.dto.request.auth.RegisterRequest;
 import vn.com.greencraze.auth.dto.request.auth.ResendOTPRequest;
 import vn.com.greencraze.auth.dto.request.auth.ResetPasswordRequest;
+import vn.com.greencraze.auth.dto.request.auth.ValidateAccessTokenRequest;
 import vn.com.greencraze.auth.dto.request.auth.VerifyOTPRequest;
 import vn.com.greencraze.auth.dto.response.auth.AuthenticateResponse;
 import vn.com.greencraze.auth.dto.response.auth.ForgotPasswordResponse;
@@ -28,6 +29,7 @@ import vn.com.greencraze.auth.dto.response.auth.RefreshTokenResponse;
 import vn.com.greencraze.auth.dto.response.auth.RegisterResponse;
 import vn.com.greencraze.auth.dto.response.auth.ResendOTPResponse;
 import vn.com.greencraze.auth.dto.response.auth.ResetPasswordResponse;
+import vn.com.greencraze.auth.dto.response.auth.ValidateAccessTokenResponse;
 import vn.com.greencraze.auth.dto.response.auth.VerifyOTPResponse;
 import vn.com.greencraze.auth.service.IAuthService;
 import vn.com.greencraze.auth.service.ISystemService;
@@ -54,22 +56,8 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-
     @PostMapping(
             value = "/login",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Login with google")
-    public ResponseEntity<RestResponse<GoogleAuthResponse>> authenticateWithGoogle(
-            @RequestBody @Valid GoogleAuthRequest request
-    ) throws GeneralSecurityException, IOException {
-        return ResponseEntity.ok(authService.authenticateWithGoogle(request));
-    }
-
-    @PostMapping(
-            value = "/google-login",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
@@ -79,6 +67,32 @@ public class AuthController {
             @RequestBody @Valid AuthenticateRequest request
     ) {
         return ResponseEntity.ok(authService.authenticate(request));
+    }
+
+    @PostMapping(
+            value = "/validate-access-token",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Validate access token")
+    public ResponseEntity<RestResponse<ValidateAccessTokenResponse>> validateAccessToken(
+            @RequestBody @Valid ValidateAccessTokenRequest request
+    ) {
+        return ResponseEntity.ok(authService.validateAccessToken(request));
+    }
+
+    @PostMapping(
+            value = "/google-login",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Login with google")
+    public ResponseEntity<RestResponse<GoogleAuthResponse>> authenticateWithGoogle(
+            @RequestBody @Valid GoogleAuthRequest request
+    ) throws GeneralSecurityException, IOException {
+        return ResponseEntity.ok(authService.authenticateWithGoogle(request));
     }
 
     @PostMapping(

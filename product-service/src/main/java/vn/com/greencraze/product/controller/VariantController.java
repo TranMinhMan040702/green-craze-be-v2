@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +38,7 @@ public class VariantController {
 
     private final IVariantService variantService;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a list of variants")
@@ -46,6 +48,7 @@ public class VariantController {
         return ResponseEntity.ok(variantService.getListVariant(productId));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a variant")
@@ -53,6 +56,7 @@ public class VariantController {
         return ResponseEntity.ok(variantService.getOneVariant(id));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a variant")
@@ -65,6 +69,7 @@ public class VariantController {
         return ResponseEntity.created(location).body(response);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a variant")
@@ -75,18 +80,20 @@ public class VariantController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a variant")
-    public ResponseEntity<Void> deleteOneUnit(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteOneVariant(@PathVariable Long id) {
         variantService.deleteOneVariant(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a list of variants")
-    public ResponseEntity<Void> deleteListUnit(@RequestParam List<Long> ids) {
+    public ResponseEntity<Void> deleteListVariant(@RequestParam List<Long> ids) {
         variantService.deleteListVariant(ids);
         return ResponseEntity.noContent().build();
     }

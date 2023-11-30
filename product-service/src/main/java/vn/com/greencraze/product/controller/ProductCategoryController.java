@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -54,6 +55,7 @@ public class ProductCategoryController {
         );
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a product category")
@@ -70,6 +72,7 @@ public class ProductCategoryController {
         return ResponseEntity.ok(productCategoryService.getOneProductCategoryBySlug(slug));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a product category")
@@ -82,28 +85,31 @@ public class ProductCategoryController {
         return ResponseEntity.created(location).body(response);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a product category")
-    public ResponseEntity<Void> updateBrand(
+    public ResponseEntity<Void> updateProductCategory(
             @PathVariable Long id, @Valid UpdateProductCategoryRequest request
     ) {
         productCategoryService.updateProductCategory(id, request);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a product category")
-    public ResponseEntity<Void> deleteOneBrand(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteOneProductCategory(@PathVariable Long id) {
         productCategoryService.deleteOneProductCategory(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a list of product category")
-    public ResponseEntity<Void> deleteListBrand(@RequestParam List<Long> ids) {
+    public ResponseEntity<Void> deleteListProductCategory(@RequestParam List<Long> ids) {
         productCategoryService.deleteListProductCategory(ids);
         return ResponseEntity.noContent().build();
     }
