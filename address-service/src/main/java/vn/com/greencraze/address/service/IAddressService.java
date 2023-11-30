@@ -23,6 +23,8 @@ public interface IAddressService {
 
     RestResponse<GetOneAddressResponse> getDefaultAddress();
 
+    RestResponse<GetOneAddressResponse> getDefaultUserAddress(String userId);
+
     RestResponse<List<GetListProvinceResponse>> getListProvince();
 
     RestResponse<List<GetListDistrictResponse>> getListDistrictByProvince(long provinceId);

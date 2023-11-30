@@ -2,6 +2,7 @@ package vn.com.greencraze.user.mapper;
 
 import org.mapstruct.Mapper;
 import vn.com.greencraze.commons.mapper.ReferenceMapper;
+import vn.com.greencraze.user.client.product.dto.response.GetOneProductResponse;
 import vn.com.greencraze.user.dto.response.userFollowProduct.CreateUserFollowProductResponse;
 import vn.com.greencraze.user.dto.response.userFollowProduct.GetListUserFollowProductResponse;
 import vn.com.greencraze.user.entity.UserFollowProduct;
@@ -14,5 +15,7 @@ public interface UserFollowProductMapper {
 
     GetListUserFollowProductResponse userFollowProductToGetListFollowingProductResponse(
             UserFollowProduct userFollowProduct);
+
+    GetListUserFollowProductResponse.ProductResponse productResponseToGetListUserFollowProductResponse(GetOneProductResponse productResponse);
 
 }

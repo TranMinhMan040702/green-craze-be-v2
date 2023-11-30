@@ -21,6 +21,7 @@ import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.user.dto.request.cart.CreateCartItemRequest;
 import vn.com.greencraze.user.dto.request.cart.UpdateCartItemRequest;
+import vn.com.greencraze.user.dto.request.cart.UpdateUserCartRequest;
 import vn.com.greencraze.user.dto.response.cart.CreateCartItemResponse;
 import vn.com.greencraze.user.dto.response.cart.GetListCartItemResponse;
 import vn.com.greencraze.user.service.ICartService;
@@ -73,7 +74,7 @@ public class CartController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a cart item")
-    public ResponseEntity<Void> updateAddress(
+    public ResponseEntity<Void> updateCartItem(
             @PathVariable Long id, @Valid UpdateCartItemRequest request
     ) {
         cartService.updateCartItem(id, request);
@@ -84,7 +85,7 @@ public class CartController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a cart item")
-    public ResponseEntity<Void> deleteOneAddress(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteOneCartItem(@PathVariable Long id) {
         cartService.deleteOneCartItem(id);
 
         return ResponseEntity.noContent().build();
@@ -93,8 +94,17 @@ public class CartController {
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a list of cart items")
-    public ResponseEntity<Void> deleteListBrand(@RequestParam List<Long> ids) {
+    public ResponseEntity<Void> deleteListCartItem(@RequestParam List<Long> ids) {
         cartService.deleteListCartItem(ids);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/update-user-cart")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Update a user cart")
+    public ResponseEntity<Void> updateUserCart(@Valid UpdateUserCartRequest request) {
+        cartService.updateUserCart(request);
 
         return ResponseEntity.noContent().build();
     }

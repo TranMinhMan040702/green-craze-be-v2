@@ -23,6 +23,7 @@ import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.product.dto.request.image.CreateProductImageRequest;
 import vn.com.greencraze.product.dto.request.image.UpdateProductImageRequest;
 import vn.com.greencraze.product.dto.request.product.CreateProductRequest;
+import vn.com.greencraze.product.dto.request.product.UpdateListProductQuantityRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateProductRequest;
 import vn.com.greencraze.product.dto.response.image.CreateProductImageResponse;
 import vn.com.greencraze.product.dto.response.image.GetListProductImageResponse;
@@ -185,4 +186,13 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+
+    // call from another service
+    @PutMapping(value = "/update-quantity", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Update a product quantity")
+    public ResponseEntity<Void> updateProductQuantity(@Valid UpdateListProductQuantityRequest request) {
+        productService.updateProductQuantity(request);
+        return ResponseEntity.noContent().build();
+    }
 }

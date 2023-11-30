@@ -127,4 +127,12 @@ public class AddressController {
         return ResponseEntity.noContent().build();
     }
 
+    // call from another service
+    @GetMapping(value = "/default/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get a default address")
+    public ResponseEntity<RestResponse<GetOneAddressResponse>> getDefaultAddress(@PathVariable String userId) {
+        return ResponseEntity.ok(addressService.getDefaultUserAddress(userId));
+    }
+
 }

@@ -31,10 +31,12 @@ import vn.com.greencraze.address.repository.specification.AddressSpecification;
 import vn.com.greencraze.address.service.IAddressService;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.auth.AuthFacade;
 import vn.com.greencraze.commons.exception.InvalidRequestException;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -49,12 +51,13 @@ public class AddressServiceImpl implements IAddressService {
     private final ProvinceMapper provinceMapper;
     private final DistrictMapper districtMapper;
     private final WardMapper wardMapper;
+    private final AuthFacade authFacade;
     private static final String RESOURCE_NAME = "Address";
     private static final List<String> SEARCH_FIELDS = List.of("receiver", "street", "email", "phone");
 
     @Override
     public RestResponse<ListResponse<GetListAddressResponse>> getListAddress(Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
-        String userId = "";
+        String userId = authFacade.getUserId();
 
         AddressSpecification addressSpecification = new AddressSpecification();
         Specification<Address> sortable = addressSpecification.sortable(isSortAscending, columnName);
@@ -71,7 +74,7 @@ public class AddressServiceImpl implements IAddressService {
 
     @Override
     public RestResponse<GetOneAddressResponse> getOneAddress(Long id) {
-        String userId = "";
+        String userId = authFacade.getUserId();
         return addressRepository.findByIdAndUserId(id, userId)
                 .map(addressMapper::addressToGetOneAddressResponse)
                 .map(RestResponse::ok)
@@ -80,7 +83,15 @@ public class AddressServiceImpl implements IAddressService {
 
     @Override
     public RestResponse<GetOneAddressResponse> getDefaultAddress() {
-        String userId = "";
+        String userId = authFacade.getUserId();
+        return addressRepository.findByUserIdAndIsDefault(userId, true)
+                .map(addressMapper::addressToGetOneAddressResponse)
+                .map(RestResponse::ok)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "userId", userId));
+    }
+
+    @Override
+    public RestResponse<GetOneAddressResponse> getDefaultUserAddress(String userId) {
         return addressRepository.findByUserIdAndIsDefault(userId, true)
                 .map(addressMapper::addressToGetOneAddressResponse)
                 .map(RestResponse::ok)
@@ -128,7 +139,8 @@ public class AddressServiceImpl implements IAddressService {
         Ward ward = wardRepository.findById(request.wardId())
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "wardId", request.wardId()));
 
-        if (ward.getDistrict().getId() != district.getId() || district.getProvince().getId() != province.getId())
+        if (!Objects.equals(ward.getDistrict().getId(), district.getId())
+                || !Objects.equals(district.getProvince().getId(), province.getId()))
             throw new InvalidRequestException("Cannot identify combined address, may be unexpected provinceId, districtId, wardId");
 
         Address address = addressMapper.createAddressRequestToAddress(request);
@@ -146,7 +158,8 @@ public class AddressServiceImpl implements IAddressService {
 
     @Override
     public void updateAddress(Long id, UpdateAddressRequest request) {
-        String userId = "";
+        String userId = authFacade.getUserId();
+
         Province province = provinceRepository.findById(request.provinceId())
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "provinceId", request.provinceId()));
         District district = districtRepository.findById(request.districtId())
@@ -154,7 +167,8 @@ public class AddressServiceImpl implements IAddressService {
         Ward ward = wardRepository.findById(request.wardId())
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "wardId", request.wardId()));
 
-        if (ward.getDistrict().getId() != district.getId() || district.getProvince().getId() != province.getId())
+        if (!Objects.equals(ward.getDistrict().getId(), district.getId())
+                || !Objects.equals(district.getProvince().getId(), province.getId()))
             throw new InvalidRequestException("Cannot identify combined address, may be unexpected provinceId, districtId, wardId");
 
         Address address = addressRepository.findByIdAndUserId(id, userId)
@@ -166,20 +180,23 @@ public class AddressServiceImpl implements IAddressService {
 
     @Override
     public void deleteOneAddress(Long id) {
-        String userId = "";
+        String userId = authFacade.getUserId();
         Address address = addressRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
+
         if (address.getStatus())
             throw new InvalidRequestException("Cannot handle to delete default address, please set another address to default and try again");
 
         address.setStatus(false);
+
         addressRepository.save(address);
     }
 
     @Transactional(rollbackOn = {ResourceNotFoundException.class, InvalidRequestException.class})
     @Override
     public void setAddressDefault(Long id) {
-        String userId = "";
+        String userId = authFacade.getUserId();
+
         Address address = addressRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
         address.setStatus(true);

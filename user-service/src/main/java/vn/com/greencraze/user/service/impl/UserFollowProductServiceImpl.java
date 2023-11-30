@@ -7,7 +7,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.auth.AuthFacade;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
+import vn.com.greencraze.user.client.product.ProductServiceClient;
+import vn.com.greencraze.user.client.product.dto.response.GetOneProductResponse;
 import vn.com.greencraze.user.dto.request.userFollowProduct.FollowProductRequest;
 import vn.com.greencraze.user.dto.response.userFollowProduct.CreateUserFollowProductResponse;
 import vn.com.greencraze.user.dto.response.userFollowProduct.GetListUserFollowProductResponse;
@@ -25,18 +28,22 @@ public class UserFollowProductServiceImpl implements IUserFollowProductService {
     private final UserFollowProductRepository userFollowProductRepository;
     private final UserProfileRepository userProfileRepository;
     private final UserFollowProductMapper userFollowProductMapper;
+    private final ProductServiceClient productServiceClient;
+    private final AuthFacade authFacade;
     private static final String RESOURCE_NAME = "UserFollowProduct";
 
     @Override
     public RestResponse<CreateUserFollowProductResponse> followProduct(FollowProductRequest request) {
-        String userId = "";
+        String userId = authFacade.getUserId();
         UserProfile user = userProfileRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "user", userId));
 
-        UserFollowProduct userFollowProduct = new UserFollowProduct();
-        userFollowProduct.setUser(user);
-        userFollowProduct.setProductId(request.productId());
+        UserFollowProduct userFollowProduct = UserFollowProduct
+                .builder()
+                .user(user)
+                .productId(request.productId())
+                .build();
 
         userFollowProductRepository.save(userFollowProduct);
 
@@ -45,7 +52,7 @@ public class UserFollowProductServiceImpl implements IUserFollowProductService {
 
     @Override
     public void unfollowProduct(FollowProductRequest request) {
-        String userId = "";
+        String userId = authFacade.getUserId();
         UserProfile user = userProfileRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "user", userId));
@@ -59,7 +66,7 @@ public class UserFollowProductServiceImpl implements IUserFollowProductService {
 
     @Override
     public RestResponse<ListResponse<GetListUserFollowProductResponse>> getListFollowingProduct(Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
-        String userId = "";
+        String userId = authFacade.getUserId();
         UserProfile user = userProfileRepository
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "user", userId));
@@ -69,6 +76,13 @@ public class UserFollowProductServiceImpl implements IUserFollowProductService {
         Page<GetListUserFollowProductResponse> responses = userFollowProductRepository
                 .findAllByUser(user, pageable)
                 .map(userFollowProductMapper::userFollowProductToGetListFollowingProductResponse);
+
+        for (GetListUserFollowProductResponse response : responses.getContent()) {
+            GetOneProductResponse productResponse = productServiceClient.getOneProduct(response.productId());
+            GetListUserFollowProductResponse.ProductResponse product = userFollowProductMapper
+                    .productResponseToGetListUserFollowProductResponse(productResponse);
+            response.setProduct(product);
+        }
 
         return RestResponse.ok(ListResponse.of(responses));
     }

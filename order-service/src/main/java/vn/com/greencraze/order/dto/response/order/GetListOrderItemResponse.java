@@ -16,6 +16,7 @@ public record GetListOrderItemResponse(
         @Nullable
         @Schema(nullable = true)
         String updatedBy,
+        Long variantId,
         Integer quantity,
         BigDecimal unitPrice,
         BigDecimal totalPrice,
@@ -28,4 +29,10 @@ public record GetListOrderItemResponse(
         String variantName,
         Long variantQuantity
 ) {
+    public GetListOrderItemResponse setValues(String sku, Long productId, String productSlug,
+                                              String productUnit, String productImage, String productName, String variantName, Long variantQuantity) {
+        return new GetListOrderItemResponse(id(), createdAt(), updatedAt(), createdBy(), updatedBy(), variantId(),
+                quantity(), unitPrice(), totalPrice(), sku, productId, productSlug, productUnit,
+                productImage, productName, variantName, variantQuantity);
+    }
 }

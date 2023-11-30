@@ -12,6 +12,7 @@ import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.product.dto.request.product.CreateProductRequest;
+import vn.com.greencraze.product.dto.request.product.UpdateListProductQuantityRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateProductRequest;
 import vn.com.greencraze.product.dto.response.product.CreateProductResponse;
 import vn.com.greencraze.product.dto.response.product.GetListProductResponse;
@@ -156,6 +157,18 @@ public class ProductServiceImpl implements IProductService {
             Product product = productRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
             product.setStatus(ProductStatus.INACTIVE);
+            productRepository.save(product);
+        }
+    }
+
+    @Transactional(rollbackOn = {ResourceNotFoundException.class})
+    @Override
+    public void updateProductQuantity(UpdateListProductQuantityRequest request) {
+        for (UpdateListProductQuantityRequest.ProductQuantityItem item : request.quantityItems()) {
+            Product product = productRepository.findById(item.id())
+                    .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", item.id()));
+            product.setQuantity(product.getQuantity() - item.quantity());
+            product.setSold(product.getSold() + item.quantity());
             productRepository.save(product);
         }
     }
