@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,16 +38,19 @@ public class TransactionController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) boolean all
     ) {
-        return ResponseEntity.ok(transactionService.getListTransaction(page, size, isSortAscending, columnName, search, all));
+        return ResponseEntity.ok(transactionService.getListTransaction(
+                page, size, isSortAscending, columnName, search, all));
     }
 
-    @GetMapping(value = "/top5-tracsaction-latest", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping(value = "/top5-transaction-latest", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a top 5 latest of transactions")
     public ResponseEntity<RestResponse<ListResponse<GetListTransactionResponse>>> getTop5TransactionLatest() {
         return ResponseEntity.ok(transactionService.getTop5TransactionLatest());
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a transaction")

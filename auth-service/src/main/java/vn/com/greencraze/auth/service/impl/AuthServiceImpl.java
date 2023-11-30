@@ -18,6 +18,7 @@ import vn.com.greencraze.auth.dto.request.auth.RefreshTokenRequest;
 import vn.com.greencraze.auth.dto.request.auth.RegisterRequest;
 import vn.com.greencraze.auth.dto.request.auth.ResendOTPRequest;
 import vn.com.greencraze.auth.dto.request.auth.ResetPasswordRequest;
+import vn.com.greencraze.auth.dto.request.auth.ValidateAccessTokenRequest;
 import vn.com.greencraze.auth.dto.request.auth.VerifyOTPRequest;
 import vn.com.greencraze.auth.dto.response.auth.AuthenticateResponse;
 import vn.com.greencraze.auth.dto.response.auth.ForgotPasswordResponse;
@@ -26,9 +27,11 @@ import vn.com.greencraze.auth.dto.response.auth.RefreshTokenResponse;
 import vn.com.greencraze.auth.dto.response.auth.RegisterResponse;
 import vn.com.greencraze.auth.dto.response.auth.ResendOTPResponse;
 import vn.com.greencraze.auth.dto.response.auth.ResetPasswordResponse;
+import vn.com.greencraze.auth.dto.response.auth.ValidateAccessTokenResponse;
 import vn.com.greencraze.auth.dto.response.auth.VerifyOTPResponse;
 import vn.com.greencraze.auth.entity.Identity;
 import vn.com.greencraze.auth.entity.IdentityToken;
+import vn.com.greencraze.auth.entity.view.UserProfileView;
 import vn.com.greencraze.auth.enumeration.IdentityStatus;
 import vn.com.greencraze.auth.enumeration.RoleCode;
 import vn.com.greencraze.auth.enumeration.TokenType;
@@ -41,6 +44,7 @@ import vn.com.greencraze.auth.exception.TokenValidationException;
 import vn.com.greencraze.auth.exception.UnconfirmedUserException;
 import vn.com.greencraze.auth.repository.IdentityRepository;
 import vn.com.greencraze.auth.repository.RoleRepository;
+import vn.com.greencraze.auth.repository.view.UserProfileViewRepository;
 import vn.com.greencraze.auth.service.IAuthService;
 import vn.com.greencraze.auth.util.OtpHelper;
 import vn.com.greencraze.auth.util.RefreshTokenHelper;
@@ -62,6 +66,7 @@ public class AuthServiceImpl implements IAuthService {
 
     private final IdentityRepository identityRepository;
     private final RoleRepository roleRepository;
+    private final UserProfileViewRepository userProfileViewRepository;
 
     private final JwtManager jwtManager;
 
@@ -135,6 +140,25 @@ public class AuthServiceImpl implements IAuthService {
                 .accessToken(generateAuthCredentialDto.accessToken)
                 .refreshToken(generateAuthCredentialDto.refreshToken)
                 .build());
+    }
+
+    @Override
+    public RestResponse<ValidateAccessTokenResponse> validateAccessToken(ValidateAccessTokenRequest request) {
+        DecodedJWT decodedJWT = jwtManager.validateToken(request.accessToken());
+
+        String userId = decodedJWT.getClaim("userId").as(String.class);
+        UserProfileView userProfileView = userProfileViewRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        Identity identity = userProfileView.getIdentity();
+        List<String> userAuthorities = identity.getRoles().stream().map(role -> "ROLE_" + role.getName()).toList();
+
+        return RestResponse.ok(
+                ValidateAccessTokenResponse.builder()
+                        .userId(userId)
+                        .userAuthorities(userAuthorities)
+                        .build()
+        );
     }
 
     @Override

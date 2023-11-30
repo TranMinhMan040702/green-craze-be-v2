@@ -67,7 +67,6 @@ public class CartController {
         RestResponse<CreateCartItemResponse> response = cartService.createCartItem(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
-
         return ResponseEntity.created(location).body(response);
     }
 
@@ -78,7 +77,6 @@ public class CartController {
             @PathVariable Long id, @Valid UpdateCartItemRequest request
     ) {
         cartService.updateCartItem(id, request);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -87,7 +85,6 @@ public class CartController {
     @Operation(summary = "Delete a cart item")
     public ResponseEntity<Void> deleteOneCartItem(@PathVariable Long id) {
         cartService.deleteOneCartItem(id);
-
         return ResponseEntity.noContent().build();
     }
 
@@ -96,7 +93,6 @@ public class CartController {
     @Operation(summary = "Delete a list of cart items")
     public ResponseEntity<Void> deleteListCartItem(@RequestParam List<Long> ids) {
         cartService.deleteListCartItem(ids);
-
         return ResponseEntity.noContent().build();
     }
 

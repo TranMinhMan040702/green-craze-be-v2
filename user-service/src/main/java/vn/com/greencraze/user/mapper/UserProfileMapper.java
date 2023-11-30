@@ -16,6 +16,7 @@ import vn.com.greencraze.user.dto.response.user.GetListUserResponse;
 import vn.com.greencraze.user.dto.response.user.GetMeResponse;
 import vn.com.greencraze.user.dto.response.user.GetOneStaffResponse;
 import vn.com.greencraze.user.dto.response.user.GetOneUserResponse;
+import vn.com.greencraze.user.entity.Staff;
 import vn.com.greencraze.user.entity.UserProfile;
 import vn.com.greencraze.user.entity.view.RoleView;
 
@@ -42,11 +43,16 @@ public interface UserProfileMapper {
     UserProfile updateUserProfileFromUpdateUserRequest(
             @MappingTarget UserProfile userProfile, UpdateUserRequest updateUserRequest);
 
-    @Mapping(source = "staff.type", target = "type")
-    @Mapping(source = "staff.code", target = "code")
-    @Mapping(source = "identity.status", target = "status")
-    @Mapping(source = "identity.roles", target = "roles")
-    GetListStaffResponse userProfileToGetListStaffResponse(UserProfile userProfile);
+    @Mapping(source = "user.email", target = "email")
+    @Mapping(source = "user.firstName", target = "firstName")
+    @Mapping(source = "user.lastName", target = "lastName")
+    @Mapping(source = "user.phone", target = "phone")
+    @Mapping(source = "user.dob", target = "dob")
+    @Mapping(source = "user.gender", target = "gender")
+    @Mapping(source = "user.avatar", target = "avatar")
+    @Mapping(source = "user.identity.status", target = "status")
+    @Mapping(source = "user.identity.roles", target = "roles")
+    GetListStaffResponse userProfileToGetListStaffResponse(Staff staff);
 
     @Mapping(source = "staff.type", target = "type")
     @Mapping(source = "staff.code", target = "code")

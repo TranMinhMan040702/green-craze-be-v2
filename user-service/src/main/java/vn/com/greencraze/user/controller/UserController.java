@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,12 +21,15 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.user.dto.request.user.CreateUserRequest;
+import vn.com.greencraze.user.dto.request.user.UpdateUserRequest;
 import vn.com.greencraze.user.dto.response.user.CreateUserResponse;
 import vn.com.greencraze.user.dto.response.user.GetListUserResponse;
+import vn.com.greencraze.user.dto.response.user.GetMeResponse;
 import vn.com.greencraze.user.dto.response.user.GetOneUserResponse;
 import vn.com.greencraze.user.service.IUserProfileService;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -57,6 +62,13 @@ public class UserController {
         return ResponseEntity.ok(userProfileService.getOneUser(id));
     }
 
+    @GetMapping(value = "/profile/me", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get a user")
+    public ResponseEntity<RestResponse<GetMeResponse>> getMe() {
+        return ResponseEntity.ok(userProfileService.getMe());
+    }
+
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Create user")
@@ -65,6 +77,38 @@ public class UserController {
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
         return ResponseEntity.created(location).body(response);
+    }
+
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Update user")
+    public ResponseEntity<Void> updateUser(@RequestBody @Valid UpdateUserRequest request) {
+        userProfileService.updateUser(request);
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/disable/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Disable user")
+    public ResponseEntity<Void> disableUser(@PathVariable String id) {
+        userProfileService.disableUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/disable")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Disable a list user")
+    public ResponseEntity<Void> disableListUser(@RequestParam List<String> ids) {
+        userProfileService.disableListUser(ids);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/enable/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Enable user")
+    public ResponseEntity<Void> enableUser(@PathVariable String id) {
+        userProfileService.enableUser(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
