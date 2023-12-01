@@ -356,7 +356,7 @@ public class OrderServiceImpl implements IOrderService {
         //pub message to create docket in inventory service
         createDocket(request.items(), order.getId(), "EXPORT");
 
-        // pub message to notify in infrastructure service
+        // TODO: pub message to notify in infrastructure service
         createNotify();
 
         return RestResponse.ok(orderMapper.orderToCreateOrderResponse(order));
@@ -454,7 +454,7 @@ public class OrderServiceImpl implements IOrderService {
 
         orderRepository.save(order);
 
-        //pub message to create notify
+        //TODO: pub message to create notify
         createNotify();
     }
 

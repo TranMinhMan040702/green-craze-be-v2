@@ -6,5 +6,5 @@ public record ReplyReviewRequest(
         @NotEmpty
         String reply
 ) {
-
+        
 }

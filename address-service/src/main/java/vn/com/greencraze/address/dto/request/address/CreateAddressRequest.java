@@ -19,5 +19,4 @@ public record CreateAddressRequest(
         @NotNull
         Long wardId
 ) {
-
 }

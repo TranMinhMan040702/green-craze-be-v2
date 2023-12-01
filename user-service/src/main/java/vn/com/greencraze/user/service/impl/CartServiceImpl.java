@@ -55,26 +55,20 @@ public class CartServiceImpl implements ICartService {
         if (product == null)
             throw new ResourceNotFoundException("Product", "id", variant.productId());
 
-        GetListCartItemResponse res = new GetListCartItemResponse(
-                cartItem.getId(),
-                cartItem.getCreatedAt(),
-                cartItem.getUpdatedAt(),
-                cartItem.getCreatedBy(),
-                cartItem.getUpdatedBy(),
-                cartItem.getQuantity(),
-                cartItem.getVariantId(),
-                variant.name(),
-                variant.quantity(),
-                variant.sku(),
-                variant.itemPrice(),
-                variant.promotionalItemPrice(),
-                variant.totalPrice(),
-                variant.totalPromotionalPrice(),
-                product.slug(),
-                product.unit().name(),
-                product.name(),
-                product.images().stream().findFirst().get().image(),
-                variant.promotionalItemPrice() != null);
+
+        GetListCartItemResponse res = cartMapper.cartItemToGetListCartItemResponse(cartItem)
+                .withVariantName(variant.name())
+                .withVariantQuantity(variant.quantity())
+                .withSku(variant.sku())
+                .withVariantPrice(variant.itemPrice())
+                .withVariantPromotionalPrice(variant.promotionalItemPrice())
+                .withTotalPrice(variant.totalPrice())
+                .withTotalPromotionalPrice(variant.totalPromotionalPrice())
+                .withProductSlug(product.slug())
+                .withProductUnit(product.unit().name())
+                .withProductName(product.name())
+                .withProductImage(product.images().stream().findFirst().get().image())
+                .withIsPromotion(variant.promotionalItemPrice() != null);
 
         return res;
     }
@@ -106,6 +100,7 @@ public class CartServiceImpl implements ICartService {
                     x = mapToGetListCartItemResponse(ci);
                 }
         );
+
         return RestResponse.ok(ListResponse.of(responses));
     }
 

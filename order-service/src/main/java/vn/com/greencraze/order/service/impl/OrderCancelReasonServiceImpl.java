@@ -57,9 +57,11 @@ public class OrderCancelReasonServiceImpl implements IOrderCancelReasonService {
 
     @Override
     public RestResponse<CreateOrderCancelReasonResponse> createOrderCancelReason(CreateOrderCancelReasonRequest request) {
-        OrderCancelReason orderCancelReason = orderCancelReasonMapper.createOrderCancelReasonRequestToOrderCancelReason(request);
+        OrderCancelReason orderCancelReason = orderCancelReasonMapper
+                .createOrderCancelReasonRequestToOrderCancelReason(request);
         orderCancelReasonRepository.save(orderCancelReason);
-        return RestResponse.created(orderCancelReasonMapper.orderCancelReasonToCreateOrderCancelReasonResponse(orderCancelReason));
+        return RestResponse.created(orderCancelReasonMapper
+                .orderCancelReasonToCreateOrderCancelReasonResponse(orderCancelReason));
     }
 
     @Override

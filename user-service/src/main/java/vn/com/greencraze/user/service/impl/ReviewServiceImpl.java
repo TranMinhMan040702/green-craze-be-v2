@@ -12,6 +12,8 @@ import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.auth.AuthFacade;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.user.client.product.ProductServiceClient;
+import vn.com.greencraze.user.client.product.dto.request.UpdateListProductReviewRequest;
+import vn.com.greencraze.user.client.product.dto.request.UpdateOneProductReviewRequest;
 import vn.com.greencraze.user.client.product.dto.response.GetOneProductResponse;
 import vn.com.greencraze.user.dto.request.review.CreateReviewRequest;
 import vn.com.greencraze.user.dto.request.review.ReplyReviewRequest;
@@ -63,7 +65,7 @@ public class ReviewServiceImpl implements IReviewService {
         for (GetListReviewResponse response : responses.getContent()) {
             GetOneProductResponse productResponse = productServiceClient.getOneProduct(response.productId());
             GetListReviewResponse.ProductResponse product = reviewMapper.productResponseToGetListReviewProductResponse(productResponse);
-            response.setProduct(product);
+            response = response.withProduct(product);
         }
 
         return RestResponse.ok(ListResponse.of(responses));
@@ -98,13 +100,17 @@ public class ReviewServiceImpl implements IReviewService {
                 .findAll(sortable, pageable)
                 .map(reviewMapper::reviewToGetListReviewResponse);
 
+        List<GetListReviewResponse> updatedListReviewResponse = new ArrayList<>();
+
         for (GetListReviewResponse response : responses.getContent()) {
             GetOneProductResponse productResponse = productServiceClient.getOneProduct(response.productId());
-            GetListReviewResponse.ProductResponse product = reviewMapper.productResponseToGetListReviewProductResponse(productResponse);
-            response.setProduct(product);
+            GetListReviewResponse.ProductResponse product = reviewMapper
+                    .productResponseToGetListReviewProductResponse(productResponse);
+
+            updatedListReviewResponse.add(response.withProduct(product));
         }
 
-        return RestResponse.ok(responses.getContent());
+        return RestResponse.ok(updatedListReviewResponse);
     }
 
     @Override
@@ -117,10 +123,11 @@ public class ReviewServiceImpl implements IReviewService {
         Long productId = response.data().productId();
 
         GetOneProductResponse productResponse = productServiceClient.getOneProduct(productId);
+        if (productResponse == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "productId", productId);
+        }
 
-        response.data().setProduct(reviewMapper.productResponseToGetOneReviewProductResponse(productResponse));
-
-        return response;
+        return RestResponse.ok(response.data().withProduct(reviewMapper.productResponseToGetOneReviewProductResponse(productResponse)));
     }
 
     @Override
@@ -137,10 +144,38 @@ public class ReviewServiceImpl implements IReviewService {
         Long productId = response.data().productId();
 
         GetOneProductResponse productResponse = productServiceClient.getOneProduct(productId);
+        if (productResponse == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "productId", productId);
+        }
 
-        response.data().setProduct(reviewMapper.productResponseToGetOneReviewProductResponse(productResponse));
+        GetOneReviewResponse.ProductResponse product = reviewMapper
+                .productResponseToGetOneReviewProductResponse(productResponse);
 
-        return response;
+        return RestResponse.ok(response.data().withProduct(product));
+    }
+
+    private void updateProductReview(Long productId) {
+        List<Review> reviews = reviewRepository.findByProductIdAndStatus(productId, true)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "productId", productId));
+
+        Double rating = reviews.stream().reduce(0.0, (a, b) -> a + b.getRating(), Double::sum) / reviews.size();
+
+        productServiceClient.updateProductReview(productId, new UpdateOneProductReviewRequest(rating));
+    }
+
+    private void updateProductReview(List<Long> productIds) {
+        UpdateListProductReviewRequest request = new UpdateListProductReviewRequest(new ArrayList<>());
+
+        for (Long productId : productIds) {
+            List<Review> reviews = reviewRepository.findByProductIdAndStatus(productId, true)
+                    .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "productId", productId));
+
+            Double rating = reviews.stream().reduce(0.0, (a, b) -> a + b.getRating(), Double::sum) / reviews.size();
+
+            request.productReviews().add(new UpdateListProductReviewRequest.UpdateOneProductReview(productId, rating));
+        }
+
+        productServiceClient.updateListProductReview(request);
     }
 
     @Override
@@ -153,8 +188,10 @@ public class ReviewServiceImpl implements IReviewService {
         if (request.image() != null)
             review.setImage(uploadService.uploadFile(request.image()));
         review.setUser(user);
+
         reviewRepository.save(review);
-        // pub message to update product review
+        // TODO: pub message to update product review
+        updateProductReview(review.getProductId());
 
         return RestResponse.created(reviewMapper.reviewToCreateReviewResponse(review));
     }
@@ -171,7 +208,8 @@ public class ReviewServiceImpl implements IReviewService {
         } else if (request.isDeleteImage()) {
             review.setImage(null);
         }
-        // pub message to update product review
+        // TODO: pub message to update product review
+        updateProductReview(review.getProductId());
 
         reviewRepository.save(review);
     }
@@ -194,6 +232,7 @@ public class ReviewServiceImpl implements IReviewService {
         review.setStatus(false);
 
         reviewRepository.save(review);
+        updateProductReview(review.getProductId());
     }
 
     @Override
@@ -208,14 +247,19 @@ public class ReviewServiceImpl implements IReviewService {
 
     @Override
     public void deleteListReview(List<Long> ids) {
+        List<Long> productIds = new ArrayList<>();
+
         for (Long id : ids) {
             Review review = reviewRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
 
             review.setStatus(false);
+            productIds.add(review.getProductId());
 
             reviewRepository.save(review);
         }
+
+        updateProductReview(productIds);
     }
 
 }

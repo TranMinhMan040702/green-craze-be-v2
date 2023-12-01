@@ -7,6 +7,7 @@ import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.inventory.client.product.ProductServiceClient;
 import vn.com.greencraze.inventory.client.product.dto.ExportProductRequest;
 import vn.com.greencraze.inventory.client.product.dto.ImportProductRequest;
+import vn.com.greencraze.inventory.dto.request.CreateDocketRequest;
 import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeExportRequest;
 import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeImportRequest;
 import vn.com.greencraze.inventory.dto.response.GetListDocketByProductResponse;
@@ -73,6 +74,20 @@ public class DocketServiceImpl implements IDocketService {
                 .map(docketMapper::docketToGetListDocketByProductResponse)
                 .map(RestResponse::ok)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "productId", id));
+    }
+
+    @Override
+    public void createDocket(CreateDocketRequest request) {
+        for (CreateDocketRequest.ProductDocket productDocket : request.productDockets()) {
+            Docket docket = Docket.builder()
+                    .orderId(request.orderId())
+                    .productId(productDocket.productId())
+                    .quantity(productDocket.quantity().longValue())
+                    .type(DocketType.valueOf(request.type()))
+                    .code(UUID.randomUUID().toString()) // TODO
+                    .build();
+            docketRepository.save(docket);
+        }
     }
 
 }

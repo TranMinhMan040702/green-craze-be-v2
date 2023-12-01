@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -106,7 +107,8 @@ public class ReviewController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(value = "/toggle/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping(value = "/toggle/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Toggle a review")
     public ResponseEntity<Void> toggleReview(
@@ -116,7 +118,8 @@ public class ReviewController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(value = "/reply/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping(value = "/reply/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Reply a review")
     public ResponseEntity<Void> replyReview(
@@ -126,6 +129,7 @@ public class ReviewController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a review")
@@ -134,6 +138,7 @@ public class ReviewController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a list of reviews")

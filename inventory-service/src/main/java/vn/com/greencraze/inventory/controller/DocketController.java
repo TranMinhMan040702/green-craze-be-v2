@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.inventory.dto.request.CreateDocketRequest;
 import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeExportRequest;
 import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeImportRequest;
 import vn.com.greencraze.inventory.dto.response.GetListDocketByProductResponse;
@@ -52,6 +53,17 @@ public class DocketController {
     public ResponseEntity<RestResponse<GetListDocketByProductResponse>> getListDocketByProduct(
             @PathVariable Long productId) {
         return ResponseEntity.ok(docketService.getListDocketByProduct(productId));
+    }
+
+    //call from another service
+
+    @PostMapping(value = "/create-docket", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Create docket")
+    public ResponseEntity<Void> createDocket(
+            @RequestBody @Valid CreateDocketRequest request) {
+        docketService.createDocket(request);
+        return ResponseEntity.notFound().build();
     }
 
 }
