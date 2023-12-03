@@ -16,11 +16,13 @@ import vn.com.greencraze.user.client.product.dto.request.UpdateListProductReview
 import vn.com.greencraze.user.client.product.dto.request.UpdateOneProductReviewRequest;
 import vn.com.greencraze.user.client.product.dto.response.GetOneProductResponse;
 import vn.com.greencraze.user.dto.request.review.CreateReviewRequest;
+import vn.com.greencraze.user.dto.request.review.GetOrderReviewRequest;
 import vn.com.greencraze.user.dto.request.review.ReplyReviewRequest;
 import vn.com.greencraze.user.dto.request.review.UpdateReviewRequest;
 import vn.com.greencraze.user.dto.response.review.CreateReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetListReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetOneReviewResponse;
+import vn.com.greencraze.user.dto.response.review.GetOrderReviewResponse;
 import vn.com.greencraze.user.entity.Review;
 import vn.com.greencraze.user.entity.UserProfile;
 import vn.com.greencraze.user.mapper.ReviewMapper;
@@ -30,6 +32,7 @@ import vn.com.greencraze.user.repository.specification.ReviewSpecification;
 import vn.com.greencraze.user.service.IReviewService;
 import vn.com.greencraze.user.service.IUploadService;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -260,6 +263,26 @@ public class ReviewServiceImpl implements IReviewService {
         }
 
         updateProductReview(productIds);
+    }
+
+    @Override
+    public RestResponse<GetOrderReviewResponse> getOrderReview(GetOrderReviewRequest request) {
+        boolean isReview = true;
+        Instant reviewedDate = null;
+        List<Instant> reviewTimes = new ArrayList<>();
+
+        for (Long id : request.orderItemIds()) {
+            Review review = reviewRepository.findByOrderItemId(id);
+            if (review == null) {
+                isReview = false;
+                break;
+            }
+            reviewTimes.add(review.getCreatedAt());
+        }
+        if (!reviewTimes.isEmpty() && reviewTimes.size() == request.orderItemIds().size())
+            reviewedDate = reviewTimes.stream().max(Instant::compareTo).get();
+
+        return RestResponse.ok(new GetOrderReviewResponse(isReview, reviewedDate));
     }
 
 }

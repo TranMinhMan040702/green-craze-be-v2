@@ -176,6 +176,7 @@ public class ProductServiceImpl implements IProductService {
             Product product = productRepository.findById(item.id())
                     .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", item.id()));
             product.setQuantity(product.getQuantity() - item.quantity());
+            product.setActualInventory(product.getActualInventory() - item.quantity());
             product.setSold(product.getSold() + item.quantity());
             productRepository.save(product);
         }

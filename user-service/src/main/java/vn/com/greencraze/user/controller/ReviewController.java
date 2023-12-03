@@ -1,6 +1,7 @@
 package vn.com.greencraze.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.user.dto.request.review.CreateReviewRequest;
+import vn.com.greencraze.user.dto.request.review.GetOrderReviewRequest;
 import vn.com.greencraze.user.dto.request.review.ReplyReviewRequest;
 import vn.com.greencraze.user.dto.request.review.UpdateReviewRequest;
 import vn.com.greencraze.user.dto.response.review.CreateReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetListReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetOneReviewResponse;
+import vn.com.greencraze.user.dto.response.review.GetOrderReviewResponse;
 import vn.com.greencraze.user.service.IReviewService;
 
 import java.net.URI;
@@ -119,11 +122,11 @@ public class ReviewController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PutMapping(value = "/reply/{id}")
+    @PutMapping(value = "/reply/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Reply a review")
     public ResponseEntity<Void> replyReview(
-            @PathVariable Long id, @Valid ReplyReviewRequest request
+            @PathVariable Long id, @Valid @RequestBody ReplyReviewRequest request
     ) {
         reviewService.replyReview(id, request);
         return ResponseEntity.noContent().build();
@@ -145,6 +148,16 @@ public class ReviewController {
     public ResponseEntity<Void> deleteListReview(@RequestParam List<Long> ids) {
         reviewService.deleteListReview(ids);
         return ResponseEntity.noContent().build();
+    }
+
+    // call from other services
+    @GetMapping(value = "/order-review", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get order review")
+    public ResponseEntity<RestResponse<GetOrderReviewResponse>> getOrderReview(
+            @Valid @RequestBody GetOrderReviewRequest request
+    ) {
+        return ResponseEntity.ok(reviewService.getOrderReview(request));
     }
 
 }

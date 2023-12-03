@@ -38,6 +38,7 @@ public class OrderController {
 
     private final IOrderService orderService;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a list of order")
@@ -48,10 +49,10 @@ public class OrderController {
             @RequestParam(defaultValue = "id") String columnName,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) boolean all,
-            @RequestParam(required = false) String status
+            @RequestParam(required = false) String orderStatus
     ) {
         return ResponseEntity.ok(orderService.getListOrder(
-                page, size, isSortAscending, columnName, search, all, status));
+                page, size, isSortAscending, columnName, search, all, orderStatus));
     }
 
     @GetMapping(value = "/me/list", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -64,10 +65,10 @@ public class OrderController {
             @RequestParam(defaultValue = "id") String columnName,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) boolean all,
-            @RequestParam(required = false) String status
+            @RequestParam(required = false) String orderStatus
     ) {
         return ResponseEntity.ok(orderService.getListUserOrder(
-                page, size, isSortAscending, columnName, search, all, status));
+                page, size, isSortAscending, columnName, search, all, orderStatus));
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
