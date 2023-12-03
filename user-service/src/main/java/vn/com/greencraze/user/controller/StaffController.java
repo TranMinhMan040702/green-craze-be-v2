@@ -97,6 +97,14 @@ public class StaffController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Toggle staff status")
+    public ResponseEntity<Void> toggleStaffStatus(@PathVariable Long id) {
+        userProfileService.toggleStaffStatus(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/enable/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Enable staff")

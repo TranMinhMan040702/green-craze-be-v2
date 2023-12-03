@@ -13,7 +13,8 @@ import java.util.List;
 public interface IBrandService {
 
     RestResponse<ListResponse<GetListBrandResponse>> getListBrand(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
+            Integer page, Integer size, Boolean isSortAscending,
+            String columnName, String search, Boolean all, Boolean status);
 
     RestResponse<GetOneBrandResponse> getOneBrand(Long id);
 

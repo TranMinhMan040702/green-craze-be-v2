@@ -40,4 +40,15 @@ public class BaseSpecification<T> {
         };
     }
 
+    public Specification<T> filterable(Boolean status) {
+        List<Predicate> wheres = new ArrayList<>();
+        return (root, query, cb) -> {
+            if (status) {
+                Predicate isStatusTrue = cb.equal(root.get("status"), true);
+                wheres.add(isStatusTrue);
+            }
+            return cb.and(wheres.toArray(new Predicate[0]));
+        };
+    }
+
 }

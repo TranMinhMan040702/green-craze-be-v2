@@ -74,6 +74,7 @@ CREATE TABLE sale
     promotional_percent DOUBLE                NOT NULL,
     slug                VARCHAR(255)          NOT NULL,
     status              VARCHAR(255)          NOT NULL,
+    `all`               BIT(1)                NULL,
     CONSTRAINT pk_sale PRIMARY KEY (id)
 );
 

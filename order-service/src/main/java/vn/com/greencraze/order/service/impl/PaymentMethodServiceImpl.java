@@ -37,14 +37,16 @@ public class PaymentMethodServiceImpl implements IPaymentMethodService {
 
     @Override
     public RestResponse<ListResponse<GetListPaymentMethodResponse>> getListPaymentMethod(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
+            Integer page, Integer size, Boolean isSortAscending,
+            String columnName, String search, Boolean all, Boolean status
     ) {
         PaymentMethodSpecification paymentMethodSpecification = new PaymentMethodSpecification();
         Specification<PaymentMethod> sortable = paymentMethodSpecification.sortable(isSortAscending, columnName);
         Specification<PaymentMethod> searchable = paymentMethodSpecification.searchable(SEARCH_FIELDS, search);
+        Specification<PaymentMethod> filterableByStatus = paymentMethodSpecification.filterable(status);
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
         Page<GetListPaymentMethodResponse> responses = paymentMethodRepository
-                .findAll(sortable.and(searchable), pageable)
+                .findAll(sortable.and(searchable).and(filterableByStatus), pageable)
                 .map(paymentMethodMapper::paymentMethodToGetListPaymentMethodResponse);
         return RestResponse.ok(ListResponse.of(responses));
     }

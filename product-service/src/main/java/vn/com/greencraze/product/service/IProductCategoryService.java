@@ -14,7 +14,8 @@ import java.util.List;
 public interface IProductCategoryService {
 
     RestResponse<ListResponse<GetListProductCategoryResponse>> getListProductCategory(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
+            Integer page, Integer size, Boolean isSortAscending,
+            String columnName, String search, Boolean all, Boolean status);
 
     RestResponse<GetOneProductCategoryResponse> getOneProductCategory(Long id);
 
