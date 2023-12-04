@@ -14,21 +14,13 @@ import java.util.List;
 
 public interface IOrderService {
 
-    RestResponse<ListResponse<GetListOrderResponse>> getListOrder(Integer page,
-                                                                  Integer size,
-                                                                  Boolean isSortAscending,
-                                                                  String columnName,
-                                                                  String search,
-                                                                  Boolean all,
-                                                                  String status);
+    RestResponse<ListResponse<GetListOrderResponse>> getListOrder(
+            Integer page, Integer size, Boolean isSortAscending, String columnName,
+            String search, Boolean all, String status);
 
-    RestResponse<ListResponse<GetListOrderResponse>> getListUserOrder(Integer page,
-                                                                      Integer size,
-                                                                      Boolean isSortAscending,
-                                                                      String columnName,
-                                                                      String search,
-                                                                      Boolean all,
-                                                                      OrderStatus status);
+    RestResponse<ListResponse<GetListOrderResponse>> getListUserOrder(
+            Integer page, Integer size, Boolean isSortAscending, String columnName,
+            String search, Boolean all, OrderStatus status);
 
     RestResponse<List<GetListOrderResponse>> getTop5OrderLatest();
 
