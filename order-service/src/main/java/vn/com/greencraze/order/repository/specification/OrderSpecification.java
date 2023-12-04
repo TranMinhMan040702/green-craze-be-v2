@@ -4,13 +4,14 @@ import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 import vn.com.greencraze.commons.specification.BaseSpecification;
 import vn.com.greencraze.order.entity.Order;
+import vn.com.greencraze.order.enumeration.OrderStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class OrderSpecification extends BaseSpecification<Order> {
 
-    public Specification<Order> filterable(String userId, String status) {
+    public Specification<Order> filterable(String userId, OrderStatus status) {
         List<Predicate> wheres = new ArrayList<>();
         return (root, query, cb) -> {
             if (userId != null) {

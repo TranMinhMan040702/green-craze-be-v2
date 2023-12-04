@@ -42,7 +42,8 @@ public record GetListFilteringProductResponse(
             String name,
             String image,
             String slug
-    ) {}
+    ) {
+    }
 
     public record BrandResponse(
             Long id,
@@ -50,17 +51,21 @@ public record GetListFilteringProductResponse(
             String code,
             String description,
             String image
-    ) {}
+    ) {
+    }
 
     public record UnitResponse(
             Long id,
             String name
-    ) {}
+    ) {
+    }
 
     public record ProductImageResponse(
             Long id,
-            String image
-    ) {}
+            String image,
+            Boolean isDefault
+    ) {
+    }
 
     public record VariantResponse(
             Long id,
@@ -72,6 +77,7 @@ public record GetListFilteringProductResponse(
             BigDecimal totalPromotionalPrice,
             BigDecimal promotionalItemPrice,
             VariantStatus status
-    ) {}
+    ) {
+    }
 
 }

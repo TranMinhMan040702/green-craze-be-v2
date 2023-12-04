@@ -13,7 +13,6 @@ import reactor.core.publisher.Mono;
 import vn.com.greencraze.gateway.client.AuthServiceClient;
 import vn.com.greencraze.gateway.dto.SimpleRouteDefinition;
 import vn.com.greencraze.gateway.dto.ValidateAccessTokenRequest;
-import vn.com.greencraze.gateway.exception.TokenValidationException;
 import vn.com.greencraze.gateway.util.CustomHeaders;
 import vn.com.greencraze.gateway.util.RequestHelper;
 
@@ -48,7 +47,7 @@ public class PreFilter implements WebFilter {
                                             .join(",", response.data().userAuthorities())
                             ))))
                     .flatMap(chain::filter)
-                    .onErrorResume(error -> Mono.error(new TokenValidationException((error.getMessage()))));
+                    .onErrorResume(Mono::error);
         }
 
         return chain.filter(exchange);

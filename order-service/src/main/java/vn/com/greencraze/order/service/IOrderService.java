@@ -8,26 +8,19 @@ import vn.com.greencraze.order.dto.request.order.UpdateOrderRequest;
 import vn.com.greencraze.order.dto.response.order.CreateOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetListOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderResponse;
+import vn.com.greencraze.order.enumeration.OrderStatus;
 
 import java.util.List;
 
 public interface IOrderService {
 
-    RestResponse<ListResponse<GetListOrderResponse>> getListOrder(Integer page,
-                                                                  Integer size,
-                                                                  Boolean isSortAscending,
-                                                                  String columnName,
-                                                                  String search,
-                                                                  Boolean all,
-                                                                  String status);
+    RestResponse<ListResponse<GetListOrderResponse>> getListOrder(
+            Integer page, Integer size, Boolean isSortAscending, String columnName,
+            String search, Boolean all, String status);
 
-    RestResponse<ListResponse<GetListOrderResponse>> getListUserOrder(Integer page,
-                                                                      Integer size,
-                                                                      Boolean isSortAscending,
-                                                                      String columnName,
-                                                                      String search,
-                                                                      Boolean all,
-                                                                      String status);
+    RestResponse<ListResponse<GetListOrderResponse>> getListUserOrder(
+            Integer page, Integer size, Boolean isSortAscending, String columnName,
+            String search, Boolean all, OrderStatus status);
 
     RestResponse<List<GetListOrderResponse>> getTop5OrderLatest();
 
