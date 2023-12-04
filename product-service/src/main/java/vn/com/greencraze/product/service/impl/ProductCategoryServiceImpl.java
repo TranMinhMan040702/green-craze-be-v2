@@ -38,14 +38,16 @@ public class ProductCategoryServiceImpl implements IProductCategoryService {
 
     @Override
     public RestResponse<ListResponse<GetListProductCategoryResponse>> getListProductCategory(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
+            Integer page, Integer size, Boolean isSortAscending,
+            String columnName, String search, Boolean all, Boolean status
     ) {
         BaseSpecification<ProductCategory> productCategorySpecification = new BaseSpecification<>();
         Specification<ProductCategory> sortable = productCategorySpecification.sortable(isSortAscending, columnName);
         Specification<ProductCategory> searchable = productCategorySpecification.searchable(SEARCH_FIELDS, search);
+        Specification<ProductCategory> filterableByStatus = productCategorySpecification.filterable(status);
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
         Page<GetListProductCategoryResponse> responses = productCategoryRepository
-                .findAll(sortable.and(searchable), pageable)
+                .findAll(sortable.and(searchable).and(filterableByStatus), pageable)
                 .map(productCategoryMapper::productCategoryToGetListProductCategoryResponse);
         return RestResponse.ok(ListResponse.of(responses));
     }

@@ -53,9 +53,9 @@ eureka:
   instance:
     prefer-ip-address: true
   client:
-    enabled: true
-    register-with-eureka: true
-    fetch-registry: true
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
 
 springdoc:
   use-fqn: true
@@ -79,6 +79,11 @@ spring:
     url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_user
     username: avnadmin
     password: AVNS_ICGL1LOHUwComp9Dj2e
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
 cloudinary:
   cloud-name: dwoejm4g6

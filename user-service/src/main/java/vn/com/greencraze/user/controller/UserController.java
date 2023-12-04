@@ -104,6 +104,14 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Toggle user status")
+    public ResponseEntity<Void> toggleUserStatus(@PathVariable String id) {
+        userProfileService.toggleUserStatus(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping("/enable/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Enable user")

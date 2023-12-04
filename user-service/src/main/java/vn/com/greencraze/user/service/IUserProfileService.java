@@ -33,6 +33,8 @@ public interface IUserProfileService {
 
     void enableUser(String id);
 
+    void toggleUserStatus(String id);
+
     void disableListUser(List<String> ids);
 
     RestResponse<ListResponse<GetListStaffResponse>> getListStaff(
@@ -49,5 +51,7 @@ public interface IUserProfileService {
     void disableStaff(Long id);
 
     void enableStaff(Long id);
+
+    void toggleStaffStatus(Long id);
 
 }

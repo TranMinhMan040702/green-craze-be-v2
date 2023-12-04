@@ -20,5 +20,4 @@ public record UpdateAddressRequest(
         Long wardId,
         Boolean isDefault
 ) {
-
 }

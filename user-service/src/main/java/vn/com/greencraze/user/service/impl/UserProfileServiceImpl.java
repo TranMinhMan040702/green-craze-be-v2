@@ -34,6 +34,8 @@ import vn.com.greencraze.user.entity.UserProfile;
 import vn.com.greencraze.user.entity.view.IdentityView;
 import vn.com.greencraze.user.enumeration.GenderType;
 import vn.com.greencraze.user.enumeration.IdentityStatus;
+import vn.com.greencraze.user.exception.InactivatedUserException;
+import vn.com.greencraze.user.exception.UnconfirmedUserException;
 import vn.com.greencraze.user.mapper.UserProfileMapper;
 import vn.com.greencraze.user.repository.StaffRepository;
 import vn.com.greencraze.user.repository.UserProfileRepository;
@@ -137,6 +139,22 @@ public class UserProfileServiceImpl implements IUserProfileService {
         authServiceClient.updateIdentityStatus(UpdateIdentityStatusRequest.builder()
                 .id(userProfile.getIdentity().getId())
                 .status(IdentityStatus.ACTIVE)
+                .build());
+    }
+
+    @Override
+    public void toggleUserStatus(String id) {
+        UserProfile userProfile = userProfileRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
+
+        authServiceClient.updateIdentityStatus(UpdateIdentityStatusRequest.builder()
+                .id(userProfile.getIdentity().getId())
+                .status(switch (userProfile.getIdentity().getStatus()) {
+                    case ACTIVE -> IdentityStatus.BLOCK;
+                    case BLOCK -> IdentityStatus.ACTIVE;
+                    case INACTIVE -> throw new InactivatedUserException();
+                    case UNCONFIRMED -> throw new UnconfirmedUserException();
+                })
                 .build());
     }
 
@@ -248,6 +266,22 @@ public class UserProfileServiceImpl implements IUserProfileService {
         authServiceClient.updateIdentityStatus(UpdateIdentityStatusRequest.builder()
                 .id(staff.getUser().getIdentity().getId())
                 .status(IdentityStatus.ACTIVE)
+                .build());
+    }
+
+    @Override
+    public void toggleStaffStatus(Long id) {
+        Staff staff = staffRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Staff", "id", id));
+
+        authServiceClient.updateIdentityStatus(UpdateIdentityStatusRequest.builder()
+                .id(staff.getUser().getIdentity().getId())
+                .status(switch (staff.getUser().getIdentity().getStatus()) {
+                    case ACTIVE -> IdentityStatus.BLOCK;
+                    case BLOCK -> IdentityStatus.ACTIVE;
+                    case INACTIVE -> throw new InactivatedUserException();
+                    case UNCONFIRMED -> throw new UnconfirmedUserException();
+                })
                 .build());
     }
 

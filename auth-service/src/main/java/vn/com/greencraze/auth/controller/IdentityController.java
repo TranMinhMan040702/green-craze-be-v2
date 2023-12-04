@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import vn.com.greencraze.auth.dto.request.identity.ChangePasswordRequest;
 import vn.com.greencraze.auth.dto.request.identity.CreateIdentityRequest;
 import vn.com.greencraze.auth.dto.request.identity.DisableListIdentityRequest;
 import vn.com.greencraze.auth.dto.request.identity.UpdateIdentityRequest;
@@ -65,6 +66,14 @@ public class IdentityController {
     @Operation(summary = "Update a identity")
     public ResponseEntity<Void> updateIdentity(@RequestBody @Valid UpdateIdentityRequest request) {
         identityService.updateIdentity(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/change-password", consumes = MediaType.APPLICATION_JSON)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Change password")
+    public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangePasswordRequest request) {
+        identityService.changePassword(request);
         return ResponseEntity.noContent().build();
     }
 

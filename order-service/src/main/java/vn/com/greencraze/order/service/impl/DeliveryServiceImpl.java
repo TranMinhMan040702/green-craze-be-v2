@@ -37,16 +37,17 @@ public class DeliveryServiceImpl implements IDeliveryService {
 
     @Override
     public RestResponse<ListResponse<GetListDeliveryResponse>> getListDelivery(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
+            Integer page, Integer size, Boolean isSortAscending,
+            String columnName, String search, Boolean all, Boolean status
     ) {
         DeliverySpecification deliverySpecification = new DeliverySpecification();
         Specification<Delivery> sortable = deliverySpecification.sortable(isSortAscending, columnName);
         Specification<Delivery> searchable = deliverySpecification.searchable(SEARCH_FIELDS, search);
+        Specification<Delivery> filterableByStatus = deliverySpecification.filterable(status);
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
         Page<GetListDeliveryResponse> responses = deliveryRepository
-                .findAll(sortable.and(searchable), pageable)
+                .findAll(sortable.and(searchable).and(filterableByStatus), pageable)
                 .map(deliveryMapper::deliveryToGetListDeliveryResponse);
-
         return RestResponse.ok(ListResponse.of(responses));
     }
 

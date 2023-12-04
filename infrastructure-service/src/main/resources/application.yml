@@ -58,11 +58,29 @@ eureka:
     register-with-eureka: false
     fetch-registry: false
 
+rabbitmq:
+  exchanges:
+    topic: internal.exchange
+  queues:
+    mail: mail.queue
+  routing-key:
+    mail: mail.routing_key
 ---
 spring:
   config:
     activate:
       on-profile: dev
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+cloudinary:
+  cloud-name: dwoejm4g6
+  api-key: 531723158945791
+  api-secret: vgCHOLFDpPoPe_DXyjk653ztW1k
+  secure: true
 
 eureka:
   client:
@@ -75,6 +93,12 @@ spring:
     activate:
       on-profile: stag
 
+cloudinary:
+  cloud-name: dwoejm4g6
+  api-key: 531723158945791
+  api-secret: vgCHOLFDpPoPe_DXyjk653ztW1k
+  secure: true
+
 eureka:
   client:
     service-url:
@@ -85,6 +109,12 @@ spring:
   config:
     activate:
       on-profile: prod
+
+cloudinary:
+  cloud-name: dwoejm4g6
+  api-key: 531723158945791
+  api-secret: vgCHOLFDpPoPe_DXyjk653ztW1k
+  secure: true
 
 eureka:
   client:

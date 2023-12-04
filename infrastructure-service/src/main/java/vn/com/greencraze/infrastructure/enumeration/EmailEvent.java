@@ -1,7 +1,10 @@
 package vn.com.greencraze.infrastructure.enumeration;
 
 public enum EmailEvent {
-    CHANGE_PASSWORD("change-password-mail-template", "[Green Craze System] Thay đổi mật khẩu");
+    CONFIRM_REGISTRATION("confirm-registration-mail-template", "[Green Craze System] Xác nhận đăng ký tài khoản"),
+    FORGOT_PASSWORD("forgot-password-mail-template", "[Green Craze System] Đặt lại mật khẩu"),
+    ORDER_CONFIRMATION("order-confirmation-mail-template", "[Green Craze System] Xác nhận đơn hàng"),
+    RESEND_OTP("resend-otp-mail-template", "[Green Craze System] Gửi lại mã");
 
     private final String template;
 

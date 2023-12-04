@@ -6,7 +6,7 @@ server:
 
 spring:
   application:
-    name: product-service
+    name: order-service
   profiles:
     active: dev
   web:

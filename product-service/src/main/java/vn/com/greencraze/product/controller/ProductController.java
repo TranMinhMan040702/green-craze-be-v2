@@ -25,21 +25,23 @@ import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.product.dto.request.image.CreateProductImageRequest;
 import vn.com.greencraze.product.dto.request.image.UpdateProductImageRequest;
 import vn.com.greencraze.product.dto.request.product.CreateProductRequest;
-import vn.com.greencraze.product.dto.request.product.UpdateListProductQuantityRequest;
 import vn.com.greencraze.product.dto.request.product.ExportProductRequest;
+import vn.com.greencraze.product.dto.request.product.FilterProductRequest;
 import vn.com.greencraze.product.dto.request.product.ImportProductRequest;
+import vn.com.greencraze.product.dto.request.product.UpdateListProductQuantityRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateProductRequest;
 import vn.com.greencraze.product.dto.response.image.CreateProductImageResponse;
 import vn.com.greencraze.product.dto.response.image.GetListProductImageResponse;
 import vn.com.greencraze.product.dto.response.image.GetOneProductImageResponse;
 import vn.com.greencraze.product.dto.response.product.CreateProductResponse;
+import vn.com.greencraze.product.dto.response.product.GetListFilteringProductResponse;
 import vn.com.greencraze.product.dto.response.product.GetListProductResponse;
+import vn.com.greencraze.product.dto.response.product.GetListSearchingProductResponse;
 import vn.com.greencraze.product.dto.response.product.GetOneProductBySlugResponse;
 import vn.com.greencraze.product.dto.response.product.GetOneProductResponse;
 import vn.com.greencraze.product.service.IProductImageService;
 import vn.com.greencraze.product.service.IProductService;
 
-import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 
@@ -62,19 +64,39 @@ public class ProductController {
             @RequestParam(defaultValue = "id") String columnName,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) boolean all,
-            @RequestParam(required = false) String categorySlug,
-            @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) Long brandId
+            @RequestParam(required = false) boolean status,
+            @RequestParam(required = false) String categorySlug
     ) {
         return ResponseEntity.ok(productService.getListProduct(
-                page, size, isSortAscending, columnName, search, all, categorySlug, minPrice, maxPrice, brandId
-        ));
+                page, size, isSortAscending, columnName, search, all, status, categorySlug));
     }
 
-    // TODO: API search product
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get a list of searching product")
+    public ResponseEntity<RestResponse<ListResponse<GetListSearchingProductResponse>>> getListSearchingProduct(
+            @RequestParam(required = false) String search
+    ) {
+        return ResponseEntity.ok(productService.getListSearchingProduct(search));
+    }
 
-    // TODO: API filter product
+    @GetMapping(value = "/filter", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get a list of filtering products")
+    public ResponseEntity<RestResponse<ListResponse<GetListFilteringProductResponse>>> getListFilteringProduct(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "true") boolean isSortAscending,
+            @RequestParam(defaultValue = "id") String columnName,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) boolean all,
+            @RequestParam(required = false) boolean status,
+            @Valid FilterProductRequest filter
+
+    ) {
+        return ResponseEntity.ok(productService.getListFilteringProduct(
+                page, size, isSortAscending, columnName, search, all, status, filter));
+    }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -231,5 +253,5 @@ public class ProductController {
         productService.exportProduct(request);
         return ResponseEntity.noContent().build();
     }
-  
+
 }

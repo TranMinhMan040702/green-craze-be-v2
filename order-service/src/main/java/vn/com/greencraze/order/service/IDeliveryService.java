@@ -13,7 +13,8 @@ import java.util.List;
 public interface IDeliveryService {
 
     RestResponse<ListResponse<GetListDeliveryResponse>> getListDelivery(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
+            Integer page, Integer size, Boolean isSortAscending,
+            String columnName, String search, Boolean all, Boolean status);
 
     RestResponse<GetOneDeliveryResponse> getOneDelivery(Long id);
 

@@ -6,4 +6,8 @@ public class InvalidPasswordException extends RuntimeException {
         super("Password is invalid");
     }
 
+    public InvalidPasswordException(String message) {
+        super(message);
+    }
+
 }
