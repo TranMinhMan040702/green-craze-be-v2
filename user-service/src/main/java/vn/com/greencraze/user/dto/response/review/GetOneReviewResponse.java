@@ -1,6 +1,7 @@
 package vn.com.greencraze.user.dto.response.review;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.With;
 import org.springframework.lang.Nullable;
 import vn.com.greencraze.user.entity.UserProfile;
 
@@ -8,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
+@With
 public record GetOneReviewResponse(
         Long id,
         Instant createdAt,
@@ -32,28 +34,6 @@ public record GetOneReviewResponse(
         UserProfile user
 ) {
     
-    public GetOneReviewResponse setProduct(ProductResponse product) {
-        return new GetOneReviewResponse(
-                id,
-                createdAt,
-                updatedAt,
-                createdBy,
-                updatedBy,
-                userId,
-                productId,
-                orderItemId,
-                title,
-                content,
-                rating,
-                image,
-                reply,
-                status,
-                variantName,
-                product,
-                user
-        );
-    }
-
     public record ProductResponse(
             Long id,
             Instant createdAt,

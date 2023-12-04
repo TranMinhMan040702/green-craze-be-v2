@@ -54,7 +54,9 @@ public class CartController {
     @GetMapping(value = "/list-ids", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a list of cart items")
-    public ResponseEntity<RestResponse<List<GetListCartItemResponse>>> getCartItemByListIds(@RequestParam List<Long> ids) {
+    public ResponseEntity<RestResponse<List<GetListCartItemResponse>>> getCartItemByListIds(
+            @RequestParam List<Long> ids
+    ) {
         return ResponseEntity.ok(cartService.getCartItemByListId(ids));
     }
 

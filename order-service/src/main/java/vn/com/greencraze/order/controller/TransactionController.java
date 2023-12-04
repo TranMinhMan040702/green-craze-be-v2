@@ -27,6 +27,7 @@ public class TransactionController {
 
     private final ITransactionService transactionService;
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a list of transactions")

@@ -29,6 +29,8 @@ import vn.com.greencraze.product.dto.request.product.ExportProductRequest;
 import vn.com.greencraze.product.dto.request.product.FilterProductRequest;
 import vn.com.greencraze.product.dto.request.product.ImportProductRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateListProductQuantityRequest;
+import vn.com.greencraze.product.dto.request.product.UpdateListProductReviewRequest;
+import vn.com.greencraze.product.dto.request.product.UpdateOneProductReviewRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateProductRequest;
 import vn.com.greencraze.product.dto.response.image.CreateProductImageResponse;
 import vn.com.greencraze.product.dto.response.image.GetListProductImageResponse;
@@ -230,7 +232,7 @@ public class ProductController {
 
     // TODO: Xem lại luồng export product
     // call from another service
-    @PutMapping(value = "/update-quantity", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/update-quantity")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a product quantity")
     public ResponseEntity<Void> updateProductQuantity(@Valid UpdateListProductQuantityRequest request) {
@@ -251,6 +253,22 @@ public class ProductController {
     @Operation(summary = "Update quantity and actual inventory a product after export")
     public ResponseEntity<Void> exportProduct(@RequestBody @Valid ExportProductRequest request) {
         productService.exportProduct(request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/{id}/update-review")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Update a product review")
+    public ResponseEntity<Void> updateOneProductReview(@PathVariable Long id, @Valid UpdateOneProductReviewRequest request) {
+        productService.updateOneProductReview(id, request);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(value = "/update-list-review")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Update list product review")
+    public ResponseEntity<Void> updateListProductReview(@Valid UpdateListProductReviewRequest request) {
+        productService.updateListProductReview(request);
         return ResponseEntity.noContent().build();
     }
 

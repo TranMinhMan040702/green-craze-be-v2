@@ -1,12 +1,14 @@
 package vn.com.greencraze.user.dto.response.userFollowProduct;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.With;
 import org.springframework.lang.Nullable;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
+@With
 public record GetListUserFollowProductResponse(
         Long id,
         Instant createdAt,
@@ -20,18 +22,6 @@ public record GetListUserFollowProductResponse(
         Long productId,
         ProductResponse product
 ) {
-
-    public GetListUserFollowProductResponse setProduct(ProductResponse product) {
-        return new GetListUserFollowProductResponse(
-                id,
-                createdAt,
-                updatedAt,
-                createdBy,
-                updatedBy,
-                productId,
-                product
-        );
-    }
 
     public record ProductResponse(
             Long id,

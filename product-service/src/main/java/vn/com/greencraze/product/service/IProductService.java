@@ -7,6 +7,8 @@ import vn.com.greencraze.product.dto.request.product.ExportProductRequest;
 import vn.com.greencraze.product.dto.request.product.FilterProductRequest;
 import vn.com.greencraze.product.dto.request.product.ImportProductRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateListProductQuantityRequest;
+import vn.com.greencraze.product.dto.request.product.UpdateListProductReviewRequest;
+import vn.com.greencraze.product.dto.request.product.UpdateOneProductReviewRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateProductRequest;
 import vn.com.greencraze.product.dto.response.product.CreateProductResponse;
 import vn.com.greencraze.product.dto.response.product.GetListFilteringProductResponse;
@@ -47,5 +49,9 @@ public interface IProductService {
     void importProduct(ImportProductRequest request);
 
     void exportProduct(ExportProductRequest request);
+
+    void updateOneProductReview(Long id, UpdateOneProductReviewRequest request);
+
+    void updateListProductReview(UpdateListProductReviewRequest request);
 
 }

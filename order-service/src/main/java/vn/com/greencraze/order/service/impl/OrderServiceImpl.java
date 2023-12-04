@@ -22,8 +22,10 @@ import vn.com.greencraze.order.client.product.dto.request.UpdateListProductQuant
 import vn.com.greencraze.order.client.product.dto.response.GetOneProductResponse;
 import vn.com.greencraze.order.client.product.dto.response.GetOneVariantResponse;
 import vn.com.greencraze.order.client.user.UserServiceClient;
+import vn.com.greencraze.order.client.user.dto.request.GetOrderReviewRequest;
 import vn.com.greencraze.order.client.user.dto.request.UpdateUserCartRequest;
 import vn.com.greencraze.order.client.user.dto.response.GetOneUserResponse;
+import vn.com.greencraze.order.client.user.dto.response.GetOrderReviewResponse;
 import vn.com.greencraze.order.constant.OrderConstants;
 import vn.com.greencraze.order.dto.request.order.CompletePaypalOrderRequest;
 import vn.com.greencraze.order.dto.request.order.CreateOrderItemRequest;
@@ -176,7 +178,14 @@ public class OrderServiceImpl implements IOrderService {
                 .findByUserIdAndCode(userId, code)
                 .map(this::mapOrderToGetOneOrderResponse)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "Order", code));
-        return RestResponse.ok(order);
+
+        GetOrderReviewResponse review = userServiceClient.getOrderReview(
+                new GetOrderReviewRequest(order.items().stream().map(GetListOrderItemResponse::id).toList()));
+
+        if (review == null)
+            throw new ResourceNotFoundException(RESOURCE_NAME, "orderIds",
+                    order.items().stream().map(GetListOrderItemResponse::id).toList());
+        return RestResponse.ok(order.withReviewedDate(review.reviewedDate()).withIsReview(review.isReview()));
     }
 
     private List<GetListOrderItemResponse> getOrderItemResponse(Set<OrderItem> orderItems) {
@@ -239,6 +248,16 @@ public class OrderServiceImpl implements IOrderService {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", oi.variantId());
             }
 
+            GetOneProductResponse product = productServiceClient.getOneProduct(variant.productId());
+            if (product == null) {
+                throw new ResourceNotFoundException(RESOURCE_NAME, "productId", variant.productId());
+            }
+
+            long q = (long) variant.quantity() * oi.quantity();
+            if (q > product.actualInventory()) {
+                throw new InvalidRequestException("Current quantity of product is not enough");
+            }
+
             BigDecimal variantPrice = variant.totalPrice().multiply(BigDecimal.valueOf(oi.quantity()));
 
             OrderItem orderItem = orderItemMapper.createOrderItemRequestToOrderItem(oi);
@@ -250,6 +269,7 @@ public class OrderServiceImpl implements IOrderService {
 
             orderItems.add(orderItem);
         }
+
         BigDecimal tax = totalAmount.multiply(OrderConstants.ORDER_TAX);
         totalAmount = totalAmount.add(delivery.getPrice()).add(tax);
 
@@ -347,16 +367,16 @@ public class OrderServiceImpl implements IOrderService {
 
         orderRepository.save(order);
 
-        // pub message to update product in product service
+        // update product in product service
         updateProduct(request.items());
 
-        // pub message to update user's cart in user service
+        // update user's cart in user service
         updateUserCart(request.items());
 
-        //pub message to create docket in inventory service
+        // create docket in inventory service
         createDocket(request.items(), order.getId(), "EXPORT");
 
-        // pub message to notify in infrastructure service
+        // TODO: pub message to notify in infrastructure service
         createNotify();
 
         return RestResponse.ok(orderMapper.orderToCreateOrderResponse(order));
@@ -454,7 +474,7 @@ public class OrderServiceImpl implements IOrderService {
 
         orderRepository.save(order);
 
-        //pub message to create notify
+        //TODO: pub message to create notify
         createNotify();
     }
 

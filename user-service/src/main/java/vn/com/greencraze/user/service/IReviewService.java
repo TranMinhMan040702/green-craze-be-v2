@@ -3,11 +3,13 @@ package vn.com.greencraze.user.service;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.user.dto.request.review.CreateReviewRequest;
+import vn.com.greencraze.user.dto.request.review.GetOrderReviewRequest;
 import vn.com.greencraze.user.dto.request.review.ReplyReviewRequest;
 import vn.com.greencraze.user.dto.request.review.UpdateReviewRequest;
 import vn.com.greencraze.user.dto.response.review.CreateReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetListReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetOneReviewResponse;
+import vn.com.greencraze.user.dto.response.review.GetOrderReviewResponse;
 
 import java.util.List;
 
@@ -36,5 +38,8 @@ public interface IReviewService {
     void toggleReview(Long id);
 
     void deleteListReview(List<Long> ids);
+
+    // call from other services
+    RestResponse<GetOrderReviewResponse> getOrderReview(GetOrderReviewRequest request);
 
 }

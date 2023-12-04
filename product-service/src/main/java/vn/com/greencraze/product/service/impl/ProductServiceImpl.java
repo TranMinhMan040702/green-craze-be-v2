@@ -17,6 +17,8 @@ import vn.com.greencraze.product.dto.request.product.ExportProductRequest;
 import vn.com.greencraze.product.dto.request.product.FilterProductRequest;
 import vn.com.greencraze.product.dto.request.product.ImportProductRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateListProductQuantityRequest;
+import vn.com.greencraze.product.dto.request.product.UpdateListProductReviewRequest;
+import vn.com.greencraze.product.dto.request.product.UpdateOneProductReviewRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateProductRequest;
 import vn.com.greencraze.product.dto.response.product.CreateProductResponse;
 import vn.com.greencraze.product.dto.response.product.GetListFilteringProductResponse;
@@ -205,6 +207,7 @@ public class ProductServiceImpl implements IProductService {
             Product product = productRepository.findById(item.id())
                     .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", item.id()));
             product.setQuantity(product.getQuantity() - item.quantity());
+            product.setActualInventory(product.getActualInventory() - item.quantity());
             product.setSold(product.getSold() + item.quantity());
             productRepository.save(product);
         }
@@ -229,6 +232,23 @@ public class ProductServiceImpl implements IProductService {
         product.setQuantity(product.getQuantity() - request.quantity());
         product.setActualInventory(product.getActualInventory() - request.quantity());
         productRepository.save(product);
+    }
+
+    @Override
+    public void updateOneProductReview(Long id, UpdateOneProductReviewRequest request) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
+
+        product.setRating(request.rating());
+
+        productRepository.save(product);
+    }
+
+    @Override
+    public void updateListProductReview(UpdateListProductReviewRequest request) {
+        for (UpdateListProductReviewRequest.UpdateOneProductReview item : request.productReviews()) {
+            updateOneProductReview(item.productId(), new UpdateOneProductReviewRequest(item.rating()));
+        }
     }
 
 }

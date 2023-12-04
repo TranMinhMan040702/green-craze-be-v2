@@ -81,7 +81,7 @@ public class UserFollowProductServiceImpl implements IUserFollowProductService {
             GetOneProductResponse productResponse = productServiceClient.getOneProduct(response.productId());
             GetListUserFollowProductResponse.ProductResponse product = userFollowProductMapper
                     .productResponseToGetListUserFollowProductResponse(productResponse);
-            response.setProduct(product);
+            response = response.withProduct(product);
         }
 
         return RestResponse.ok(ListResponse.of(responses));

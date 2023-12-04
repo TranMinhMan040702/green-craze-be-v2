@@ -55,26 +55,20 @@ public class CartServiceImpl implements ICartService {
         if (product == null)
             throw new ResourceNotFoundException("Product", "id", variant.productId());
 
-        GetListCartItemResponse res = new GetListCartItemResponse(
-                cartItem.getId(),
-                cartItem.getCreatedAt(),
-                cartItem.getUpdatedAt(),
-                cartItem.getCreatedBy(),
-                cartItem.getUpdatedBy(),
-                cartItem.getQuantity(),
-                cartItem.getVariantId(),
-                variant.name(),
-                variant.quantity(),
-                variant.sku(),
-                variant.itemPrice(),
-                variant.promotionalItemPrice(),
-                variant.totalPrice(),
-                variant.totalPromotionalPrice(),
-                product.slug(),
-                product.unit().name(),
-                product.name(),
-                product.images().stream().findFirst().get().image(),
-                variant.promotionalItemPrice() != null);
+
+        GetListCartItemResponse res = cartMapper.cartItemToGetListCartItemResponse(cartItem)
+                .withVariantName(variant.name())
+                .withVariantQuantity(variant.quantity())
+                .withSku(variant.sku())
+                .withVariantPrice(variant.itemPrice())
+                .withVariantPromotionalPrice(variant.promotionalItemPrice())
+                .withTotalPrice(variant.totalPrice())
+                .withTotalPromotionalPrice(variant.totalPromotionalPrice())
+                .withProductSlug(product.slug())
+                .withProductUnit(product.unit().name())
+                .withProductName(product.name())
+                .withProductImage(product.images().stream().findFirst().get().image())
+                .withIsPromotion(variant.promotionalItemPrice() != null);
 
         return res;
     }
@@ -106,6 +100,7 @@ public class CartServiceImpl implements ICartService {
                     x = mapToGetListCartItemResponse(ci);
                 }
         );
+
         return RestResponse.ok(ListResponse.of(responses));
     }
 
@@ -123,6 +118,9 @@ public class CartServiceImpl implements ICartService {
 
     @Override
     public RestResponse<CreateCartItemResponse> createCartItem(CreateCartItemRequest request) {
+        if (request.quantity() <= 0)
+            throw new InvalidRequestException("Unexpected quantity, it must be a positive number");
+
         String userId = authFacade.getUserId();
         UserProfile user = userProfileRepository
                 .findById(userId)
@@ -130,6 +128,24 @@ public class CartServiceImpl implements ICartService {
 
         Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cart", userId));
+
+        GetOneVariantResponse variant = productServiceClient.getOneVariant(request.variantId());
+        if (variant == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", request.variantId());
+        }
+
+        GetOneProductResponse product = productServiceClient.getOneProduct(variant.productId());
+        if (product == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "productId", variant.productId());
+        }
+
+        if (product.status() != GetOneProductResponse.ProductStatus.ACTIVE) {
+            throw new InvalidRequestException("Unexpected variantId, product is not active");
+        }
+
+        long quantity = product.actualInventory();
+        if (quantity < (request.quantity() * variant.quantity().longValue()))
+            throw new InvalidRequestException("Unexpected quantity, it must be less than or equal to product in inventory");
 
         CartItem cartItem = cartItemRepository.findByCartAndVariantId(cart, request.variantId());
 
@@ -162,6 +178,24 @@ public class CartServiceImpl implements ICartService {
                 .stream().filter(x -> Objects.equals(x.getCart().getId(), cart.getId()))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cartItem", id));
+
+        GetOneVariantResponse variant = productServiceClient.getOneVariant(cartItem.getVariantId());
+        if (variant == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", cartItem.getVariantId());
+        }
+
+        GetOneProductResponse product = productServiceClient.getOneProduct(variant.productId());
+        if (product == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "productId", variant.productId());
+        }
+
+        if (product.status() != GetOneProductResponse.ProductStatus.ACTIVE) {
+            throw new InvalidRequestException("Unexpected variantId, product is not active");
+        }
+
+        long quantity = product.actualInventory();
+        if (quantity < (request.quantity() * variant.quantity().longValue()))
+            throw new InvalidRequestException("Unexpected quantity, it must be less than or equal to product in inventory");
 
         cartItem.setQuantity(request.quantity() + cartItem.getQuantity());
 

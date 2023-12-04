@@ -1,11 +1,13 @@
 package vn.com.greencraze.user.dto.response.cart;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.With;
 import org.springframework.lang.Nullable;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
+@With
 public record GetListCartItemResponse(
         Long id,
         Instant createdAt,
@@ -33,5 +35,5 @@ public record GetListCartItemResponse(
         String productImage,
         Boolean isPromotion
 ) {
-        
+
 }
