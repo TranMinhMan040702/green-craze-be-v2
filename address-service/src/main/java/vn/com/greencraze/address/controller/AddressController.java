@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -37,7 +38,7 @@ import java.util.List;
 @Tag(name = "address :: Address")
 @RequiredArgsConstructor
 public class AddressController {
-    
+
     private final IAddressService addressService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -93,7 +94,7 @@ public class AddressController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a address")
-    public ResponseEntity<RestResponse<CreateAddressResponse>> createAddress(@Valid CreateAddressRequest request) {
+    public ResponseEntity<RestResponse<CreateAddressResponse>> createAddress(@RequestBody @Valid CreateAddressRequest request) {
         RestResponse<CreateAddressResponse> response = addressService.createAddress(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();

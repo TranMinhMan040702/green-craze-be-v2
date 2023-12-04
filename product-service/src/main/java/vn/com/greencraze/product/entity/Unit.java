@@ -58,7 +58,8 @@ public class Unit {
     private String name;
 
     @Column(name = "status", nullable = false)
-    private Boolean status;
+    @Builder.Default
+    private Boolean status = true;
 
     @OneToMany(mappedBy = "unit", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Product> products = new HashSet<>();

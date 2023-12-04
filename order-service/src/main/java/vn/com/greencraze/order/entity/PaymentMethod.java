@@ -60,5 +60,6 @@ public class PaymentMethod {
     private String image;
 
     @Column(name = "status", nullable = false)
-    private Boolean status;
+    @Builder.Default
+    private Boolean status = true;
 }

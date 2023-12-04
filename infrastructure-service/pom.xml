@@ -19,6 +19,7 @@
         <amqp.version>0.0.1-SNAPSHOT</amqp.version>
         <commons.version>0.0.1-SNAPSHOT</commons.version>
         <spring-cloud.version>2022.0.4</spring-cloud.version>
+        <cloudinary.version>1.33.0</cloudinary.version>
     </properties>
 
     <dependencies>
@@ -83,6 +84,11 @@
             <groupId>vn.com.greencraze.amqp</groupId>
             <artifactId>amqp</artifactId>
             <version>${amqp.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http44</artifactId>
+            <version>${cloudinary.version}</version>
         </dependency>
         <dependency>
             <groupId>vn.com.greencraze</groupId>

@@ -72,7 +72,8 @@ public class ProductCategory {
     private String slug;
 
     @Column(name = "status", nullable = false)
-    private Boolean status;
+    @Builder.Default
+    private Boolean status = true;
 
     @ManyToMany(mappedBy = "productCategories")
     @Builder.Default

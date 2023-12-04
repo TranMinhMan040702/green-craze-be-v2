@@ -76,6 +76,12 @@ spring:
     username: guest
     password: guest
 
+cloudinary:
+  cloud-name: dwoejm4g6
+  api-key: 531723158945791
+  api-secret: vgCHOLFDpPoPe_DXyjk653ztW1k
+  secure: true
+
 eureka:
   client:
     service-url:
@@ -87,6 +93,12 @@ spring:
     activate:
       on-profile: stag
 
+cloudinary:
+  cloud-name: dwoejm4g6
+  api-key: 531723158945791
+  api-secret: vgCHOLFDpPoPe_DXyjk653ztW1k
+  secure: true
+
 eureka:
   client:
     service-url:
@@ -97,6 +109,12 @@ spring:
   config:
     activate:
       on-profile: prod
+
+cloudinary:
+  cloud-name: dwoejm4g6
+  api-key: 531723158945791
+  api-secret: vgCHOLFDpPoPe_DXyjk653ztW1k
+  secure: true
 
 eureka:
   client:
