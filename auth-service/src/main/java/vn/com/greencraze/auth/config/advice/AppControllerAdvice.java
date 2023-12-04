@@ -40,14 +40,14 @@ public class AppControllerAdvice implements CommonControllerAdvice {
     @ExceptionHandler(InactivatedUserException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public RestError unactivatedUserExceptionHandler(InactivatedUserException e, HttpServletRequest request) {
+    public RestError inactivatedUserExceptionHandler(InactivatedUserException e, HttpServletRequest request) {
         return RestError.builder()
                 .status(HttpStatus.BAD_REQUEST.value())
-                .type(URI.create("https://problems.greencraze.com.vn/unactivated-user"))
-                .title("Unactivated User")
+                .type(URI.create("https://problems.greencraze.com.vn/inactivated-user"))
+                .title("Inactivated User")
                 .detail(e.getMessage())
                 .instance(URI.create(request.getRequestURI()))
-                .code("UNACTIVATED_USER")
+                .code("INACTIVATED_USER")
                 .build();
     }
 

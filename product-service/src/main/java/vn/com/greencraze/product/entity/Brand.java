@@ -67,7 +67,8 @@ public class Brand {
     private String image;
 
     @Column(name = "status", nullable = false)
-    private Boolean status;
+    @Builder.Default
+    private Boolean status = true;
 
     @OneToMany(mappedBy = "brand", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

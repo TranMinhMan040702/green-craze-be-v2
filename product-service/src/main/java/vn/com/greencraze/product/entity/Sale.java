@@ -6,12 +6,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -84,7 +86,11 @@ public class Sale {
     @Enumerated(EnumType.STRING)
     private SaleStatus status;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @Column(name = "all_product_category")
+    private Boolean allProductCategory;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @OrderBy
     @JoinTable(
             name = "sale_product_category",
             joinColumns = @JoinColumn(name = "sale_id", nullable = false),

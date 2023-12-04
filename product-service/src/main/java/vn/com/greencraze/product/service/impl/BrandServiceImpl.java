@@ -39,14 +39,16 @@ public class BrandServiceImpl implements IBrandService {
 
     @Override
     public RestResponse<ListResponse<GetListBrandResponse>> getListBrand(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
+            Integer page, Integer size, Boolean isSortAscending,
+            String columnName, String search, Boolean all, Boolean status
     ) {
         BrandSpecification brandSpecification = new BrandSpecification();
         Specification<Brand> sortable = brandSpecification.sortable(isSortAscending, columnName);
         Specification<Brand> searchable = brandSpecification.searchable(SEARCH_FIELDS, search);
+        Specification<Brand> filterableByStatus = brandSpecification.filterable(status);
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
         Page<GetListBrandResponse> responses = brandRepository
-                .findAll(sortable.and(searchable), pageable)
+                .findAll(sortable.and(searchable).and(filterableByStatus), pageable)
                 .map(brandMapper::brandToGetListBrandResponse);
         return RestResponse.ok(ListResponse.of(responses));
     }

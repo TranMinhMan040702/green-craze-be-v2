@@ -9,7 +9,11 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import vn.com.greencraze.amqp.RabbitMQMessageProducer;
+import vn.com.greencraze.auth.client.user.UserServiceClient;
+import vn.com.greencraze.auth.client.user.dto.CreateUserRequest;
 import vn.com.greencraze.auth.config.property.AppProperties;
+import vn.com.greencraze.auth.config.property.RabbitMQProperties;
 import vn.com.greencraze.auth.config.security.JwtManager;
 import vn.com.greencraze.auth.dto.request.auth.AuthenticateRequest;
 import vn.com.greencraze.auth.dto.request.auth.ForgotPasswordRequest;
@@ -42,6 +46,7 @@ import vn.com.greencraze.auth.exception.InactivatedUserException;
 import vn.com.greencraze.auth.exception.InvalidPasswordException;
 import vn.com.greencraze.auth.exception.TokenValidationException;
 import vn.com.greencraze.auth.exception.UnconfirmedUserException;
+import vn.com.greencraze.auth.rabbitmq.dto.request.SendEmailRequest;
 import vn.com.greencraze.auth.repository.IdentityRepository;
 import vn.com.greencraze.auth.repository.RoleRepository;
 import vn.com.greencraze.auth.repository.view.UserProfileViewRepository;
@@ -49,6 +54,7 @@ import vn.com.greencraze.auth.service.IAuthService;
 import vn.com.greencraze.auth.util.OtpHelper;
 import vn.com.greencraze.auth.util.RefreshTokenHelper;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.EmailEvent;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 
 import java.io.IOException;
@@ -56,6 +62,7 @@ import java.security.GeneralSecurityException;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -73,6 +80,11 @@ public class AuthServiceImpl implements IAuthService {
     private final PasswordEncoder passwordEncoder;
 
     private final AppProperties appProperties;
+    private final RabbitMQProperties rabbitMQProperties;
+
+    private final UserServiceClient userServiceClient;
+
+    private final RabbitMQMessageProducer producer;
 
     @Builder
     private record GenerateAuthCredentialDto(
@@ -128,7 +140,10 @@ public class AuthServiceImpl implements IAuthService {
             case BLOCK -> throw new BlockedUserException();
             case INACTIVE -> throw new InactivatedUserException();
             case UNCONFIRMED -> {
-                // TODO: Send OTP
+                resendOTP(ResendOTPRequest.builder()
+                        .email(identity.getUsername())
+                        .type(TokenType.REGISTER_OTP)
+                        .build());
                 throw new UnconfirmedUserException();
             }
         }
@@ -176,6 +191,8 @@ public class AuthServiceImpl implements IAuthService {
 
         // Step 2: get payload
         var payload = idToken.getPayload();
+        System.out.println(payload.get("given_name"));
+        System.out.println(payload.get("family_name"));
         Optional<Identity> identityOption = identityRepository.findByUsername(payload.getEmail());
 
         Identity identity;
@@ -193,11 +210,18 @@ public class AuthServiceImpl implements IAuthService {
                     .status(IdentityStatus.ACTIVE)
                     .roles(Set.of(roleRepository.getReferenceByCode(RoleCode.USER.toString())))
                     .build();
-            // TODO: call user service create user
+            identityRepository.save(identity);
+
+            // call user service create user
+            userServiceClient.createUser(CreateUserRequest.builder()
+                    .identityId(identity.getId())
+                    .firstName((String) payload.get("given_name"))
+                    .lastName((String) payload.get("family_name"))
+                    .email(identity.getUsername())
+                    .build());
         }
 
         GenerateAuthCredentialDto generateAuthCredentialDto = GenerateAuthCredential(identity);
-
         return RestResponse.ok(GoogleAuthResponse.builder()
                 .accessToken(generateAuthCredentialDto.accessToken)
                 .refreshToken(generateAuthCredentialDto.refreshToken)
@@ -234,8 +258,23 @@ public class AuthServiceImpl implements IAuthService {
                     .expiredAt(Instant.now().plusMillis(appProperties.otpTokenExpirationMillis()))
                     .build()));
             identityRepository.save(identity);
-            // TODO: call user service create user
-            // TODO: Send email otp
+            // call user service create user
+            userServiceClient.createUser(CreateUserRequest.builder()
+                    .identityId(identity.getId())
+                    .firstName(request.firstName())
+                    .lastName(request.lastName())
+                    .email(identity.getUsername())
+                    .build());
+            // send email otp
+            producer.publish(SendEmailRequest.builder()
+                    .event(EmailEvent.CONFIRM_REGISTRATION)
+                    .email(identity.getUsername())
+                    .payload(Map.of(
+                            "name", identity.getUsername(), // TODO
+                            "email", identity.getUsername(),
+                            "OTP", otp
+                    ))
+                    .build(), rabbitMQProperties.internalExchange(), rabbitMQProperties.mailRoutingKey());
         }
 
         return RestResponse.ok(RegisterResponse.builder()
@@ -348,7 +387,16 @@ public class AuthServiceImpl implements IAuthService {
 
         identityRepository.save(identity);
 
-        // Step 5: send email for user (TODO)
+        // Step 5: send email for user
+        producer.publish(SendEmailRequest.builder()
+                .event(EmailEvent.CONFIRM_REGISTRATION)
+                .email(identity.getUsername())
+                .payload(Map.of(
+                        "name", identity.getUsername(), // TODO
+                        "email", identity.getUsername(),
+                        "OTP", otp
+                ))
+                .build(), rabbitMQProperties.internalExchange(), rabbitMQProperties.mailRoutingKey());
 
         return RestResponse.ok(ResendOTPResponse.builder()
                 .isSuccess(true)

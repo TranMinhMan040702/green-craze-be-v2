@@ -14,13 +14,16 @@ import vn.com.greencraze.commons.exception.InvalidRequestException;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.product.dto.request.product.CreateProductRequest;
 import vn.com.greencraze.product.dto.request.product.ExportProductRequest;
+import vn.com.greencraze.product.dto.request.product.FilterProductRequest;
 import vn.com.greencraze.product.dto.request.product.ImportProductRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateListProductQuantityRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateListProductReviewRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateOneProductReviewRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateProductRequest;
 import vn.com.greencraze.product.dto.response.product.CreateProductResponse;
+import vn.com.greencraze.product.dto.response.product.GetListFilteringProductResponse;
 import vn.com.greencraze.product.dto.response.product.GetListProductResponse;
+import vn.com.greencraze.product.dto.response.product.GetListSearchingProductResponse;
 import vn.com.greencraze.product.dto.response.product.GetOneProductBySlugResponse;
 import vn.com.greencraze.product.dto.response.product.GetOneProductResponse;
 import vn.com.greencraze.product.entity.Product;
@@ -36,7 +39,6 @@ import vn.com.greencraze.product.repository.specification.ProductSpecification;
 import vn.com.greencraze.product.service.IProductService;
 import vn.com.greencraze.product.service.IUploadService;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -59,20 +61,49 @@ public class ProductServiceImpl implements IProductService {
 
     @Override
     public RestResponse<ListResponse<GetListProductResponse>> getListProduct(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all,
-            String categorySlug, BigDecimal minPrice, BigDecimal maxPrice, Long brandId
+            Integer page, Integer size, Boolean isSortAscending, String columnName,
+            String search, Boolean all, Boolean status, String categorySlug
     ) {
         ProductSpecification productSpecification = new ProductSpecification();
         Specification<Product> sortable = productSpecification.sortable(isSortAscending, columnName);
         Specification<Product> searchable = productSpecification.searchable(SEARCH_FIELDS, search);
-        Specification<Product> filterable = productSpecification.filterable(
-                categorySlug, minPrice, maxPrice, brandId
-        );
+        Specification<Product> filterableByCategorySlug = productSpecification.filterable(categorySlug);
+        Specification<Product> filterableByStatus = productSpecification.filterable(status);
 
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
         Page<GetListProductResponse> responses = productRepository
-                .findAll(sortable.and(searchable).and(filterable), pageable)
+                .findAll(sortable.and(searchable).and(filterableByCategorySlug).and(filterableByStatus), pageable)
                 .map(productMapper::productToGetListProductResponse);
+        return RestResponse.created(ListResponse.of(responses));
+    }
+
+    @Override
+    public RestResponse<ListResponse<GetListSearchingProductResponse>> getListSearchingProduct(String search) {
+        ProductSpecification productSpecification = new ProductSpecification();
+        Specification<Product> searchable = productSpecification.searchable(SEARCH_FIELDS, search);
+        Specification<Product> filterableByStatus = productSpecification.filterable(true);
+
+        Pageable pageable = PageRequest.of(0, 5);
+        Page<GetListSearchingProductResponse> responses = productRepository
+                .findAll(searchable.and(filterableByStatus), pageable)
+                .map(productMapper::productToGetListSearchingProductResponse);
+        return RestResponse.created(ListResponse.of(responses));
+    }
+
+    @Override
+    public RestResponse<ListResponse<GetListFilteringProductResponse>> getListFilteringProduct(
+            Integer page, Integer size, Boolean isSortAscending, String columnName,
+            String search, Boolean all, Boolean status, FilterProductRequest filter
+    ) {
+        ProductSpecification productSpecification = new ProductSpecification();
+        Specification<Product> sortable = productSpecification.sortable(isSortAscending, columnName);
+        Specification<Product> searchable = productSpecification.searchable(SEARCH_FIELDS, search);
+        Specification<Product> filterableByStatus = productSpecification.filterable(status);
+        Specification<Product> filterable = productSpecification.filterable(filter);
+        Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
+        Page<GetListFilteringProductResponse> responses = productRepository
+                .findAll(sortable.and(searchable).and(filterable).and(filterableByStatus), pageable)
+                .map(productMapper::productToGetListFilteringProductResponse);
         return RestResponse.created(ListResponse.of(responses));
     }
 

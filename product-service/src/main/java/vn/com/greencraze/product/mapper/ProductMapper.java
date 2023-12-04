@@ -7,7 +7,9 @@ import vn.com.greencraze.commons.mapper.ReferenceMapper;
 import vn.com.greencraze.product.dto.request.product.CreateProductRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateProductRequest;
 import vn.com.greencraze.product.dto.response.product.CreateProductResponse;
+import vn.com.greencraze.product.dto.response.product.GetListFilteringProductResponse;
 import vn.com.greencraze.product.dto.response.product.GetListProductResponse;
+import vn.com.greencraze.product.dto.response.product.GetListSearchingProductResponse;
 import vn.com.greencraze.product.dto.response.product.GetOneProductBySlugResponse;
 import vn.com.greencraze.product.dto.response.product.GetOneProductResponse;
 import vn.com.greencraze.product.entity.Product;
@@ -19,6 +21,10 @@ public interface ProductMapper {
     Product idToProduct(String id);
 
     GetListProductResponse productToGetListProductResponse(Product product);
+
+    GetListSearchingProductResponse productToGetListSearchingProductResponse(Product product);
+
+    GetListFilteringProductResponse productToGetListFilteringProductResponse(Product product);
 
     GetOneProductResponse productToGetOneProductResponse(Product product);
 

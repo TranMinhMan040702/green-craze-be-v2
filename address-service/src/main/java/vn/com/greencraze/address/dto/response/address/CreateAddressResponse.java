@@ -2,6 +2,9 @@ package vn.com.greencraze.address.dto.response.address;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.lang.Nullable;
+import vn.com.greencraze.address.dto.response.district.GetOneDistrictResponse;
+import vn.com.greencraze.address.dto.response.province.GetOneProvinceResponse;
+import vn.com.greencraze.address.dto.response.ward.GetOneWardResponse;
 
 import java.time.Instant;
 
@@ -21,8 +24,8 @@ public record CreateAddressResponse(
         String street,
         Boolean isDefault,
         Boolean status,
-        Long provinceId,
-        Long districtId,
-        Long wardId
+        GetOneProvinceResponse province,
+        GetOneDistrictResponse district,
+        GetOneWardResponse ward
 ) {
 }

@@ -47,9 +47,11 @@ public class DeliveryController {
             @RequestParam(defaultValue = "true") boolean isSortAscending,
             @RequestParam(defaultValue = "id") String columnName,
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) boolean all
+            @RequestParam(required = false) boolean all,
+            @RequestParam(required = false) boolean status
     ) {
-        return ResponseEntity.ok(deliveryService.getListDelivery(page, size, isSortAscending, columnName, search, all));
+        return ResponseEntity.ok(deliveryService.getListDelivery(
+                page, size, isSortAscending, columnName, search, all, status));
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

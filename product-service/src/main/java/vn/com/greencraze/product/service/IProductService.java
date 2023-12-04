@@ -4,24 +4,32 @@ import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.product.dto.request.product.CreateProductRequest;
 import vn.com.greencraze.product.dto.request.product.ExportProductRequest;
+import vn.com.greencraze.product.dto.request.product.FilterProductRequest;
 import vn.com.greencraze.product.dto.request.product.ImportProductRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateListProductQuantityRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateListProductReviewRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateOneProductReviewRequest;
 import vn.com.greencraze.product.dto.request.product.UpdateProductRequest;
 import vn.com.greencraze.product.dto.response.product.CreateProductResponse;
+import vn.com.greencraze.product.dto.response.product.GetListFilteringProductResponse;
 import vn.com.greencraze.product.dto.response.product.GetListProductResponse;
+import vn.com.greencraze.product.dto.response.product.GetListSearchingProductResponse;
 import vn.com.greencraze.product.dto.response.product.GetOneProductBySlugResponse;
 import vn.com.greencraze.product.dto.response.product.GetOneProductResponse;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public interface IProductService {
 
     RestResponse<ListResponse<GetListProductResponse>> getListProduct(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all,
-            String categorySlug, BigDecimal minPrice, BigDecimal maxPrice, Long brandId);
+            Integer page, Integer size, Boolean isSortAscending, String columnName,
+            String search, Boolean all, Boolean status, String categorySlug);
+
+    RestResponse<ListResponse<GetListSearchingProductResponse>> getListSearchingProduct(String search);
+
+    RestResponse<ListResponse<GetListFilteringProductResponse>> getListFilteringProduct(
+            Integer page, Integer size, Boolean isSortAscending, String columnName,
+            String search, Boolean all, Boolean status, FilterProductRequest filter);
 
     RestResponse<GetOneProductResponse> getOneProduct(Long id);
 

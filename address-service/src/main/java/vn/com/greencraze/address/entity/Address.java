@@ -84,5 +84,6 @@ public class Address {
     private Boolean isDefault;
 
     @Column(name = "status", nullable = false)
-    private Boolean status;
+    @Builder.Default
+    private Boolean status = true;
 }

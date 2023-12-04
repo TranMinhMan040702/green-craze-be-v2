@@ -35,14 +35,16 @@ public class OrderCancelReasonServiceImpl implements IOrderCancelReasonService {
 
     @Override
     public RestResponse<ListResponse<GetListOrderCancelReasonResponse>> getListOrderCancelReason(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all
+            Integer page, Integer size, Boolean isSortAscending,
+            String columnName, String search, Boolean all, Boolean status
     ) {
         OrderCancelReasonSpecification orderCancelReasonSpecification = new OrderCancelReasonSpecification();
         Specification<OrderCancelReason> sortable = orderCancelReasonSpecification.sortable(isSortAscending, columnName);
         Specification<OrderCancelReason> searchable = orderCancelReasonSpecification.searchable(SEARCH_FIELDS, search);
+        Specification<OrderCancelReason> filterableByStatus = orderCancelReasonSpecification.filterable(status);
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
         Page<GetListOrderCancelReasonResponse> responses = orderCancelReasonRepository
-                .findAll(sortable.and(searchable), pageable)
+                .findAll(sortable.and(searchable).and(filterableByStatus), pageable)
                 .map(orderCancelReasonMapper::orderCancelReasonToGetListOrderCancelReasonResponse);
         return RestResponse.ok(ListResponse.of(responses));
     }

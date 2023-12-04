@@ -1,21 +1,18 @@
 # Delivery
 CREATE TABLE delivery
 (
-    id          BIGINT AUTO_INCREMENT NOT NULL,
-    created_at  datetime              NOT NULL,
-    updated_at  datetime              NOT NULL,
-    created_by  VARCHAR(255)          NULL,
-    updated_by  VARCHAR(255)          NULL,
-    name        VARCHAR(255)          NOT NULL,
-    description VARCHAR(255)          NOT NULL,
-    price       DECIMAL               NOT NULL,
-    image       TEXT                  NOT NULL,
-    status      BIT(1)                NOT NULL,
+    id            BIGINT AUTO_INCREMENT NOT NULL,
+    created_at    datetime              NOT NULL,
+    updated_at    datetime              NOT NULL,
+    created_by    VARCHAR(255)          NULL,
+    updated_by    VARCHAR(255)          NULL,
+    name          VARCHAR(255)          NOT NULL,
+    `description` VARCHAR(255)          NOT NULL,
+    price         DECIMAL               NOT NULL,
+    image         TEXT                  NOT NULL,
+    status        BIT(1)                NOT NULL,
     CONSTRAINT pk_delivery PRIMARY KEY (id)
 );
-
-ALTER TABLE delivery
-    ADD CONSTRAINT uc_delivery_code UNIQUE (code);
 
 ALTER TABLE delivery
     ADD CONSTRAINT uc_delivery_name UNIQUE (name);

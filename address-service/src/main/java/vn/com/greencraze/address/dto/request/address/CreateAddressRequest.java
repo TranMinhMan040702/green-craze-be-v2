@@ -12,6 +12,7 @@ public record CreateAddressRequest(
         String email,
         @NotBlank
         String street,
+        Boolean status,
         @NotNull
         Long provinceId,
         @NotNull

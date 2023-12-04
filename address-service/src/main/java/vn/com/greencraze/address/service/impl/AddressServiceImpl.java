@@ -88,6 +88,8 @@ public class AddressServiceImpl implements IAddressService {
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "userId", userId));
     }
 
+    // TODO: GetListUserAddress
+
     @Override
     public RestResponse<GetOneAddressResponse> getDefaultUserAddress(String userId) {
         return addressRepository.findByUserIdAndIsDefault(userId, true)
@@ -127,6 +129,7 @@ public class AddressServiceImpl implements IAddressService {
     @Transactional(rollbackOn = {ResourceNotFoundException.class, InvalidRequestException.class})
     @Override
     public RestResponse<CreateAddressResponse> createAddress(CreateAddressRequest request) {
+        String userId = authFacade.getUserId();
         Province province = provinceRepository.findById(request.provinceId())
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "provinceId", request.provinceId()));
         District district = districtRepository.findById(request.districtId())
@@ -139,13 +142,13 @@ public class AddressServiceImpl implements IAddressService {
             throw new InvalidRequestException("Cannot identify combined address, may be unexpected provinceId, districtId, wardId");
 
         Address address = addressMapper.createAddressRequestToAddress(request);
+        address.setUserId(userId);
         address.setIsDefault(true);
 
         addressRepository.findAll().forEach(x -> {
             x.setIsDefault(false);
             addressRepository.save(x);
         });
-
         addressRepository.save(address);
 
         return RestResponse.created(addressMapper.addressToCreateAddressResponse(address));

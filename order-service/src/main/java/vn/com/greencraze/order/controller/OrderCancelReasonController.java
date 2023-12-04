@@ -47,10 +47,11 @@ public class OrderCancelReasonController {
             @RequestParam(defaultValue = "true") boolean isSortAscending,
             @RequestParam(defaultValue = "id") String columnName,
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) boolean all
+            @RequestParam(required = false) boolean all,
+            @RequestParam(required = false) boolean status
     ) {
         return ResponseEntity.ok(orderCancelReasonService.getListOrderCancelReason(
-                page, size, isSortAscending, columnName, search, all));
+                page, size, isSortAscending, columnName, search, all, status));
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
