@@ -1,6 +1,8 @@
 package vn.com.greencraze.order.dto.response.order;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.With;
+import org.springframework.lang.Nullable;
 import vn.com.greencraze.order.client.address.dto.response.GetOneAddressResponse;
 import vn.com.greencraze.order.client.user.dto.response.GetOneUserResponse;
 import vn.com.greencraze.order.dto.response.orderCancelReason.GetOneOrderCancelReasonResponse;
@@ -15,7 +17,11 @@ public record GetListOrderResponse(
         Long id,
         Instant createdAt,
         Instant updatedAt,
+        @Nullable
+        @Schema(nullable = true)
         String createdBy,
+        @Nullable
+        @Schema(nullable = true)
         String updatedBy,
         String userId,
         Long addressId,
