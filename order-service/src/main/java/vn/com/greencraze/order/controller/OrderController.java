@@ -25,6 +25,7 @@ import vn.com.greencraze.order.dto.request.order.UpdateOrderRequest;
 import vn.com.greencraze.order.dto.response.order.CreateOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetListOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderResponse;
+import vn.com.greencraze.order.enumeration.OrderStatus;
 import vn.com.greencraze.order.service.IOrderService;
 
 import java.net.URI;
@@ -65,7 +66,7 @@ public class OrderController {
             @RequestParam(defaultValue = "id") String columnName,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) boolean all,
-            @RequestParam(required = false) String orderStatus
+            @RequestParam(required = false) OrderStatus orderStatus
     ) {
         return ResponseEntity.ok(orderService.getListUserOrder(
                 page, size, isSortAscending, columnName, search, all, orderStatus));

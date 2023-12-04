@@ -103,7 +103,7 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public RestResponse<ListResponse<GetListOrderResponse>> getListUserOrder(
             Integer page, Integer size, Boolean isSortAscending, String columnName,
-            String search, Boolean all, String status) {
+            String search, Boolean all, OrderStatus status) {
         String userId = authFacade.getUserId();
 
         OrderSpecification orderSpecification = new OrderSpecification();
@@ -111,7 +111,7 @@ public class OrderServiceImpl implements IOrderService {
         Specification<Order> searchable = orderSpecification.searchable(SEARCH_FIELDS, search);
         Specification<Order> filterable = orderSpecification.filterable(userId, status);
 
-        Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page, size);
+        Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
 
         Page<GetListOrderResponse> orders = orderRepository
                 .findAll(sortable.and(searchable).and(filterable), pageable)
@@ -139,11 +139,11 @@ public class OrderServiceImpl implements IOrderService {
 
         GetOneUserResponse user = userServiceClient.getOneUser(order.getUserId());
         if (user == null)
-            throw new ResourceNotFoundException("User", "userId", order.getUserId());
+            throw new ResourceNotFoundException(RESOURCE_NAME, "userId", order.getUserId());
 
         GetOneAddressResponse address = addressServiceClient.getOneAddress(order.getAddressId());
         if (address == null)
-            throw new ResourceNotFoundException("Address", "addressId", order.getAddressId());
+            throw new ResourceNotFoundException(RESOURCE_NAME, "addressId", order.getAddressId());
 
         return orderResponse.withUser(user).withAddress(address).withItems(getOrderItemResponse(order.getOrderItems()));
     }

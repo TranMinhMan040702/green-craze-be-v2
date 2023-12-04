@@ -54,7 +54,6 @@ public class DeliveryController {
                 page, size, isSortAscending, columnName, search, all, status));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a delivery")
@@ -62,7 +61,7 @@ public class DeliveryController {
         return ResponseEntity.ok(deliveryService.getOneDelivery(id));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a delivery")
@@ -75,7 +74,7 @@ public class DeliveryController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a delivery")
@@ -86,7 +85,7 @@ public class DeliveryController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a delivery")
@@ -95,7 +94,7 @@ public class DeliveryController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a list of deliveries")

@@ -34,7 +34,7 @@ public class ProductSpecification extends BaseSpecification<Product> {
         return (root, query, cb) -> {
             if (status) {
                 Predicate isNotEqualInactiveProductStatus = cb.notEqual(
-                        root.get("status"), ProductStatus.INACTIVE.toString());
+                        root.get("status"), ProductStatus.INACTIVE);
                 wheres.add(isNotEqualInactiveProductStatus);
             }
             return cb.and(wheres.toArray(new Predicate[0]));

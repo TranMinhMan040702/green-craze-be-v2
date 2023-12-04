@@ -7,7 +7,7 @@ import vn.com.greencraze.order.dto.response.order.GetListOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderResponse;
 import vn.com.greencraze.order.entity.Order;
 
-@Mapper(uses = {ReferenceMapper.class})
+@Mapper(uses = {ReferenceMapper.class, OrderItemMapper.class, TransactionMapper.class, OrderCancelReasonMapper.class})
 public interface OrderMapper {
 
     GetListOrderResponse orderToGetListOrderResponse(Order order);

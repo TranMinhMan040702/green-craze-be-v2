@@ -8,6 +8,7 @@ import vn.com.greencraze.order.dto.request.order.UpdateOrderRequest;
 import vn.com.greencraze.order.dto.response.order.CreateOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetListOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderResponse;
+import vn.com.greencraze.order.enumeration.OrderStatus;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public interface IOrderService {
                                                                       String columnName,
                                                                       String search,
                                                                       Boolean all,
-                                                                      String status);
+                                                                      OrderStatus status);
 
     RestResponse<List<GetListOrderResponse>> getTop5OrderLatest();
 
