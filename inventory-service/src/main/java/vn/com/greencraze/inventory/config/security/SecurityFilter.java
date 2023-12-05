@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,12 +25,13 @@ public class SecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
+        String userToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         String userId = request.getHeader(CustomHeaders.X_AUTH_USER_ID);
         String userAuthorities = request.getHeader(CustomHeaders.X_AUTH_USER_AUTHORITIES);
 
         if (StringUtils.hasText(userId) && StringUtils.hasText(userAuthorities)) {
             UserDetails userDetails = User.builder()
-                    .username(userId)
+                    .username(userId.concat(",").concat(userToken))
                     .password("PROTECTED")
                     .authorities(userAuthorities.split(","))
                     .build();

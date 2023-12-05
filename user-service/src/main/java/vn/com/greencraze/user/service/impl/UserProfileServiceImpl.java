@@ -11,6 +11,7 @@ import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.auth.AuthFacade;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
+import vn.com.greencraze.user.client.address.AddressServiceClient;
 import vn.com.greencraze.user.client.auth.AuthServiceClient;
 import vn.com.greencraze.user.client.auth.dto.request.CreateIdentityRequest;
 import vn.com.greencraze.user.client.auth.dto.request.DisableListIdentityRequest;
@@ -56,10 +57,15 @@ public class UserProfileServiceImpl implements IUserProfileService {
     private final UserProfileRepository userProfileRepository;
     private final StaffRepository staffRepository;
     private final IdentityViewRepository identityViewRepository;
+
     private final UserProfileMapper userProfileMapper;
+
     private final IUploadService uploadService;
+
     private final AuthFacade authFacade;
+
     private final AuthServiceClient authServiceClient;
+    private final AddressServiceClient addressServiceClient;
     private static final String RESOURCE_NAME = "User";
     private static final List<String> SEARCH_FIELDS = List.of("name");
 
@@ -74,27 +80,32 @@ public class UserProfileServiceImpl implements IUserProfileService {
         Page<GetListUserResponse> responses = userProfileRepository
                 .findAll(sortable.and(searchable), pageable)
                 .map(userProfileMapper::userProfileToGetListUserResponse);
-        // todo: set address
-
         return RestResponse.ok(ListResponse.of(responses));
     }
 
     @Override
     public RestResponse<GetOneUserResponse> getOneUser(String id) {
-        // todo: Set address
-        return userProfileRepository.findById(id)
+        GetOneUserResponse response = userProfileRepository.findById(id)
                 .map(userProfileMapper::userProfileToGetOneUserResponse)
-                .map(RestResponse::ok)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
+
+        var userAddresses = addressServiceClient.getListAddressByUserId(id);
+        response = response.withAddresses(userAddresses.data().stream()
+                .map(userProfileMapper::getListAddressByUserIdResponseToAddressUserResponse).toList());
+        return RestResponse.ok(response);
     }
 
     @Override
     public RestResponse<GetMeResponse> getMe() {
         String userId = authFacade.getUserId();
-        return userProfileRepository.findById(userId)
+        GetMeResponse response = userProfileRepository.findById(userId)
                 .map(userProfileMapper::userProfileToGetMeResponse)
-                .map(RestResponse::ok)
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "identityId", ""));
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", userId));
+
+        var userAddresses = addressServiceClient.getListAddressByUserId(userId);
+        response = response.withAddresses(userAddresses.data().stream()
+                .map(userProfileMapper::getListAddressByUserIdResponseToAddressUserResponse).toList());
+        return RestResponse.ok(response);
     }
 
     @Override
@@ -183,7 +194,6 @@ public class UserProfileServiceImpl implements IUserProfileService {
         Page<GetListStaffResponse> responses = staffRepository
                 .findAll(sortable.and(searchable), pageable)
                 .map(userProfileMapper::userProfileToGetListStaffResponse);
-        //todo: map address
         return RestResponse.ok(ListResponse.of(responses));
     }
 
@@ -191,7 +201,12 @@ public class UserProfileServiceImpl implements IUserProfileService {
     public RestResponse<GetOneStaffResponse> getOneStaff(Long id) {
         Staff staff = staffRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Staff", "id", id));
-        return RestResponse.ok(userProfileMapper.userProfileToGetOneStaffResponse(staff.getUser()));
+        GetOneStaffResponse response = userProfileMapper.userProfileToGetOneStaffResponse(staff.getUser());
+
+        var userAddresses = addressServiceClient.getListAddressByUserId(staff.getUser().getId());
+        response = response.withAddresses(userAddresses.data().stream()
+                .map(userProfileMapper::getListAddressByUserIdResponseToAddressUserResponse).toList());
+        return RestResponse.ok(response);
     }
 
     @Override

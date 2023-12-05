@@ -18,12 +18,14 @@ public record AddressUserResponse(
 
     public record DistrictResponse(
             String name,
-            String code
+            String code,
+            ProvinceResponse province
     ) {}
 
     public record WardResponse(
             String name,
-            String code
+            String code,
+            DistrictResponse district
     ) {}
 
 }

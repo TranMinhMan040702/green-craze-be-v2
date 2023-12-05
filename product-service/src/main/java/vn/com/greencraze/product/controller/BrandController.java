@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -54,7 +55,7 @@ public class BrandController {
                 page, size, isSortAscending, columnName, search, all, status));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a brand")
@@ -67,7 +68,7 @@ public class BrandController {
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a brand")
     public ResponseEntity<RestResponse<CreateBrandResponse>> createBrand(
-            @Valid CreateBrandRequest request
+            @ModelAttribute @Valid CreateBrandRequest request
     ) {
         RestResponse<CreateBrandResponse> response = brandService.createBrand(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")

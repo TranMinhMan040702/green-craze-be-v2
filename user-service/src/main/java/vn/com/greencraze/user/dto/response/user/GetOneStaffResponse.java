@@ -1,6 +1,7 @@
 package vn.com.greencraze.user.dto.response.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.With;
 import org.springframework.lang.Nullable;
 import vn.com.greencraze.user.enumeration.GenderType;
 import vn.com.greencraze.user.enumeration.IdentityStatus;
@@ -9,6 +10,7 @@ import vn.com.greencraze.user.enumeration.StaffType;
 import java.time.Instant;
 import java.util.List;
 
+@With
 public record GetOneStaffResponse(
         String id,
         Instant createdAt,

@@ -6,6 +6,7 @@ import org.mapstruct.MappingTarget;
 import vn.com.greencraze.address.dto.request.address.CreateAddressRequest;
 import vn.com.greencraze.address.dto.request.address.UpdateAddressRequest;
 import vn.com.greencraze.address.dto.response.address.CreateAddressResponse;
+import vn.com.greencraze.address.dto.response.address.GetListAddressByUserIdResponse;
 import vn.com.greencraze.address.dto.response.address.GetListAddressResponse;
 import vn.com.greencraze.address.dto.response.address.GetOneAddressResponse;
 import vn.com.greencraze.address.entity.Address;
@@ -18,6 +19,8 @@ public interface AddressMapper {
     Address idToAddress(String id);
 
     GetListAddressResponse addressToGetListAddressResponse(Address address);
+
+    GetListAddressByUserIdResponse addressToGetListAddressByUserIdResponse(Address address);
 
     GetOneAddressResponse addressToGetOneAddressResponse(Address address);
 

@@ -32,6 +32,5 @@ public record GetListStaffResponse(
         IdentityStatus status,
         StaffType type,
         String code,
-        List<String> roles,
-        List<AddressUserResponse> addresses
+        List<String> roles
 ) {}
