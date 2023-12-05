@@ -78,9 +78,9 @@ public class UserFollowProductServiceImpl implements IUserFollowProductService {
                 .map(userFollowProductMapper::userFollowProductToGetListFollowingProductResponse);
 
         for (GetListUserFollowProductResponse response : responses.getContent()) {
-            GetOneProductResponse productResponse = productServiceClient.getOneProduct(response.productId());
+            RestResponse<GetOneProductResponse> productResponse = productServiceClient.getOneProduct(response.productId());
             GetListUserFollowProductResponse.ProductResponse product = userFollowProductMapper
-                    .productResponseToGetListUserFollowProductResponse(productResponse);
+                    .productResponseToGetListUserFollowProductResponse(productResponse.data());
             response = response.withProduct(product);
         }
 

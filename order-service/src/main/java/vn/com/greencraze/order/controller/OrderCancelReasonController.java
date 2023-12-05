@@ -7,12 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -54,7 +54,7 @@ public class OrderCancelReasonController {
                 page, size, isSortAscending, columnName, search, all, status));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get an orderCancelReason")
@@ -63,12 +63,12 @@ public class OrderCancelReasonController {
         return ResponseEntity.ok(orderCancelReasonService.getOneOrderCancelReason(id));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create an orderCancelReason")
     public ResponseEntity<RestResponse<CreateOrderCancelReasonResponse>> createOrderCancelReason(
-            @Valid CreateOrderCancelReasonRequest request
+            @RequestBody @Valid CreateOrderCancelReasonRequest request
     ) {
         RestResponse<CreateOrderCancelReasonResponse> response = orderCancelReasonService
                 .createOrderCancelReason(request);
@@ -77,18 +77,18 @@ public class OrderCancelReasonController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update an orderCancelReason")
     public ResponseEntity<Void> updateOrderCancelReason(
-            @PathVariable Long id, @Valid UpdateOrderCancelReasonRequest request
+            @PathVariable Long id, @RequestBody @Valid UpdateOrderCancelReasonRequest request
     ) {
         orderCancelReasonService.updateOrderCancelReason(id, request);
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete an orderCancelReason")
@@ -97,7 +97,7 @@ public class OrderCancelReasonController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a list of orderCancelReasons")

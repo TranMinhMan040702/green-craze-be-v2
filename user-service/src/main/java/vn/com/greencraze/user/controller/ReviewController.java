@@ -126,7 +126,7 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Reply a review")
     public ResponseEntity<Void> replyReview(
-            @PathVariable Long id, @Valid @RequestBody ReplyReviewRequest request
+            @PathVariable Long id, @RequestBody @Valid ReplyReviewRequest request
     ) {
         reviewService.replyReview(id, request);
         return ResponseEntity.noContent().build();
@@ -151,11 +151,11 @@ public class ReviewController {
     }
 
     // call from other services
-    @GetMapping(value = "/order-review", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/order-review", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get order review")
     public ResponseEntity<RestResponse<GetOrderReviewResponse>> getOrderReview(
-            @Valid @RequestBody GetOrderReviewRequest request
+            @RequestBody @Valid GetOrderReviewRequest request
     ) {
         return ResponseEntity.ok(reviewService.getOrderReview(request));
     }

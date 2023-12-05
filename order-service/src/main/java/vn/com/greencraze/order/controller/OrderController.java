@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -98,7 +99,7 @@ public class OrderController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create an order")
-    public ResponseEntity<RestResponse<CreateOrderResponse>> createOrder(@Valid CreateOrderRequest request) {
+    public ResponseEntity<RestResponse<CreateOrderResponse>> createOrder(@RequestBody @Valid CreateOrderRequest request) {
         RestResponse<CreateOrderResponse> response = orderService.createOrder(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
@@ -108,7 +109,7 @@ public class OrderController {
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a order")
-    public ResponseEntity<Void> updateOrder(@PathVariable Long id, @Valid UpdateOrderRequest request) {
+    public ResponseEntity<Void> updateOrder(@PathVariable Long id, @RequestBody @Valid UpdateOrderRequest request) {
         orderService.updateOrder(id, request);
         return ResponseEntity.noContent().build();
     }
@@ -116,7 +117,7 @@ public class OrderController {
     @PutMapping(value = "/paypal/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a order")
-    public ResponseEntity<Void> completePaypalOrder(@PathVariable Long id, @Valid CompletePaypalOrderRequest request) {
+    public ResponseEntity<Void> completePaypalOrder(@PathVariable Long id, @RequestBody @Valid CompletePaypalOrderRequest request) {
         orderService.completePaypalOrder(id, request);
         return ResponseEntity.noContent().build();
     }

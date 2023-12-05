@@ -1,6 +1,7 @@
 package vn.com.greencraze.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,11 +47,11 @@ public class UserFollowProductController {
                 columnName, search, all));
     }
 
-    @PostMapping(value = "/like", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/like", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a userFollowProduct")
     public ResponseEntity<RestResponse<CreateUserFollowProductResponse>> followProduct(
-            @Valid FollowProductRequest request
+            @RequestBody @Valid FollowProductRequest request
     ) {
         RestResponse<CreateUserFollowProductResponse> response = userFollowProductService.followProduct(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
@@ -58,10 +59,10 @@ public class UserFollowProductController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PostMapping(value = "/unlike")
+    @PostMapping(value = "/unlike", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Create a userFollowProduct")
-    public ResponseEntity<Void> unfollowProduct(@Valid FollowProductRequest request) {
+    public ResponseEntity<Void> unfollowProduct(@RequestBody @Valid FollowProductRequest request) {
         userFollowProductService.unfollowProduct(request);
         return ResponseEntity.noContent().build();
     }

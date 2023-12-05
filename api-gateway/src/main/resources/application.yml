@@ -491,9 +491,9 @@ spring:
           uri: lb://product-service
           predicates:
             - Method=GET
-            - Path=/api/products/slug/{slug}
+            - Path=/api/products/detail/{slug}
           filters:
-            - SetPath=/core/product/products/slug/{slug}
+            - SetPath=/core/product/products/detail/{slug}
         - id: private::product::createProduct
           uri: lb://product-service
           predicates:

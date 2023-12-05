@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 public record CreateOrderCancelReasonRequest(
         @NotBlank
         String name,
-
         @NotBlank
         String note
-) {}
+) {
+}

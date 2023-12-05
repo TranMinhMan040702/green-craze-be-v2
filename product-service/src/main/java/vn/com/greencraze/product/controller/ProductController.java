@@ -232,6 +232,13 @@ public class ProductController {
 
     // TODO: Xem lại luồng export product
     // call from another service
+    @GetMapping(value = "/{id}/service", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get a product from other service")
+    public ResponseEntity<RestResponse<GetOneProductResponse>> getOneProductFromOtherService(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getOneProduct(id));
+    }
+
     @PutMapping(value = "/update-quantity")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a product quantity")

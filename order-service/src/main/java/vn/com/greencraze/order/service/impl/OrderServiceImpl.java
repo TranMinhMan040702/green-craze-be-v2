@@ -137,29 +137,36 @@ public class OrderServiceImpl implements IOrderService {
     private GetListOrderResponse mapOrderToGetListOrderResponse(Order order) {
         GetListOrderResponse orderResponse = orderMapper.orderToGetListOrderResponse(order);
 
-        GetOneUserResponse user = userServiceClient.getOneUser(order.getUserId());
-        if (user == null)
+        RestResponse<GetOneUserResponse> user = userServiceClient.getOneUser(order.getUserId());
+        if (user == null) {
             throw new ResourceNotFoundException(RESOURCE_NAME, "userId", order.getUserId());
+        }
 
-        GetOneAddressResponse address = addressServiceClient.getOneAddress(order.getAddressId());
-        if (address == null)
+        RestResponse<GetOneAddressResponse> address = addressServiceClient.getOneAddress(order.getAddressId());
+        if (address == null) {
             throw new ResourceNotFoundException(RESOURCE_NAME, "addressId", order.getAddressId());
+        }
 
-        return orderResponse.withUser(user).withAddress(address).withItems(getOrderItemResponse(order.getOrderItems()));
+        return orderResponse.withUser(user.data())
+                .withAddress(address.data())
+                .withItems(getOrderItemResponse(order.getOrderItems()));
     }
 
     private GetOneOrderResponse mapOrderToGetOneOrderResponse(Order order) {
         GetOneOrderResponse orderResponse = orderMapper.orderToGetOneOrderResponse(order);
 
-        GetOneUserResponse user = userServiceClient.getOneUser(order.getUserId());
-        if (user == null)
-            throw new ResourceNotFoundException("User", "userId", order.getUserId());
+        RestResponse<GetOneUserResponse> user = userServiceClient.getOneUser(order.getUserId());
+        if (user == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "userId", order.getUserId());
+        }
 
-        GetOneAddressResponse address = addressServiceClient.getOneAddress(order.getAddressId());
-        if (address == null)
-            throw new ResourceNotFoundException("Address", "addressId", order.getAddressId());
-
-        return orderResponse.withUser(user).withAddress(address).withItems(getOrderItemResponse(order.getOrderItems()));
+        RestResponse<GetOneAddressResponse> address = addressServiceClient.getOneAddress(order.getAddressId());
+        if (address == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "addressId", order.getAddressId());
+        }
+        return orderResponse.withUser(user.data())
+                .withAddress(address.data())
+                .withItems(getOrderItemResponse(order.getOrderItems()));
     }
 
     @Override
@@ -179,13 +186,15 @@ public class OrderServiceImpl implements IOrderService {
                 .map(this::mapOrderToGetOneOrderResponse)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "Order", code));
 
-        GetOrderReviewResponse review = userServiceClient.getOrderReview(
+        RestResponse<GetOrderReviewResponse> review = userServiceClient.getOrderReview(
                 new GetOrderReviewRequest(order.items().stream().map(GetListOrderItemResponse::id).toList()));
 
-        if (review == null)
+        if (review == null) {
             throw new ResourceNotFoundException(RESOURCE_NAME, "orderIds",
                     order.items().stream().map(GetListOrderItemResponse::id).toList());
-        return RestResponse.ok(order.withReviewedDate(review.reviewedDate()).withIsReview(review.isReview()));
+        }
+        return RestResponse.ok(order.withReviewedDate(review.data().reviewedDate())
+                .withIsReview(review.data().isReview()));
     }
 
     private List<GetListOrderItemResponse> getOrderItemResponse(Set<OrderItem> orderItems) {
@@ -194,15 +203,17 @@ public class OrderServiceImpl implements IOrderService {
                 .setOrderItemToListGetListOrderItemResponse(orderItems);
 
         for (GetListOrderItemResponse item : orderItemResponses) {
-            GetOneVariantResponse variant = productServiceClient.getOneVariant(item.variantId());
-            if (variant == null) {
+            RestResponse<GetOneVariantResponse> variantResp = productServiceClient.getOneVariant(item.variantId());
+            if (variantResp == null) {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", item.variantId());
             }
+            GetOneVariantResponse variant = variantResp.data();
 
-            GetOneProductResponse product = productServiceClient.getOneProduct(variant.productId());
-            if (product == null) {
+            RestResponse<GetOneProductResponse> productResp = productServiceClient.getOneProduct(variant.productId());
+            if (productResp == null) {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "productId", variant.productId());
             }
+            GetOneProductResponse product = productResp.data();
 
             updatedOrderItemResponses.add(item.withSku(variant.sku())
                     .withProductId(variant.productId())
@@ -223,11 +234,11 @@ public class OrderServiceImpl implements IOrderService {
         String userId = authFacade.getUserId();
         Order order = new Order();
         // get default address
-        GetOneAddressResponse address = addressServiceClient.getDefaultAddress(userId);
+        RestResponse<GetOneAddressResponse> address = addressServiceClient.getDefaultAddress(userId);
         if (address == null) {
             throw new ResourceNotFoundException("Address", "addressId", userId);
         }
-        Long addressId = address.id();
+        Long addressId = address.data().id();
 
         Delivery delivery = deliveryRepository
                 .findById(request.deliveryId())
@@ -243,15 +254,17 @@ public class OrderServiceImpl implements IOrderService {
 
         for (CreateOrderItemRequest oi : request.items()) {
             // get variant from product service
-            GetOneVariantResponse variant = productServiceClient.getOneVariant(oi.variantId());
-            if (variant == null) {
+            RestResponse<GetOneVariantResponse> variantResp = productServiceClient.getOneVariant(oi.variantId());
+            if (variantResp == null) {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", oi.variantId());
             }
+            GetOneVariantResponse variant = variantResp.data();
 
-            GetOneProductResponse product = productServiceClient.getOneProduct(variant.productId());
-            if (product == null) {
+            RestResponse<GetOneProductResponse> productResp = productServiceClient.getOneProduct(variant.productId());
+            if (productResp == null) {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "productId", variant.productId());
             }
+            GetOneProductResponse product = productResp.data();
 
             long q = (long) variant.quantity() * oi.quantity();
             if (q > product.actualInventory()) {
@@ -300,9 +313,10 @@ public class OrderServiceImpl implements IOrderService {
 
         for (CreateOrderItemRequest item : items) {
 
-            GetOneVariantResponse variant = productServiceClient.getOneVariant(item.variantId());
-            if (variant == null)
+            RestResponse<GetOneVariantResponse> variantResp = productServiceClient.getOneVariant(item.variantId());
+            if (variantResp == null)
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", item.variantId());
+            GetOneVariantResponse variant = variantResp.data();
 
             request.quantityItems().add(
                     new UpdateListProductQuantityRequest.ProductQuantityItem(
@@ -336,9 +350,11 @@ public class OrderServiceImpl implements IOrderService {
         CreateDocketRequest request = new CreateDocketRequest(orderId, type, new ArrayList<>());
 
         for (CreateOrderItemRequest item : items) {
-            GetOneVariantResponse variant = productServiceClient.getOneVariant(item.variantId());
-            if (variant == null)
+            RestResponse<GetOneVariantResponse> variantResp = productServiceClient.getOneVariant(item.variantId());
+            if (variantResp == null) {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", item.variantId());
+            }
+            GetOneVariantResponse variant = variantResp.data();
 
             request.productDockets().add(
                     new CreateDocketRequest.ProductDocket(
@@ -386,16 +402,22 @@ public class OrderServiceImpl implements IOrderService {
         if (order.getStatus() == OrderStatus.NOT_PROCESSED
                 && !order.getPaymentStatus()
                 && Objects.equals(order.getTransaction().getPaymentMethod(), PaymentCode.PAYPAL.name())) {
-            throw new InvalidRequestException("Cannot update this order status, until it was paid by user through PayPal");
+            throw new InvalidRequestException(
+                    "Cannot update this order status, until it was paid by user through PayPal"
+            );
         }
 
         // Cannot update order while it's delivered
         if (order.getStatus() == OrderStatus.DELIVERED) {
-            throw new InvalidRequestException("Unexpected order status, cannot update order while it's delivered");
+            throw new InvalidRequestException(
+                    "Unexpected order status, cannot update order while it's delivered"
+            );
         }
 
         if (order.getStatus() == OrderStatus.CANCELLED && (!hasInRole("ADMIN") && !hasInRole("STAFF"))) {
-            throw new InvalidRequestException("Unexpected order status, user cannot update order while it's cancelled");
+            throw new InvalidRequestException(
+                    "Unexpected order status, user cannot update order while it's cancelled"
+            );
         }
 
         // Customer cannot cancel order while it's processing, only admin and staff can do that
@@ -424,7 +446,8 @@ public class OrderServiceImpl implements IOrderService {
                 order.setOtherCancelReason(request.otherCancellation());
             }
             // update product when cancelling order
-            List<CreateOrderItemRequest> items = orderItemMapper.orderItemToCreateOrderItemRequest(order.getOrderItems());
+            List<CreateOrderItemRequest> items = orderItemMapper
+                    .orderItemToCreateOrderItemRequest(order.getOrderItems());
             items.forEach(x -> x = x.withQuantity(x.quantity() * -1));
             updateProduct(items);
 
