@@ -1,6 +1,7 @@
 package vn.com.greencraze.user.dto.response.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.With;
 import org.springframework.lang.Nullable;
 import vn.com.greencraze.user.enumeration.GenderType;
 import vn.com.greencraze.user.enumeration.IdentityStatus;
@@ -8,6 +9,7 @@ import vn.com.greencraze.user.enumeration.IdentityStatus;
 import java.time.Instant;
 import java.util.List;
 
+@With
 public record GetListUserResponse(
         String id,
         Instant createdAt,
@@ -29,6 +31,5 @@ public record GetListUserResponse(
         @Schema(nullable = true)
         String avatar,
         IdentityStatus status,
-        List<String> roles,
-        List<AddressUserResponse> addresses
+        List<String> roles
 ) {}

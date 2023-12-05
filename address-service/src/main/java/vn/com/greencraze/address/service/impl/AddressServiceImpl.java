@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import vn.com.greencraze.address.dto.request.address.CreateAddressRequest;
 import vn.com.greencraze.address.dto.request.address.UpdateAddressRequest;
 import vn.com.greencraze.address.dto.response.address.CreateAddressResponse;
+import vn.com.greencraze.address.dto.response.address.GetListAddressByUserIdResponse;
 import vn.com.greencraze.address.dto.response.address.GetListAddressResponse;
 import vn.com.greencraze.address.dto.response.address.GetOneAddressResponse;
 import vn.com.greencraze.address.dto.response.district.GetListDistrictResponse;
@@ -51,6 +52,7 @@ public class AddressServiceImpl implements IAddressService {
     private final ProvinceMapper provinceMapper;
     private final DistrictMapper districtMapper;
     private final WardMapper wardMapper;
+
     private final AuthFacade authFacade;
     private static final String RESOURCE_NAME = "Address";
     private static final List<String> SEARCH_FIELDS = List.of("receiver", "street", "email", "phone");
@@ -68,6 +70,13 @@ public class AddressServiceImpl implements IAddressService {
                 .findAll(sortable.and(searchable).and(filterable), pageable)
                 .map(addressMapper::addressToGetListAddressResponse);
         return RestResponse.ok(ListResponse.of(responses));
+    }
+
+    @Override
+    public RestResponse<List<GetListAddressByUserIdResponse>> getListAddressByUserId(String userId) {
+        List<GetListAddressByUserIdResponse> responses = addressRepository.findAllByUserId(userId).stream()
+                .map(addressMapper::addressToGetListAddressByUserIdResponse).toList();
+        return RestResponse.ok(responses);
     }
 
     @Override

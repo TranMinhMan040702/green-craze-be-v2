@@ -10,7 +10,6 @@ public record UpdateProductCategoryRequest(
         String name,
         @Nullable
         Long parentId,
-        @Nullable
         MultipartFile image,
         @NotBlank
         String slug,

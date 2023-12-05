@@ -5,7 +5,7 @@ import org.springframework.lang.Nullable;
 
 import java.time.Instant;
 
-public record GetListUserAddressResponse(
+public record GetListAddressByUserIdResponse(
         Long id,
         Instant createdAt,
         Instant updatedAt,

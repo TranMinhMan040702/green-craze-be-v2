@@ -3,6 +3,7 @@ package vn.com.greencraze.address.service;
 import vn.com.greencraze.address.dto.request.address.CreateAddressRequest;
 import vn.com.greencraze.address.dto.request.address.UpdateAddressRequest;
 import vn.com.greencraze.address.dto.response.address.CreateAddressResponse;
+import vn.com.greencraze.address.dto.response.address.GetListAddressByUserIdResponse;
 import vn.com.greencraze.address.dto.response.address.GetListAddressResponse;
 import vn.com.greencraze.address.dto.response.address.GetOneAddressResponse;
 import vn.com.greencraze.address.dto.response.district.GetListDistrictResponse;
@@ -17,6 +18,8 @@ public interface IAddressService {
 
     RestResponse<ListResponse<GetListAddressResponse>> getListAddress(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
+
+    RestResponse<List<GetListAddressByUserIdResponse>> getListAddressByUserId(String userId);
 
     RestResponse<GetOneAddressResponse> getOneAddress(Long id);
 

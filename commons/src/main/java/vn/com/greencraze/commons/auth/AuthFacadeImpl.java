@@ -30,7 +30,23 @@ public class AuthFacadeImpl implements AuthFacade {
             throw new AuthenticationCredentialsNotFoundException("Unable to retrieve user ID due to anonymous access");
         } else {
             try {
-                return authentication.getName();
+                return authentication.getName().split(",")[0];
+            } catch (Exception e) {
+                throw new AuthenticationCredentialsNotFoundException(
+                        "Unable to retrieve user ID while parsing text: %s".formatted(authentication.getName()));
+            }
+        }
+    }
+
+    @Override
+    public String getUserAccessToken() {
+        Authentication authentication = getAuthentication();
+
+        if (authentication instanceof AnonymousAuthenticationToken) {
+            throw new AuthenticationCredentialsNotFoundException("Unable to retrieve user ID due to anonymous access");
+        } else {
+            try {
+                return authentication.getName().split(",")[1];
             } catch (Exception e) {
                 throw new AuthenticationCredentialsNotFoundException(
                         "Unable to retrieve user ID while parsing text: %s".formatted(authentication.getName()));

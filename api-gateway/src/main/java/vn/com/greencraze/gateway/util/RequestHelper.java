@@ -5,6 +5,7 @@ import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.util.UriTemplate;
 import vn.com.greencraze.gateway.dto.SimpleRouteDefinition;
 import vn.com.greencraze.gateway.exception.InvalidRequestException;
 
@@ -34,9 +35,14 @@ public class RequestHelper {
         ).build();
     }
 
+    private static boolean isMatchingUri(String sourcePath, String requestPath) {
+        UriTemplate uriTemplate = new UriTemplate(sourcePath);
+        return uriTemplate.matches(requestPath);
+    }
+
     public static boolean isPrivate(ServerHttpRequest request, List<SimpleRouteDefinition> routeDefinitions) {
         return routeDefinitions.stream()
-                .filter(routeDefinition -> routeDefinition.sourcePath().equals(request.getPath().toString()) &&
+                .filter(routeDefinition -> isMatchingUri(routeDefinition.sourcePath(), request.getPath().toString()) &&
                         routeDefinition.method().equalsIgnoreCase(request.getMethod().name()))
                 .findFirst()
                 .map(routeDefinition -> "private".equals(routeDefinition.id().authLevel()))

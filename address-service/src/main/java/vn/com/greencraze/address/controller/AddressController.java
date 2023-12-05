@@ -21,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import vn.com.greencraze.address.dto.request.address.CreateAddressRequest;
 import vn.com.greencraze.address.dto.request.address.UpdateAddressRequest;
 import vn.com.greencraze.address.dto.response.address.CreateAddressResponse;
+import vn.com.greencraze.address.dto.response.address.GetListAddressByUserIdResponse;
 import vn.com.greencraze.address.dto.response.address.GetListAddressResponse;
 import vn.com.greencraze.address.dto.response.address.GetOneAddressResponse;
 import vn.com.greencraze.address.dto.response.district.GetListDistrictResponse;
@@ -53,6 +54,15 @@ public class AddressController {
             @RequestParam(required = false) boolean all
     ) {
         return ResponseEntity.ok(addressService.getListAddress(page, size, isSortAscending, columnName, search, all));
+    }
+
+    @GetMapping(value = "/user/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get list addresses of user")
+    public ResponseEntity<RestResponse<List<GetListAddressByUserIdResponse>>> getListAddressByUserId(
+            @PathVariable String id
+    ) {
+        return ResponseEntity.ok(addressService.getListAddressByUserId(id));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
