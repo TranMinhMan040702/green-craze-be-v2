@@ -1,11 +1,11 @@
-package vn.com.greencraze.address.dto.response.address;
+package vn.com.greencraze.user.client.address.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.lang.Nullable;
 
 import java.time.Instant;
 
-public record GetListAddressResponse(
+public record GetListAddressByUserIdResponse(
         Long id,
         Instant createdAt,
         Instant updatedAt,

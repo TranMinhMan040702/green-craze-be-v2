@@ -6,9 +6,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
+import vn.com.greencraze.user.client.address.dto.response.GetListAddressByUserIdResponse;
 import vn.com.greencraze.user.dto.request.user.CreateStaffRequest;
 import vn.com.greencraze.user.dto.request.user.CreateUserRequest;
 import vn.com.greencraze.user.dto.request.user.UpdateUserRequest;
+import vn.com.greencraze.user.dto.response.user.AddressUserResponse;
 import vn.com.greencraze.user.dto.response.user.CreateStaffResponse;
 import vn.com.greencraze.user.dto.response.user.CreateUserResponse;
 import vn.com.greencraze.user.dto.response.user.GetListStaffResponse;
@@ -74,5 +76,8 @@ public interface UserProfileMapper {
     default String getRoleName(RoleView role) {
         return role.getName();
     }
+
+    AddressUserResponse getListAddressByUserIdResponseToAddressUserResponse(
+            GetListAddressByUserIdResponse getListAddressByUserIdResponse);
 
 }

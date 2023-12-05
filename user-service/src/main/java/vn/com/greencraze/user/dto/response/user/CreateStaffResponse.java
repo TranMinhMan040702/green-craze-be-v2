@@ -29,6 +29,5 @@ public record CreateStaffResponse(
         @Schema(nullable = true)
         String avatar,
         IdentityStatus status,
-        List<String> roles,
-        List<AddressUserResponse> addresses
+        List<String> roles
 ) {}
