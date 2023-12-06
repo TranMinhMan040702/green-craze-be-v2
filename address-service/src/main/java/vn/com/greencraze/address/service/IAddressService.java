@@ -17,7 +17,8 @@ import java.util.List;
 public interface IAddressService {
 
     RestResponse<ListResponse<GetListAddressResponse>> getListAddress(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
+            Integer page, Integer size, Boolean isSortAscending,
+            String columnName, String search, Boolean all, Boolean status);
 
     RestResponse<List<GetListAddressByUserIdResponse>> getListAddressByUserId(String userId);
 

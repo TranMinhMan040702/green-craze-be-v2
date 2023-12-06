@@ -94,15 +94,7 @@ public class CartServiceImpl implements ICartService {
 
         Page<GetListCartItemResponse> responses = cartItemRepository
                 .findAll(sortable.and(filterable), pageable)
-                .map(cartMapper::cartItemToGetListCartItemResponse);
-
-        responses.getContent().forEach(x -> {
-                    GetListCartItemResponse item = x;
-                    CartItem ci = cartItemRepository.findById(x.id())
-                            .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cartItem", item.id()));
-                    x = mapToGetListCartItemResponse(ci);
-                }
-        );
+                .map(this::mapToGetListCartItemResponse);
 
         return RestResponse.ok(ListResponse.of(responses));
     }
@@ -211,7 +203,7 @@ public class CartServiceImpl implements ICartService {
                     "Unexpected quantity, it must be less than or equal to product in inventory"
             );
 
-        cartItem.setQuantity(request.quantity() + cartItem.getQuantity());
+        cartItem.setQuantity(request.quantity());
 
         cartItemRepository.save(cartItem);
     }
@@ -226,12 +218,7 @@ public class CartServiceImpl implements ICartService {
         Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cart", userId));
 
-        CartItem cartItem = cart.getCartItems()
-                .stream().filter(x -> Objects.equals(x.getCart().getId(), cart.getId()))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cartItem", cartItemId));
-
-        cartItemRepository.delete(cartItem);
+        cartItemRepository.deleteById(cartItemId);
     }
 
     @Override
@@ -245,12 +232,7 @@ public class CartServiceImpl implements ICartService {
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cart", userId));
 
         for (Long id : ids) {
-            CartItem cartItem = cart.getCartItems()
-                    .stream().filter(x -> Objects.equals(x.getCart().getId(), cart.getId()))
-                    .findFirst()
-                    .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cartItem", id));
-
-            cartItemRepository.delete(cartItem);
+            cartItemRepository.deleteById(id);
         }
 
     }

@@ -16,6 +16,6 @@ public interface UserFollowProductMapper {
     GetListUserFollowProductResponse userFollowProductToGetListFollowingProductResponse(
             UserFollowProduct userFollowProduct);
 
-    GetListUserFollowProductResponse.ProductResponse productResponseToGetListUserFollowProductResponse(GetOneProductResponse productResponse);
+    GetListUserFollowProductResponse productResponseToGetListUserFollowProductResponse(GetOneProductResponse productResponse);
 
 }

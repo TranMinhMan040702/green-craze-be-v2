@@ -47,7 +47,8 @@ public class UserFollowProductServiceImpl implements IUserFollowProductService {
 
         userFollowProductRepository.save(userFollowProduct);
 
-        return RestResponse.ok(userFollowProductMapper.userFollowProductToCreateUserFollowProductResponse(userFollowProduct));
+        return RestResponse.ok(userFollowProductMapper
+                .userFollowProductToCreateUserFollowProductResponse(userFollowProduct));
     }
 
     @Override
@@ -64,8 +65,18 @@ public class UserFollowProductServiceImpl implements IUserFollowProductService {
         userFollowProductRepository.delete(userFollowProduct);
     }
 
+    private GetListUserFollowProductResponse mapToGetListUserFollowProductResponse(
+            UserFollowProduct userFollowProduct
+    ) {
+        RestResponse<GetOneProductResponse> productResponse = productServiceClient
+                .getOneProduct(userFollowProduct.getProductId());
+
+        return userFollowProductMapper.productResponseToGetListUserFollowProductResponse(productResponse.data());
+    }
+
     @Override
-    public RestResponse<ListResponse<GetListUserFollowProductResponse>> getListFollowingProduct(Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
+    public RestResponse<ListResponse<GetListUserFollowProductResponse>> getListFollowingProduct(Integer page
+            , Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
         String userId = authFacade.getUserId();
         UserProfile user = userProfileRepository
                 .findById(userId)
@@ -75,14 +86,7 @@ public class UserFollowProductServiceImpl implements IUserFollowProductService {
 
         Page<GetListUserFollowProductResponse> responses = userFollowProductRepository
                 .findAllByUser(user, pageable)
-                .map(userFollowProductMapper::userFollowProductToGetListFollowingProductResponse);
-
-        for (GetListUserFollowProductResponse response : responses.getContent()) {
-            RestResponse<GetOneProductResponse> productResponse = productServiceClient.getOneProduct(response.productId());
-            GetListUserFollowProductResponse.ProductResponse product = userFollowProductMapper
-                    .productResponseToGetListUserFollowProductResponse(productResponse.data());
-            response = response.withProduct(product);
-        }
+                .map(this::mapToGetListUserFollowProductResponse);
 
         return RestResponse.ok(ListResponse.of(responses));
     }

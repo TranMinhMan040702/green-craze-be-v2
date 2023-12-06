@@ -8,9 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import vn.com.greencraze.amqp.RabbitMQMessageProducer;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.auth.AuthFacade;
+import vn.com.greencraze.commons.enumeration.EmailEvent;
 import vn.com.greencraze.commons.exception.InvalidRequestException;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.order.client.address.AddressServiceClient;
@@ -26,6 +28,7 @@ import vn.com.greencraze.order.client.user.dto.request.GetOrderReviewRequest;
 import vn.com.greencraze.order.client.user.dto.request.UpdateUserCartRequest;
 import vn.com.greencraze.order.client.user.dto.response.GetOneUserResponse;
 import vn.com.greencraze.order.client.user.dto.response.GetOrderReviewResponse;
+import vn.com.greencraze.order.config.property.RabbitMQProperties;
 import vn.com.greencraze.order.constant.OrderConstants;
 import vn.com.greencraze.order.dto.request.order.CompletePaypalOrderRequest;
 import vn.com.greencraze.order.dto.request.order.CreateOrderItemRequest;
@@ -44,9 +47,9 @@ import vn.com.greencraze.order.enumeration.OrderStatus;
 import vn.com.greencraze.order.enumeration.PaymentCode;
 import vn.com.greencraze.order.mapper.OrderItemMapper;
 import vn.com.greencraze.order.mapper.OrderMapper;
+import vn.com.greencraze.order.rabbitmq.dto.request.SendEmailRequest;
 import vn.com.greencraze.order.repository.DeliveryRepository;
 import vn.com.greencraze.order.repository.OrderCancelReasonRepository;
-import vn.com.greencraze.order.repository.OrderItemRepository;
 import vn.com.greencraze.order.repository.OrderRepository;
 import vn.com.greencraze.order.repository.PaymentMethodRepository;
 import vn.com.greencraze.order.repository.specification.OrderSpecification;
@@ -57,6 +60,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -66,7 +70,6 @@ import java.util.UUID;
 public class OrderServiceImpl implements IOrderService {
 
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
     private final PaymentMethodRepository paymentMethodRepository;
     private final DeliveryRepository deliveryRepository;
     private final OrderCancelReasonRepository orderCancelReasonRepository;
@@ -78,6 +81,10 @@ public class OrderServiceImpl implements IOrderService {
     private final ProductServiceClient productServiceClient;
     private final UserServiceClient userServiceClient;
     private final InventoryServiceClient inventoryServiceClient;
+
+    private final RabbitMQProperties rabbitMQProperties;
+
+    private final RabbitMQMessageProducer producer;
 
     private final AuthFacade authFacade;
     private static final String RESOURCE_NAME = "Order";
@@ -365,8 +372,36 @@ public class OrderServiceImpl implements IOrderService {
         inventoryServiceClient.createDocket(request);
     }
 
-    private void createNotify() {
+    private void createNotify(Order order) {
+        String userId = authFacade.getUserId();
+        RestResponse<GetOneUserResponse> userResp = userServiceClient.getOneUser(userId);
+        if (userResp == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "userId", userId);
+        }
+        GetOneUserResponse user = userResp.data();
 
+        RestResponse<GetOneAddressResponse> addressResp = addressServiceClient.getDefaultAddress(userId);
+        if (addressResp == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "userId", userId);
+        }
+        GetOneAddressResponse address = addressResp.data();
+        String addressDetail = address.street() + ", " + address.ward().name()
+                + ", " + address.district().name() + ", " + address.province().name();
+
+        // send email order
+        producer.publish(SendEmailRequest.builder()
+                .event(EmailEvent.ORDER_CONFIRMATION)
+                .email(user.email())
+                .payload(Map.of(
+                        "name", user.firstName() + " " + user.lastName(),
+                        "email", address.email(),
+                        "receiver", address.receiver(),
+                        "phone", address.phone(),
+                        "totalPrice", order.getTotalAmount(),
+                        "paymentMethod", order.getTransaction().getPaymentMethod(),
+                        "address", addressDetail
+                ))
+                .build(), rabbitMQProperties.internalExchange(), rabbitMQProperties.mailRoutingKey());
     }
 
     private boolean hasInRole(String role) {
@@ -393,7 +428,7 @@ public class OrderServiceImpl implements IOrderService {
         createDocket(request.items(), order.getId(), "EXPORT");
 
         // TODO: pub message to notify in infrastructure service
-        createNotify();
+        createNotify(order);
 
         return RestResponse.ok(orderMapper.orderToCreateOrderResponse(order));
     }
@@ -498,7 +533,7 @@ public class OrderServiceImpl implements IOrderService {
         orderRepository.save(order);
 
         //TODO: pub message to create notify
-        createNotify();
+        createNotify(order);
     }
 
 }

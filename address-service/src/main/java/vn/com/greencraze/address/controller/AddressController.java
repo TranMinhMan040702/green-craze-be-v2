@@ -48,12 +48,15 @@ public class AddressController {
     public ResponseEntity<RestResponse<ListResponse<GetListAddressResponse>>> getListAddress(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "true") boolean isSortAscending,
-            @RequestParam(defaultValue = "id") String columnName,
+            @RequestParam(defaultValue = "false") boolean isSortAscending,
+            @RequestParam(defaultValue = "isDefault") String columnName,
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) boolean all
+            @RequestParam(required = false) boolean all,
+            @RequestParam(required = false) boolean status
     ) {
-        return ResponseEntity.ok(addressService.getListAddress(page, size, isSortAscending, columnName, search, all));
+        return ResponseEntity.ok(addressService.getListAddress(
+                page, size, isSortAscending, columnName, search, all, status
+        ));
     }
 
     @GetMapping(value = "/user/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -101,20 +104,25 @@ public class AddressController {
         return ResponseEntity.ok(addressService.getListWardByDistrict(id));
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a address")
-    public ResponseEntity<RestResponse<CreateAddressResponse>> createAddress(@RequestBody @Valid CreateAddressRequest request) {
+    public ResponseEntity<RestResponse<CreateAddressResponse>> createAddress(
+            @RequestBody @Valid CreateAddressRequest request
+    ) {
         RestResponse<CreateAddressResponse> response = addressService.createAddress(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
         return ResponseEntity.created(location).body(response);
     }
 
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a address")
-    public ResponseEntity<Void> updateAddress(@PathVariable Long id, @Valid UpdateAddressRequest request) {
+    public ResponseEntity<Void> updateAddress(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateAddressRequest request
+    ) {
         addressService.updateAddress(id, request);
         return ResponseEntity.noContent().build();
     }

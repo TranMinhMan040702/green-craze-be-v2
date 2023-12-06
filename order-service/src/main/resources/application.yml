@@ -79,6 +79,15 @@ spring:
     url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_order
     username: avnadmin
     password: AVNS_ICGL1LOHUwComp9Dj2e
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+rabbitmq:
+  internal-exchange: internal.exchange
+  mail-routing-key: mail.routing_key
 
 cloudinary:
   cloud-name: dwoejm4g6
