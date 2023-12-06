@@ -13,8 +13,6 @@ public interface AuthFacade {
 
     String getUserId();
 
-    String getUserAccessToken();
-
     Collection<? extends GrantedAuthority> getAuthorities();
 
 }
