@@ -12,10 +12,10 @@ public interface ProductServiceClient {
 
     String BASE = "/core/product";
 
-    @PutMapping(BASE + "/import")
+    @PutMapping(BASE + "/products/import")
     void importProduct(@RequestBody @Valid ImportProductRequest request);
 
-    @PutMapping(BASE + "/export")
+    @PutMapping(BASE + "/products/export")
     void exportProduct(@RequestBody @Valid ExportProductRequest request);
 
 }

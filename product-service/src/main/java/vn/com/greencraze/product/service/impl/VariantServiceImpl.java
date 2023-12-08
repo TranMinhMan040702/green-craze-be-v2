@@ -55,6 +55,7 @@ public class VariantServiceImpl implements IVariantService {
             throw new ResourceNotFoundException("Product", "id", request.productId());
         }
         Variant variant = variantMapper.createVariantRequestToVariant(request);
+        variant.setStatus(VariantStatus.ACTIVE);
         variantRepository.save(variant);
         return RestResponse.created(variantMapper.variantToCreateVariantResponse(variant));
     }

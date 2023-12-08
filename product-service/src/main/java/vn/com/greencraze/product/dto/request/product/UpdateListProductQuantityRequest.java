@@ -10,9 +10,10 @@ public record UpdateListProductQuantityRequest(
         @NotEmpty
         List<ProductQuantityItem> quantityItems
 ) {
+
     public record ProductQuantityItem(
             Long id,
             Integer quantity
-    ) {
-    }
+    ) {}
+
 }

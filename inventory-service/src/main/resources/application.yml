@@ -51,7 +51,7 @@ logging:
 
 eureka:
   instance:
-    prefer-ip-address: false
+    prefer-ip-address: true
   client:
     enabled: true
     register-with-eureka: true

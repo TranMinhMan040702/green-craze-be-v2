@@ -134,3 +134,16 @@ CREATE TABLE user_follow_post
 
 ALTER TABLE user_follow_post
     ADD CONSTRAINT FK_USER_FOLLOW_POST_ON_USER FOREIGN KEY (user_id) REFERENCES user_profile (id);
+
+# View
+CREATE VIEW core_user.identity_view AS
+SELECT id, username, status
+FROM core_auth.identity;
+
+CREATE VIEW core_user.role_view AS
+SELECT id, name, code
+FROM core_auth.role;
+
+CREATE VIEW core_user.identity_role_view AS
+SELECT identity_id, role_id
+FROM core_auth.identity_role;

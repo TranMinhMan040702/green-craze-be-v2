@@ -10,11 +10,12 @@ public record UpdateListProductReviewRequest(
         @NotEmpty
         List<UpdateOneProductReview> productReviews
 ) {
+
     public record UpdateOneProductReview(
             @NotNull
             Long productId,
             @NotNull
             Double rating
-    ) {
-    }
+    ) {}
+
 }

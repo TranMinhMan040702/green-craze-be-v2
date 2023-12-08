@@ -61,3 +61,8 @@ CREATE TABLE identity_token
 
 ALTER TABLE identity_token
     ADD CONSTRAINT FK_IDENTITY_TOKEN_ON_IDENTITY FOREIGN KEY (identity_id) REFERENCES identity (id);
+
+# View
+CREATE VIEW core_auth.user_profile_view AS
+SELECT id, identity_id
+FROM core_user.user_profile

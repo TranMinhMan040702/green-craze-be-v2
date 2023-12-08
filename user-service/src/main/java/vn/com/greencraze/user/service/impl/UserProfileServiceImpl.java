@@ -7,11 +7,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.auth.AuthFacade;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.user.client.address.AddressServiceClient;
+import vn.com.greencraze.user.client.address.dto.request.CreateStaffAddressRequest;
+import vn.com.greencraze.user.client.address.dto.request.UpdateStaffAddressRequest;
 import vn.com.greencraze.user.client.auth.AuthServiceClient;
 import vn.com.greencraze.user.client.auth.dto.request.CreateIdentityRequest;
 import vn.com.greencraze.user.client.auth.dto.request.DisableListIdentityRequest;
@@ -214,37 +217,70 @@ public class UserProfileServiceImpl implements IUserProfileService {
         CreateIdentityResponse identity = authServiceClient.createIdentity(CreateIdentityRequest.builder()
                 .email(request.email())
                 .password(request.password())
-                .build());
+                .build()).data();
         IdentityView identityView = identityViewRepository.getReferenceById(identity.id());
 
         UserProfile userProfile = userProfileMapper.createStaffRequestToUserProfile(request);
         userProfile.setIdentity(identityView);
         userProfile.setCart(Cart.builder().user(userProfile).build());
         userProfile.setStaff(Staff.builder()
+                .user(userProfile)
                 .type(request.type())
                 .code(UUID.randomUUID().toString())
                 .build());
         userProfileRepository.save(userProfile);
 
-        // todo: call address service create address for staff
+        addressServiceClient.createStaffAddress(CreateStaffAddressRequest.builder()
+                .userId(userProfile.getId())
+                .receiver(request.address().receiver())
+                .phone(request.phone())
+                .email(request.email())
+                .street(request.address().street())
+                .status(true)
+                .provinceId(request.address().provinceId())
+                .districtId(request.address().districtId())
+                .wardId(request.address().wardId())
+                .build());
 
         return RestResponse.created(userProfileMapper.userProfileToCreateStaffResponse(userProfile));
     }
 
     @Override
     public void updateStaff(Long id, UpdateStaffRequest request) {
+        // Step 1: update information staff
         Staff staff = staffRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Staff", "id", id));
 
         staff.setType(request.type());
+        staff.setUser(userProfileMapper.updateUserProfileFromUpdateStaffRequest(staff.getUser(), request));
         staffRepository.save(staff);
 
-        authServiceClient.updateIdentity(UpdateIdentityRequest.builder()
+        // Step 2: check and update password
+        if (StringUtils.hasText(request.password())) {
+            authServiceClient.updateIdentity(UpdateIdentityRequest.builder()
+                    .id(staff.getUser().getIdentity().getId())
+                    .password(request.password())
+                    .build());
+        }
+
+        // Step 3: update status
+        authServiceClient.updateIdentityStatus(UpdateIdentityStatusRequest.builder()
                 .id(staff.getUser().getIdentity().getId())
-                .password(request.password())
+                .status(request.status())
                 .build());
 
         // todo: call address service update address for staff
+        addressServiceClient.updateStaffAddress(
+                request.address().id(),
+                UpdateStaffAddressRequest.builder()
+                        .receiver(request.address().receiver())
+                        .phone(request.address().phone())
+                        .email(request.address().email())
+                        .street(request.address().street())
+                        .provinceId(request.address().provinceId())
+                        .districtId(request.address().districtId())
+                        .wardId(request.address().wardId())
+                        .build());
     }
 
     @Transactional(rollbackOn = {ResourceNotFoundException.class})

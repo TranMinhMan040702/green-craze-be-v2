@@ -8,8 +8,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.address.dto.request.address.CreateAddressRequest;
+import vn.com.greencraze.address.dto.request.address.CreateStaffAddressRequest;
 import vn.com.greencraze.address.dto.request.address.UpdateAddressRequest;
+import vn.com.greencraze.address.dto.request.address.UpdateStaffAddressRequest;
 import vn.com.greencraze.address.dto.response.address.CreateAddressResponse;
+import vn.com.greencraze.address.dto.response.address.CreateStaffAddressResponse;
 import vn.com.greencraze.address.dto.response.address.GetListAddressByUserIdResponse;
 import vn.com.greencraze.address.dto.response.address.GetListAddressResponse;
 import vn.com.greencraze.address.dto.response.address.GetOneAddressResponse;
@@ -221,12 +224,58 @@ public class AddressServiceImpl implements IAddressService {
         addressRepository.save(address);
     }
 
-    //call from other serivce
     @Override
     public RestResponse<GetOneAddressResponse> getOneAddressFromOtherService(Long id) {
         return addressRepository.findById(id)
                 .map(addressMapper::addressToGetOneAddressResponse)
-                .map(RestResponse::ok)
+                .map(RestResponse::ok);
+      }
+
+    @Override
+    public RestResponse<CreateStaffAddressResponse> createStaffAddress(CreateStaffAddressRequest request) {
+        Province province = provinceRepository.findById(request.provinceId())
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "provinceId", request.provinceId()));
+        District district = districtRepository.findById(request.districtId())
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "districtId", request.districtId()));
+        Ward ward = wardRepository.findById(request.wardId())
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "wardId", request.wardId()));
+
+        if (!Objects.equals(ward.getDistrict().getId(), district.getId())
+                || !Objects.equals(district.getProvince().getId(), province.getId())) {
+            throw new InvalidRequestException("Cannot identify combined address, " +
+                    "may be unexpected provinceId, districtId, wardId");
+        }
+
+        Address address = addressMapper.createStaffAddressRequestToAddress(request);
+        address.setIsDefault(true);
+
+        addressRepository.findAll().forEach(x -> {
+            x.setIsDefault(false);
+            addressRepository.save(x);
+        });
+        addressRepository.save(address);
+
+        return RestResponse.created(addressMapper.addressToCreateStaffAddressResponse(address));
+    }
+
+    @Override
+    public void updateStaffAddress(Long id, UpdateStaffAddressRequest request) {
+        Province province = provinceRepository.findById(request.provinceId())
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "provinceId", request.provinceId()));
+        District district = districtRepository.findById(request.districtId())
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "districtId", request.districtId()));
+        Ward ward = wardRepository.findById(request.wardId())
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "wardId", request.wardId()));
+
+        if (!Objects.equals(ward.getDistrict().getId(), district.getId())
+                || !Objects.equals(district.getProvince().getId(), province.getId())) {
+            throw new InvalidRequestException("Cannot identify combined address, " +
+                    "may be unexpected provinceId, districtId, wardId");
+        }
+
+        addressRepository.findById(id)
+                .map(address -> addressMapper.updateAddressFromUpdateStaffAddressRequest(address, request))
+                .map(addressRepository::save)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
     }
 

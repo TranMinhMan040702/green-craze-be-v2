@@ -3,7 +3,6 @@ package vn.com.greencraze.inventory.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.RestResponse;
-import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.inventory.client.product.ProductServiceClient;
 import vn.com.greencraze.inventory.client.product.dto.ExportProductRequest;
 import vn.com.greencraze.inventory.client.product.dto.ImportProductRequest;
@@ -17,6 +16,7 @@ import vn.com.greencraze.inventory.mapper.DocketMapper;
 import vn.com.greencraze.inventory.repository.DocketRepository;
 import vn.com.greencraze.inventory.service.IDocketService;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -69,11 +69,10 @@ public class DocketServiceImpl implements IDocketService {
     }
 
     @Override
-    public RestResponse<GetListDocketByProductResponse> getListDocketByProduct(Long id) {
-        return docketRepository.findByProductId(id)
-                .map(docketMapper::docketToGetListDocketByProductResponse)
-                .map(RestResponse::ok)
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "productId", id));
+    public RestResponse<List<GetListDocketByProductResponse>> getListDocketByProduct(Long id) {
+        List<GetListDocketByProductResponse> responses = docketRepository.findByProductId(id)
+                .stream().map(docketMapper::docketToGetListDocketByProductResponse).toList();
+        return RestResponse.ok(responses);
     }
 
     @Override

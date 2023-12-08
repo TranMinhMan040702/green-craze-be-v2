@@ -21,7 +21,9 @@ import vn.com.greencraze.auth.dto.request.identity.UpdateIdentityRequest;
 import vn.com.greencraze.auth.dto.request.identity.UpdateIdentityStatusRequest;
 import vn.com.greencraze.auth.dto.response.user.CreateIdentityResponse;
 import vn.com.greencraze.auth.service.IIdentityService;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 
 import java.net.URI;
 
@@ -33,6 +35,7 @@ public class IdentityController {
 
     private final IIdentityService identityService;
 
+    @InternalApi(Microservice.USER)
     @PutMapping(value = "/update-status", consumes = MediaType.APPLICATION_JSON)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update status a identity")
@@ -41,6 +44,7 @@ public class IdentityController {
         return ResponseEntity.noContent().build();
     }
 
+    @InternalApi(Microservice.USER)
     @PutMapping(value = "/disable", consumes = MediaType.APPLICATION_JSON)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Disable a list identities")
@@ -49,6 +53,7 @@ public class IdentityController {
         return ResponseEntity.noContent().build();
     }
 
+    @InternalApi(Microservice.USER)
     @PostMapping(consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a identity")
@@ -61,6 +66,7 @@ public class IdentityController {
         return ResponseEntity.created(location).body(response);
     }
 
+    @InternalApi(Microservice.USER)
     @PutMapping(value = "/update-identity", consumes = MediaType.APPLICATION_JSON)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a identity")

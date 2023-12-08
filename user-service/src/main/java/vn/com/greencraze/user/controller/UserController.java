@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 import vn.com.greencraze.user.dto.request.user.CreateUserRequest;
 import vn.com.greencraze.user.dto.request.user.UpdateUserRequest;
 import vn.com.greencraze.user.dto.response.user.CreateUserResponse;
@@ -69,6 +71,7 @@ public class UserController {
         return ResponseEntity.ok(userProfileService.getMe());
     }
 
+    @InternalApi(Microservice.AUTH)
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Create user")
@@ -79,12 +82,12 @@ public class UserController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update user")
-    public ResponseEntity<Void> updateUser(@RequestBody @Valid UpdateUserRequest request) {
+    public ResponseEntity<Void> updateUser(@Valid UpdateUserRequest request) {
         userProfileService.updateUser(request);
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 
     // TODO: Giữ lại toggle

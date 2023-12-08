@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,6 +52,7 @@ public class SaleController {
         return ResponseEntity.ok(saleService.getListSale(page, size, isSortAscending, columnName, search, all));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a sale")
@@ -68,6 +70,7 @@ public class SaleController {
         return ResponseEntity.created(location).body(response);
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PutMapping(
             value = "/{id}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
@@ -82,6 +85,7 @@ public class SaleController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a sale")
@@ -90,6 +94,7 @@ public class SaleController {
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Delete a list of sales")
@@ -98,7 +103,8 @@ public class SaleController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/apply")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/apply")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Apply a sale")
     public ResponseEntity<Void> applySale(@RequestParam Long id) {
@@ -106,7 +112,8 @@ public class SaleController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/cancel")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/cancel")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Cancel a sale")
     public ResponseEntity<Void> cancelSale(@RequestParam Long id) {

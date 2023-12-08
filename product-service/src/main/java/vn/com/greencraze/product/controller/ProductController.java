@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 import vn.com.greencraze.product.dto.request.image.CreateProductImageRequest;
 import vn.com.greencraze.product.dto.request.image.UpdateProductImageRequest;
 import vn.com.greencraze.product.dto.request.product.CreateProductRequest;
@@ -247,6 +249,7 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+    @InternalApi(Microservice.INVENTORY)
     @PutMapping(value = "/import", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update quantity and actual inventory a product after import")
@@ -255,6 +258,7 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
+    @InternalApi(Microservice.INVENTORY)
     @PutMapping(value = "/export", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update quantity and actual inventory a product after export")
