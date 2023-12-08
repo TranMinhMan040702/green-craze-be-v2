@@ -11,6 +11,7 @@ CREATE TABLE docket
     quantity   BIGINT                NOT NULL,
     type       VARCHAR(255)          NOT NULL,
     code       VARCHAR(255)          NOT NULL,
+    note       VARCHAR(255)          NOT NULL,
     CONSTRAINT pk_docket PRIMARY KEY (id)
 );
 

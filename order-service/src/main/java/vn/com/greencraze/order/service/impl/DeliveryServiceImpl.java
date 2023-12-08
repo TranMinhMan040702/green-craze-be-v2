@@ -33,7 +33,7 @@ public class DeliveryServiceImpl implements IDeliveryService {
     private final IUploadService uploadService;
 
     private static final String RESOURCE_NAME = "Delivery";
-    private static final List<String> SEARCH_FIELDS = List.of("name", "code");
+    private static final List<String> SEARCH_FIELDS = List.of("name");
 
     @Override
     public RestResponse<ListResponse<GetListDeliveryResponse>> getListDelivery(

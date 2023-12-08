@@ -1,7 +1,6 @@
 package vn.com.greencraze.user.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +10,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -22,7 +23,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.user.dto.request.review.CreateReviewRequest;
-import vn.com.greencraze.user.dto.request.review.GetOrderReviewRequest;
 import vn.com.greencraze.user.dto.request.review.ReplyReviewRequest;
 import vn.com.greencraze.user.dto.request.review.UpdateReviewRequest;
 import vn.com.greencraze.user.dto.response.review.CreateReviewResponse;
@@ -111,7 +111,7 @@ public class ReviewController {
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @PutMapping(value = "/toggle/{id}")
+    @PatchMapping(value = "/toggle/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Toggle a review")
     public ResponseEntity<Void> toggleReview(
@@ -126,7 +126,7 @@ public class ReviewController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Reply a review")
     public ResponseEntity<Void> replyReview(
-            @PathVariable Long id, @Valid @RequestBody ReplyReviewRequest request
+            @PathVariable Long id, @RequestBody @Valid ReplyReviewRequest request
     ) {
         reviewService.replyReview(id, request);
         return ResponseEntity.noContent().build();
@@ -151,13 +151,13 @@ public class ReviewController {
     }
 
     // call from other services
-    @GetMapping(value = "/order-review", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/internal/order-review")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get order review")
     public ResponseEntity<RestResponse<GetOrderReviewResponse>> getOrderReview(
-            @Valid @RequestBody GetOrderReviewRequest request
+            @RequestParam List<Long> orderItemIds
     ) {
-        return ResponseEntity.ok(reviewService.getOrderReview(request));
+        return ResponseEntity.ok(reviewService.getOrderReview(orderItemIds));
     }
 
 }

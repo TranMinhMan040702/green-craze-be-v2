@@ -6,11 +6,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import vn.com.greencraze.amqp.RabbitMQMessageProducer;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.auth.AuthFacade;
+import vn.com.greencraze.commons.enumeration.EmailEvent;
 import vn.com.greencraze.commons.exception.InvalidRequestException;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.order.client.address.AddressServiceClient;
@@ -22,10 +23,10 @@ import vn.com.greencraze.order.client.product.dto.request.UpdateListProductQuant
 import vn.com.greencraze.order.client.product.dto.response.GetOneProductResponse;
 import vn.com.greencraze.order.client.product.dto.response.GetOneVariantResponse;
 import vn.com.greencraze.order.client.user.UserServiceClient;
-import vn.com.greencraze.order.client.user.dto.request.GetOrderReviewRequest;
 import vn.com.greencraze.order.client.user.dto.request.UpdateUserCartRequest;
 import vn.com.greencraze.order.client.user.dto.response.GetOneUserResponse;
 import vn.com.greencraze.order.client.user.dto.response.GetOrderReviewResponse;
+import vn.com.greencraze.order.config.property.RabbitMQProperties;
 import vn.com.greencraze.order.constant.OrderConstants;
 import vn.com.greencraze.order.dto.request.order.CompletePaypalOrderRequest;
 import vn.com.greencraze.order.dto.request.order.CreateOrderItemRequest;
@@ -34,6 +35,7 @@ import vn.com.greencraze.order.dto.request.order.UpdateOrderRequest;
 import vn.com.greencraze.order.dto.response.order.CreateOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetListOrderItemResponse;
 import vn.com.greencraze.order.dto.response.order.GetListOrderResponse;
+import vn.com.greencraze.order.dto.response.order.GetOneOrderItemResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderResponse;
 import vn.com.greencraze.order.entity.Delivery;
 import vn.com.greencraze.order.entity.Order;
@@ -44,19 +46,21 @@ import vn.com.greencraze.order.enumeration.OrderStatus;
 import vn.com.greencraze.order.enumeration.PaymentCode;
 import vn.com.greencraze.order.mapper.OrderItemMapper;
 import vn.com.greencraze.order.mapper.OrderMapper;
+import vn.com.greencraze.order.rabbitmq.dto.request.SendEmailRequest;
 import vn.com.greencraze.order.repository.DeliveryRepository;
 import vn.com.greencraze.order.repository.OrderCancelReasonRepository;
 import vn.com.greencraze.order.repository.OrderItemRepository;
 import vn.com.greencraze.order.repository.OrderRepository;
 import vn.com.greencraze.order.repository.PaymentMethodRepository;
+import vn.com.greencraze.order.repository.TransactionRepository;
 import vn.com.greencraze.order.repository.specification.OrderSpecification;
 import vn.com.greencraze.order.service.IOrderService;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -66,10 +70,11 @@ import java.util.UUID;
 public class OrderServiceImpl implements IOrderService {
 
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
     private final PaymentMethodRepository paymentMethodRepository;
     private final DeliveryRepository deliveryRepository;
     private final OrderCancelReasonRepository orderCancelReasonRepository;
+    private final TransactionRepository transactionRepository;
+    private final OrderItemRepository orderItemRepository;
 
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
@@ -79,6 +84,10 @@ public class OrderServiceImpl implements IOrderService {
     private final UserServiceClient userServiceClient;
     private final InventoryServiceClient inventoryServiceClient;
 
+    private final RabbitMQProperties rabbitMQProperties;
+
+    private final RabbitMQMessageProducer producer;
+
     private final AuthFacade authFacade;
     private static final String RESOURCE_NAME = "Order";
     private static final List<String> SEARCH_FIELDS = List.of("code");
@@ -86,12 +95,12 @@ public class OrderServiceImpl implements IOrderService {
     @Override
     public RestResponse<ListResponse<GetListOrderResponse>> getListOrder(
             Integer page, Integer size, Boolean isSortAscending, String columnName,
-            String search, Boolean all, String status) {
+            String search, Boolean all, OrderStatus status) {
         OrderSpecification orderSpecification = new OrderSpecification();
         Specification<Order> sortable = orderSpecification.sortable(isSortAscending, columnName);
         Specification<Order> searchable = orderSpecification.searchable(SEARCH_FIELDS, search);
 
-        Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page, size);
+        Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
 
         Page<GetListOrderResponse> orders = orderRepository
                 .findAll(sortable.and(searchable), pageable)
@@ -137,29 +146,36 @@ public class OrderServiceImpl implements IOrderService {
     private GetListOrderResponse mapOrderToGetListOrderResponse(Order order) {
         GetListOrderResponse orderResponse = orderMapper.orderToGetListOrderResponse(order);
 
-        GetOneUserResponse user = userServiceClient.getOneUser(order.getUserId());
-        if (user == null)
+        RestResponse<GetOneUserResponse> user = userServiceClient.getOneUser(order.getUserId());
+        if (user == null) {
             throw new ResourceNotFoundException(RESOURCE_NAME, "userId", order.getUserId());
+        }
 
-        GetOneAddressResponse address = addressServiceClient.getOneAddress(order.getAddressId());
-        if (address == null)
+        RestResponse<GetOneAddressResponse> address = addressServiceClient.getOneAddress(order.getAddressId());
+        if (address == null) {
             throw new ResourceNotFoundException(RESOURCE_NAME, "addressId", order.getAddressId());
+        }
 
-        return orderResponse.withUser(user).withAddress(address).withItems(getOrderItemResponse(order.getOrderItems()));
+        return orderResponse.withUser(user.data())
+                .withAddress(address.data())
+                .withItems(getOrderItemResponse(order.getOrderItems()));
     }
 
     private GetOneOrderResponse mapOrderToGetOneOrderResponse(Order order) {
         GetOneOrderResponse orderResponse = orderMapper.orderToGetOneOrderResponse(order);
 
-        GetOneUserResponse user = userServiceClient.getOneUser(order.getUserId());
-        if (user == null)
-            throw new ResourceNotFoundException("User", "userId", order.getUserId());
+        RestResponse<GetOneUserResponse> user = userServiceClient.getOneUser(order.getUserId());
+        if (user == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "userId", order.getUserId());
+        }
 
-        GetOneAddressResponse address = addressServiceClient.getOneAddress(order.getAddressId());
-        if (address == null)
-            throw new ResourceNotFoundException("Address", "addressId", order.getAddressId());
-
-        return orderResponse.withUser(user).withAddress(address).withItems(getOrderItemResponse(order.getOrderItems()));
+        RestResponse<GetOneAddressResponse> address = addressServiceClient.getOneAddress(order.getAddressId());
+        if (address == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "addressId", order.getAddressId());
+        }
+        return orderResponse.withUser(user.data())
+                .withAddress(address.data())
+                .withItems(getOrderItemResponse(order.getOrderItems()));
     }
 
     @Override
@@ -179,13 +195,22 @@ public class OrderServiceImpl implements IOrderService {
                 .map(this::mapOrderToGetOneOrderResponse)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "Order", code));
 
-        GetOrderReviewResponse review = userServiceClient.getOrderReview(
-                new GetOrderReviewRequest(order.items().stream().map(GetListOrderItemResponse::id).toList()));
+        List<Long> orderItemIds = order.items().stream().map(GetListOrderItemResponse::id).toList();
+        RestResponse<GetOrderReviewResponse> review = userServiceClient.getOrderReview(orderItemIds);
 
-        if (review == null)
+        if (review.data() == null) {
             throw new ResourceNotFoundException(RESOURCE_NAME, "orderIds",
                     order.items().stream().map(GetListOrderItemResponse::id).toList());
-        return RestResponse.ok(order.withReviewedDate(review.reviewedDate()).withIsReview(review.isReview()));
+        }
+
+        if (review.data().reviewedDate() != null) {
+            order = order.withReviewedDate(review.data().reviewedDate());
+        }
+        if (review.data().isReview() != null) {
+            order = order.withIsReview(review.data().isReview());
+        }
+
+        return RestResponse.ok(order);
     }
 
     private List<GetListOrderItemResponse> getOrderItemResponse(Set<OrderItem> orderItems) {
@@ -194,15 +219,17 @@ public class OrderServiceImpl implements IOrderService {
                 .setOrderItemToListGetListOrderItemResponse(orderItems);
 
         for (GetListOrderItemResponse item : orderItemResponses) {
-            GetOneVariantResponse variant = productServiceClient.getOneVariant(item.variantId());
-            if (variant == null) {
+            RestResponse<GetOneVariantResponse> variantResp = productServiceClient.getOneVariant(item.variantId());
+            if (variantResp == null) {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", item.variantId());
             }
+            GetOneVariantResponse variant = variantResp.data();
 
-            GetOneProductResponse product = productServiceClient.getOneProduct(variant.productId());
-            if (product == null) {
+            RestResponse<GetOneProductResponse> productResp = productServiceClient.getOneProduct(variant.productId());
+            if (productResp == null) {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "productId", variant.productId());
             }
+            GetOneProductResponse product = productResp.data();
 
             updatedOrderItemResponses.add(item.withSku(variant.sku())
                     .withProductId(variant.productId())
@@ -221,13 +248,12 @@ public class OrderServiceImpl implements IOrderService {
 
     private Order initOrder(CreateOrderRequest request) {
         String userId = authFacade.getUserId();
-        Order order = new Order();
         // get default address
-        GetOneAddressResponse address = addressServiceClient.getDefaultAddress(userId);
+        RestResponse<GetOneAddressResponse> address = addressServiceClient.getDefaultAddress(userId);
         if (address == null) {
-            throw new ResourceNotFoundException("Address", "addressId", userId);
+            throw new ResourceNotFoundException(RESOURCE_NAME, "addressId", userId);
         }
-        Long addressId = address.id();
+        Long addressId = address.data().id();
 
         Delivery delivery = deliveryRepository
                 .findById(request.deliveryId())
@@ -238,20 +264,32 @@ public class OrderServiceImpl implements IOrderService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         RESOURCE_NAME, "paymentMethodId", request.paymentMethodId()));
 
-        Set<OrderItem> orderItems = new HashSet<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
+        Order order = Order.builder()
+                .code(UUID.randomUUID().toString().replace("-", "").toUpperCase()) // TODO: generate code
+                .userId(userId)
+                .addressId(addressId)
+                .deliveryMethod(delivery.getName())
+                .note(request.note())
+                .shippingCost(delivery.getPrice())
+                .tax(OrderConstants.ORDER_TAX.doubleValue())
+                .status(OrderStatus.NOT_PROCESSED)
+                .paymentStatus(false)
+                .build();
 
         for (CreateOrderItemRequest oi : request.items()) {
             // get variant from product service
-            GetOneVariantResponse variant = productServiceClient.getOneVariant(oi.variantId());
-            if (variant == null) {
+            RestResponse<GetOneVariantResponse> variantResp = productServiceClient.getOneVariant(oi.variantId());
+            if (variantResp == null) {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", oi.variantId());
             }
+            GetOneVariantResponse variant = variantResp.data();
 
-            GetOneProductResponse product = productServiceClient.getOneProduct(variant.productId());
-            if (product == null) {
+            RestResponse<GetOneProductResponse> productResp = productServiceClient.getOneProduct(variant.productId());
+            if (productResp == null) {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "productId", variant.productId());
             }
+            GetOneProductResponse product = productResp.data();
 
             long q = (long) variant.quantity() * oi.quantity();
             if (q > product.actualInventory()) {
@@ -267,30 +305,23 @@ public class OrderServiceImpl implements IOrderService {
 
             totalAmount = totalAmount.add(variantPrice);
 
-            orderItems.add(orderItem);
+            order.getOrderItems().add(orderItem);
         }
 
         BigDecimal tax = totalAmount.multiply(OrderConstants.ORDER_TAX);
         totalAmount = totalAmount.add(delivery.getPrice()).add(tax);
+        order.setTotalAmount(totalAmount);
 
         Transaction transaction = new Transaction();
         transaction.setPaymentMethod(paymentMethod.getCode());
         transaction.setTotalPay(totalAmount);
+        transaction.setOrder(order);
+        order.setTransaction(transaction);
 
-        return Order.builder()
-                .code(UUID.randomUUID().toString().replace('-', ' ').toUpperCase())
-                .userId(userId)
-                .addressId(addressId)
-                .deliveryMethod(delivery.getName())
-                .transaction(transaction)
-                .note(request.note())
-                .orderItems(orderItems)
-                .shippingCost(delivery.getPrice())
-                .tax(OrderConstants.ORDER_TAX.doubleValue())
-                .status(OrderStatus.NOT_PROCESSED)
-                .paymentStatus(false)
-                .totalAmount(totalAmount)
-                .build();
+        orderRepository.save(order);
+        transactionRepository.save(transaction);
+
+        return order;
     }
 
     private void updateProduct(List<CreateOrderItemRequest> items) {
@@ -300,9 +331,10 @@ public class OrderServiceImpl implements IOrderService {
 
         for (CreateOrderItemRequest item : items) {
 
-            GetOneVariantResponse variant = productServiceClient.getOneVariant(item.variantId());
-            if (variant == null)
+            RestResponse<GetOneVariantResponse> variantResp = productServiceClient.getOneVariant(item.variantId());
+            if (variantResp == null)
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", item.variantId());
+            GetOneVariantResponse variant = variantResp.data();
 
             request.quantityItems().add(
                     new UpdateListProductQuantityRequest.ProductQuantityItem(
@@ -336,9 +368,11 @@ public class OrderServiceImpl implements IOrderService {
         CreateDocketRequest request = new CreateDocketRequest(orderId, type, new ArrayList<>());
 
         for (CreateOrderItemRequest item : items) {
-            GetOneVariantResponse variant = productServiceClient.getOneVariant(item.variantId());
-            if (variant == null)
+            RestResponse<GetOneVariantResponse> variantResp = productServiceClient.getOneVariant(item.variantId());
+            if (variantResp == null) {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", item.variantId());
+            }
+            GetOneVariantResponse variant = variantResp.data();
 
             request.productDockets().add(
                     new CreateDocketRequest.ProductDocket(
@@ -346,26 +380,51 @@ public class OrderServiceImpl implements IOrderService {
                             variant.quantity() * item.quantity())
             );
         }
+
         inventoryServiceClient.createDocket(request);
     }
 
-    private void createNotify() {
+    private void createNotify(Order order) {
+        String userId = authFacade.getUserId();
+        RestResponse<GetOneUserResponse> userResp = userServiceClient.getOneUser(userId);
+        if (userResp == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "userId", userId);
+        }
+        GetOneUserResponse user = userResp.data();
 
+        RestResponse<GetOneAddressResponse> addressResp = addressServiceClient.getDefaultAddress(userId);
+        if (addressResp == null) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "userId", userId);
+        }
+        GetOneAddressResponse address = addressResp.data();
+        String addressDetail = address.street() + ", " + address.ward().name()
+                + ", " + address.district().name() + ", " + address.province().name();
+
+        // send email order
+        producer.publish(SendEmailRequest.builder()
+                .event(EmailEvent.ORDER_CONFIRMATION)
+                .email(user.email())
+                .payload(Map.of(
+                        "name", user.firstName() + " " + user.lastName(),
+                        "email", address.email(),
+                        "receiver", address.receiver(),
+                        "phone", address.phone(),
+                        "totalPrice", order.getTotalAmount(),
+                        "paymentMethod", order.getTransaction().getPaymentMethod(),
+                        "address", addressDetail
+                ))
+                .build(), rabbitMQProperties.internalExchange(), rabbitMQProperties.mailRoutingKey());
     }
 
     private boolean hasInRole(String role) {
-        Authentication auth = authFacade.getAuthentication();
-
-        return auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(role));
+        return authFacade.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(role));
     }
 
-    @Transactional(rollbackOn = {ResourceNotFoundException.class})
+
     @Override
+    @Transactional(rollbackOn = {ResourceNotFoundException.class})
     public RestResponse<CreateOrderResponse> createOrder(CreateOrderRequest request) {
-
         Order order = initOrder(request);
-
-        orderRepository.save(order);
 
         // update product in product service
         updateProduct(request.items());
@@ -376,32 +435,48 @@ public class OrderServiceImpl implements IOrderService {
         // create docket in inventory service
         createDocket(request.items(), order.getId(), "EXPORT");
 
-        // TODO: pub message to notify in infrastructure service
-        createNotify();
+        // pub message to notify in infrastructure service
+        createNotify(order);
 
         return RestResponse.ok(orderMapper.orderToCreateOrderResponse(order));
     }
 
     private void validateOrderStatus(Order order, OrderStatus status) {
+        // Cannot update order while it's not paid by user through PayPal
         if (order.getStatus() == OrderStatus.NOT_PROCESSED
                 && !order.getPaymentStatus()
+                && status != OrderStatus.CANCELLED
                 && Objects.equals(order.getTransaction().getPaymentMethod(), PaymentCode.PAYPAL.name())) {
-            throw new InvalidRequestException("Cannot update this order status, until it was paid by user through PayPal");
+            throw new InvalidRequestException(
+                    "Cannot update this order status, it was not paid by user through PayPal"
+            );
+        }
+
+        //  Cannot cancel order while it's paid
+        if (status == OrderStatus.CANCELLED
+                && order.getPaymentStatus()) {
+            throw new InvalidRequestException(
+                    "Cannot update this order status, it was paid by user before"
+            );
         }
 
         // Cannot update order while it's delivered
         if (order.getStatus() == OrderStatus.DELIVERED) {
-            throw new InvalidRequestException("Unexpected order status, cannot update order while it's delivered");
+            throw new InvalidRequestException(
+                    "Unexpected order status, cannot update order while it's delivered"
+            );
         }
 
-        if (order.getStatus() == OrderStatus.CANCELLED && (!hasInRole("ADMIN") && !hasInRole("STAFF"))) {
-            throw new InvalidRequestException("Unexpected order status, user cannot update order while it's cancelled");
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new InvalidRequestException(
+                    "Unexpected order status, order was cancelled"
+            );
         }
 
         // Customer cannot cancel order while it's processing, only admin and staff can do that
         if (order.getStatus() != OrderStatus.NOT_PROCESSED
                 && Objects.equals(status, OrderStatus.CANCELLED)
-                && (!hasInRole("ADMIN") && !hasInRole("STAFF"))) {
+                && !(hasInRole("ROLE_ADMIN") || hasInRole("ROLE_STAFF"))) {
             throw new InvalidRequestException("Unexpected order status, cannot cancel order while it's processing");
         }
     }
@@ -415,17 +490,20 @@ public class OrderServiceImpl implements IOrderService {
                 order.getTransaction().setPaidAt(now);
             order.getTransaction().setCompletedAt(now);
         } else if (Objects.equals(request.status(), OrderStatus.CANCELLED)) {
-            if (request.otherCancellation().isEmpty() || request.otherCancellation().isBlank()) {
+            if (request.orderCancellationReasonId() != null) {
+
                 var cancellationReason = orderCancelReasonRepository.findById(request.orderCancellationReasonId())
                         .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cancelReason",
                                 request.orderCancellationReasonId()));
                 order.setCancelReason(cancellationReason);
-            } else {
+
+            } else if (request.otherCancellation() != null && !request.otherCancellation().isBlank()) {
                 order.setOtherCancelReason(request.otherCancellation());
             }
             // update product when cancelling order
-            List<CreateOrderItemRequest> items = orderItemMapper.orderItemToCreateOrderItemRequest(order.getOrderItems());
-            items.forEach(x -> x = x.withQuantity(x.quantity() * -1));
+            List<CreateOrderItemRequest> items = orderItemMapper
+                    .orderItemToCreateOrderItemRequest(order.getOrderItems())
+                    .stream().map(x -> x.withQuantity(x.quantity() * -1)).toList();
             updateProduct(items);
 
             // create docket when cancelling order
@@ -444,7 +522,7 @@ public class OrderServiceImpl implements IOrderService {
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
 
         // check if current user is not in admin role --> find by userid and id --> in case user want to cancel order
-        if (!hasInRole("ADMIN")) {
+        if (!hasInRole("ROLE_ADMIN")) {
             String userId = authFacade.getUserId();
             order = orderRepository.findByIdAndUserId(id, userId)
                     .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
@@ -474,8 +552,17 @@ public class OrderServiceImpl implements IOrderService {
 
         orderRepository.save(order);
 
-        //TODO: pub message to create notify
-        createNotify();
+        // pub message to create notify
+        createNotify(order);
+    }
+
+    // call from other service
+    @Override
+    public RestResponse<GetOneOrderItemResponse> getOneOrderItem(Long orderItemId) {
+        return orderItemRepository.findById(orderItemId)
+                .map(orderItemMapper::orderItemToGetOneOrderItemResponse)
+                .map(RestResponse::ok)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "orderItemId", orderItemId));
     }
 
 }

@@ -17,7 +17,6 @@ public record UpdateAddressRequest(
         @NotNull
         Long districtId,
         @NotNull
-        Long wardId,
-        Boolean isDefault
+        Long wardId
 ) {
 }

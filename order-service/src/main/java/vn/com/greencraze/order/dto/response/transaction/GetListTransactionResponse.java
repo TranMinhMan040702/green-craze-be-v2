@@ -17,14 +17,12 @@ public record GetListTransactionResponse(
         @Schema(nullable = true)
         String updatedBy,
         String paymentMethod,
-        @Nullable
         Instant paidAt,
-        @Nullable
-        Instant completeAt,
+        Instant completedAt,
         BigDecimal totalPay,
         String paypalOrderId,
         String paypalOrderStatus,
         String orderCode
 ) {
-        
+
 }

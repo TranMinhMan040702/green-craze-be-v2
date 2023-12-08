@@ -2,6 +2,7 @@ package vn.com.greencraze.user.dto.request.review;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.lang.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 public record UpdateReviewRequest(
@@ -11,8 +12,9 @@ public record UpdateReviewRequest(
         String content,
         @NotNull
         Integer rating,
-        @NotNull
+        @Nullable
         MultipartFile image,
+        @Nullable
         Boolean isDeleteImage
 ) {
 

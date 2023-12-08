@@ -12,10 +12,12 @@ public record UpdateListProductQuantityRequest(
 ) {
 
     public record ProductQuantityItem(
+            @NotNull
             Long id,
+            @NotNull
             Integer quantity
     ) {
-        
+
     }
 
 }

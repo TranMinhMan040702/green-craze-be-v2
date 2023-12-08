@@ -33,6 +33,7 @@ public record GetOneOrderResponse(
         String code,
         String deliveryMethod,
         Boolean isReview,
+        @Nullable
         Instant reviewedDate,
         GetOneUserResponse user,
         GetOneAddressResponse address,

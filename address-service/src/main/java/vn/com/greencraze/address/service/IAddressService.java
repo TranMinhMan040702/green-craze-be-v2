@@ -20,15 +20,14 @@ import java.util.List;
 public interface IAddressService {
 
     RestResponse<ListResponse<GetListAddressResponse>> getListAddress(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
+            Integer page, Integer size, Boolean isSortAscending,
+            String columnName, String search, Boolean all, Boolean status);
 
     RestResponse<List<GetListAddressByUserIdResponse>> getListAddressByUserId(String userId);
 
     RestResponse<GetOneAddressResponse> getOneAddress(Long id);
 
     RestResponse<GetOneAddressResponse> getDefaultAddress();
-
-    RestResponse<GetOneAddressResponse> getDefaultUserAddress(String userId);
 
     RestResponse<List<GetListProvinceResponse>> getListProvince();
 
@@ -44,6 +43,10 @@ public interface IAddressService {
 
     void setAddressDefault(Long id);
 
+    RestResponse<GetOneAddressResponse> getOneAddressFromOtherService(Long id);
+
+    RestResponse<GetOneAddressResponse> getDefaultUserAddress(String userId);
+  
     RestResponse<CreateStaffAddressResponse> createStaffAddress(CreateStaffAddressRequest request);
 
     void updateStaffAddress(Long id, UpdateStaffAddressRequest request);

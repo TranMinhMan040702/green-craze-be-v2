@@ -53,12 +53,15 @@ public class AddressController {
     public ResponseEntity<RestResponse<ListResponse<GetListAddressResponse>>> getListAddress(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "true") boolean isSortAscending,
-            @RequestParam(defaultValue = "id") String columnName,
+            @RequestParam(defaultValue = "false") boolean isSortAscending,
+            @RequestParam(defaultValue = "isDefault") String columnName,
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) boolean all
+            @RequestParam(required = false) boolean all,
+            @RequestParam(required = false) boolean status
     ) {
-        return ResponseEntity.ok(addressService.getListAddress(page, size, isSortAscending, columnName, search, all));
+        return ResponseEntity.ok(addressService.getListAddress(
+                page, size, isSortAscending, columnName, search, all, status
+        ));
     }
 
     @InternalApi(Microservice.USER)
@@ -119,10 +122,13 @@ public class AddressController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a address")
-    public ResponseEntity<Void> updateAddress(@PathVariable Long id, @Valid UpdateAddressRequest request) {
+    public ResponseEntity<Void> updateAddress(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateAddressRequest request
+    ) {
         addressService.updateAddress(id, request);
         return ResponseEntity.noContent().build();
     }
@@ -143,11 +149,20 @@ public class AddressController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping(value = "/default/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    // call from another service
+    @GetMapping(value = "/internal/default/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a default address")
     public ResponseEntity<RestResponse<GetOneAddressResponse>> getDefaultAddress(@PathVariable String userId) {
         return ResponseEntity.ok(addressService.getDefaultUserAddress(userId));
+    }
+
+
+    @GetMapping(value = "/internal/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get a address")
+    public ResponseEntity<RestResponse<GetOneAddressResponse>> getOneAddressFromOtherService(@PathVariable Long id) {
+        return ResponseEntity.ok(addressService.getOneAddressFromOtherService(id));
     }
 
     @InternalApi(Microservice.USER)

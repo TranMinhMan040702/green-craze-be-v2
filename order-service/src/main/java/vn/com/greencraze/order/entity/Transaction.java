@@ -57,19 +57,19 @@ public class Transaction {
     @Column(name = "payment_method", nullable = false)
     private String paymentMethod;
 
-    @Column(name = "paid_at", nullable = false)
+    @Column(name = "paid_at")
     private Instant paidAt;
 
     @Column(name = "total_pay", nullable = false)
     private BigDecimal totalPay;
 
-    @Column(name = "completed_at", nullable = false)
+    @Column(name = "completed_at")
     private Instant completedAt;
 
-    @Column(name = "paypal_order_id", nullable = false)
+    @Column(name = "paypal_order_id")
     private String paypalOrderId;
 
-    @Column(name = "paypal_order_status", nullable = false)
+    @Column(name = "paypal_order_status")
     private String paypalOrderStatus;
 
     @OneToOne(cascade = CascadeType.ALL)

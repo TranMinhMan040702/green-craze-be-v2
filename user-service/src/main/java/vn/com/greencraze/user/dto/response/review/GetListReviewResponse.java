@@ -3,7 +3,7 @@ package vn.com.greencraze.user.dto.response.review;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.With;
 import org.springframework.lang.Nullable;
-import vn.com.greencraze.user.entity.UserProfile;
+import vn.com.greencraze.user.dto.response.user.GetOneUserResponse;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -31,7 +31,7 @@ public record GetListReviewResponse(
         Boolean status,
         String variantName,
         ProductResponse product,
-        UserProfile user
+        GetOneUserResponse user
 ) {
 
     public record ProductResponse(

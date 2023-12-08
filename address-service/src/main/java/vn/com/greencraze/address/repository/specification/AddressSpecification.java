@@ -10,12 +10,16 @@ import java.util.List;
 
 public class AddressSpecification extends BaseSpecification<Address> {
 
-    public Specification<Address> filterable(String userId) {
+    public Specification<Address> filterable(String userId, Boolean status) {
         List<Predicate> wheres = new ArrayList<>();
         return (root, query, cb) -> {
             if (userId != null) {
                 Predicate isEqualUserId = cb.equal(root.get("userId"), userId);
                 wheres.add(isEqualUserId);
+            }
+            if (status != null) {
+                Predicate isEqualStatusId = cb.equal(root.get("status"), status);
+                wheres.add(isEqualStatusId);
             }
             return cb.and(wheres.toArray(new Predicate[0]));
         };

@@ -98,4 +98,12 @@ public class VariantController {
         return ResponseEntity.noContent().build();
     }
 
+    //call from other service
+    @GetMapping(value = "/internal/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get a variant")
+    public ResponseEntity<RestResponse<GetOneVariantResponse>> getOneVariantFromOtherService(@PathVariable Long id) {
+        return ResponseEntity.ok(variantService.getOneVariant(id));
+    }
+
 }

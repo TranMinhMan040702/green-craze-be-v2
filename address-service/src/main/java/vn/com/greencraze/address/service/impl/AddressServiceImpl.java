@@ -62,12 +62,14 @@ public class AddressServiceImpl implements IAddressService {
 
     @Override
     public RestResponse<ListResponse<GetListAddressResponse>> getListAddress(
-            Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
+            Integer page, Integer size, Boolean isSortAscending,
+            String columnName, String search, Boolean all, Boolean status) {
         String userId = authFacade.getUserId();
         AddressSpecification addressSpecification = new AddressSpecification();
+
         Specification<Address> sortable = addressSpecification.sortable(isSortAscending, columnName);
         Specification<Address> searchable = addressSpecification.searchable(SEARCH_FIELDS, search);
-        Specification<Address> filterable = addressSpecification.filterable(userId);
+        Specification<Address> filterable = addressSpecification.filterable(userId, status);
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
         Page<GetListAddressResponse> responses = addressRepository
                 .findAll(sortable.and(searchable).and(filterable), pageable)
@@ -150,17 +152,20 @@ public class AddressServiceImpl implements IAddressService {
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "wardId", request.wardId()));
 
         if (!Objects.equals(ward.getDistrict().getId(), district.getId())
-                || !Objects.equals(district.getProvince().getId(), province.getId()))
+                || !Objects.equals(district.getProvince().getId(), province.getId())) {
             throw new InvalidRequestException("Cannot identify combined address, may be unexpected provinceId, districtId, wardId");
+        }
 
         Address address = addressMapper.createAddressRequestToAddress(request);
-        address.setUserId(userId);
-        address.setIsDefault(true);
 
-        addressRepository.findAll().forEach(x -> {
+        addressRepository.findAllByUserId(userId).forEach(x -> {
             x.setIsDefault(false);
             addressRepository.save(x);
         });
+
+        address.setUserId(userId);
+        address.setIsDefault(true);
+        address.setStatus(true);
         addressRepository.save(address);
 
         return RestResponse.created(addressMapper.addressToCreateAddressResponse(address));
@@ -177,8 +182,9 @@ public class AddressServiceImpl implements IAddressService {
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "wardId", request.wardId()));
 
         if (!Objects.equals(ward.getDistrict().getId(), district.getId())
-                || !Objects.equals(district.getProvince().getId(), province.getId()))
+                || !Objects.equals(district.getProvince().getId(), province.getId())) {
             throw new InvalidRequestException("Cannot identify combined address, may be unexpected provinceId, districtId, wardId");
+        }
 
         Address address = addressRepository.findByIdAndUserId(id, userId)
                 .map(a -> addressMapper.updateAddressFromUpdateAddressRequest(a, request))
@@ -192,8 +198,9 @@ public class AddressServiceImpl implements IAddressService {
         Address address = addressRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
 
-        if (address.getStatus())
+        if (address.getIsDefault()) {
             throw new InvalidRequestException("Cannot handle to delete default address, please set another address to default and try again");
+        }
 
         address.setStatus(false);
 
@@ -207,15 +214,22 @@ public class AddressServiceImpl implements IAddressService {
 
         Address address = addressRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
-        address.setStatus(true);
 
-        addressRepository.findAll().forEach(x -> {
+        addressRepository.findAllByUserId(userId).forEach(x -> {
             x.setIsDefault(false);
             addressRepository.save(x);
         });
+        address.setIsDefault(true);
 
         addressRepository.save(address);
     }
+
+    @Override
+    public RestResponse<GetOneAddressResponse> getOneAddressFromOtherService(Long id) {
+        return addressRepository.findById(id)
+                .map(addressMapper::addressToGetOneAddressResponse)
+                .map(RestResponse::ok);
+      }
 
     @Override
     public RestResponse<CreateStaffAddressResponse> createStaffAddress(CreateStaffAddressRequest request) {
