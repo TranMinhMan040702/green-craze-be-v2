@@ -31,8 +31,10 @@ import vn.com.greencraze.address.dto.response.district.GetListDistrictResponse;
 import vn.com.greencraze.address.dto.response.province.GetListProvinceResponse;
 import vn.com.greencraze.address.dto.response.ward.GetListWardResponse;
 import vn.com.greencraze.address.service.IAddressService;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 
 import java.net.URI;
 import java.util.List;
@@ -59,6 +61,7 @@ public class AddressController {
         return ResponseEntity.ok(addressService.getListAddress(page, size, isSortAscending, columnName, search, all));
     }
 
+    @InternalApi(Microservice.USER)
     @GetMapping(value = "/user/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get list addresses of user")
@@ -147,6 +150,7 @@ public class AddressController {
         return ResponseEntity.ok(addressService.getDefaultUserAddress(userId));
     }
 
+    @InternalApi(Microservice.USER)
     @PostMapping(
             value = "/staff",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -163,6 +167,7 @@ public class AddressController {
         return ResponseEntity.created(location).body(response);
     }
 
+    @InternalApi(Microservice.USER)
     @PutMapping(value = "/staff/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a staff address")
