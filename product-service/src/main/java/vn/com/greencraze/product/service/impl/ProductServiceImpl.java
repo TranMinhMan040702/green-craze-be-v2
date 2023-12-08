@@ -39,7 +39,9 @@ import vn.com.greencraze.product.repository.specification.ProductSpecification;
 import vn.com.greencraze.product.service.IProductService;
 import vn.com.greencraze.product.service.IUploadService;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -136,6 +138,7 @@ public class ProductServiceImpl implements IProductService {
         }
 
         Product product = productMapper.createProductRequestToProduct(request);
+        product.setStatus(ProductStatus.ACTIVE);
 
         request.productImages().forEach(
                 image -> product.getImages().add(ProductImage.builder()
@@ -146,18 +149,13 @@ public class ProductServiceImpl implements IProductService {
                         .build())
         );
         product.getImages().get(0).setIsDefault(true);
-
-        //        for (String variant : request.variants()) {
-        //            variants.add(objectMapper.readValue(variant, Variant.class));
-        //        }
-        // TODO: test convert JSON to Object
-        String v = """
-                {"name":"Lốc","sku":"HGCC-1","itemPrice":450,"quantity":100,"totalPrice":45000,"status":"ACTIVE"}
-                """;
-        Variant variant = objectMapper.readValue(v, Variant.class);
-        variant.setProduct(product);
-        product.getVariants().add(variant);
-
+        Set<Variant> variants = new HashSet<>();
+        for (String v : request.variants()) {
+            Variant variant = objectMapper.readValue(v, Variant.class);
+            variant.setProduct(product);
+            variants.add(variant);
+        }
+        product.setVariants(variants);
         productRepository.save(product);
 
         return RestResponse.created(productMapper.productToCreateProductResponse(product));

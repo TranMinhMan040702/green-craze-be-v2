@@ -4,8 +4,11 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import vn.com.greencraze.address.dto.request.address.CreateAddressRequest;
+import vn.com.greencraze.address.dto.request.address.CreateStaffAddressRequest;
 import vn.com.greencraze.address.dto.request.address.UpdateAddressRequest;
+import vn.com.greencraze.address.dto.request.address.UpdateStaffAddressRequest;
 import vn.com.greencraze.address.dto.response.address.CreateAddressResponse;
+import vn.com.greencraze.address.dto.response.address.CreateStaffAddressResponse;
 import vn.com.greencraze.address.dto.response.address.GetListAddressByUserIdResponse;
 import vn.com.greencraze.address.dto.response.address.GetListAddressResponse;
 import vn.com.greencraze.address.dto.response.address.GetOneAddressResponse;
@@ -36,5 +39,18 @@ public interface AddressMapper {
     @Mapping(source = "wardId", target = "ward")
     Address updateAddressFromUpdateAddressRequest(
             @MappingTarget Address address, UpdateAddressRequest updateAddressRequest);
+
+    @Mapping(source = "provinceId", target = "province")
+    @Mapping(source = "districtId", target = "district")
+    @Mapping(source = "wardId", target = "ward")
+    Address createStaffAddressRequestToAddress(CreateStaffAddressRequest createStaffAddressRequest);
+
+    CreateStaffAddressResponse addressToCreateStaffAddressResponse(Address address);
+
+    @Mapping(source = "provinceId", target = "province")
+    @Mapping(source = "districtId", target = "district")
+    @Mapping(source = "wardId", target = "ward")
+    Address updateAddressFromUpdateStaffAddressRequest(
+            @MappingTarget Address address, UpdateStaffAddressRequest updateStaffAddressRequest);
 
 }

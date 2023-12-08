@@ -12,7 +12,5 @@ public record CreateBrandRequest(
         @NotNull
         MultipartFile image,
         @NotBlank
-        String code,
-        @NotNull
-        Boolean status
+        String code
 ) {}

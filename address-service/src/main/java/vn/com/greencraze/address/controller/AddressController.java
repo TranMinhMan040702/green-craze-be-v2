@@ -19,8 +19,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import vn.com.greencraze.address.dto.request.address.CreateAddressRequest;
+import vn.com.greencraze.address.dto.request.address.CreateStaffAddressRequest;
 import vn.com.greencraze.address.dto.request.address.UpdateAddressRequest;
+import vn.com.greencraze.address.dto.request.address.UpdateStaffAddressRequest;
 import vn.com.greencraze.address.dto.response.address.CreateAddressResponse;
+import vn.com.greencraze.address.dto.response.address.CreateStaffAddressResponse;
 import vn.com.greencraze.address.dto.response.address.GetListAddressByUserIdResponse;
 import vn.com.greencraze.address.dto.response.address.GetListAddressResponse;
 import vn.com.greencraze.address.dto.response.address.GetOneAddressResponse;
@@ -28,8 +31,10 @@ import vn.com.greencraze.address.dto.response.district.GetListDistrictResponse;
 import vn.com.greencraze.address.dto.response.province.GetListProvinceResponse;
 import vn.com.greencraze.address.dto.response.ward.GetListWardResponse;
 import vn.com.greencraze.address.service.IAddressService;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 
 import java.net.URI;
 import java.util.List;
@@ -56,6 +61,7 @@ public class AddressController {
         return ResponseEntity.ok(addressService.getListAddress(page, size, isSortAscending, columnName, search, all));
     }
 
+    @InternalApi(Microservice.USER)
     @GetMapping(value = "/user/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get list addresses of user")
@@ -101,10 +107,12 @@ public class AddressController {
         return ResponseEntity.ok(addressService.getListWardByDistrict(id));
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a address")
-    public ResponseEntity<RestResponse<CreateAddressResponse>> createAddress(@RequestBody @Valid CreateAddressRequest request) {
+    public ResponseEntity<RestResponse<CreateAddressResponse>> createAddress(
+            @RequestBody @Valid CreateAddressRequest request
+    ) {
         RestResponse<CreateAddressResponse> response = addressService.createAddress(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
@@ -135,12 +143,39 @@ public class AddressController {
         return ResponseEntity.noContent().build();
     }
 
-    // call from another service
     @GetMapping(value = "/default/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a default address")
     public ResponseEntity<RestResponse<GetOneAddressResponse>> getDefaultAddress(@PathVariable String userId) {
         return ResponseEntity.ok(addressService.getDefaultUserAddress(userId));
+    }
+
+    @InternalApi(Microservice.USER)
+    @PostMapping(
+            value = "/staff",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create a staff address")
+    public ResponseEntity<RestResponse<CreateStaffAddressResponse>> createStaffAddress(
+            @RequestBody @Valid CreateStaffAddressRequest request
+    ) {
+        RestResponse<CreateStaffAddressResponse> response = addressService.createStaffAddress(request);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(response.data().id()).toUri();
+        return ResponseEntity.created(location).body(response);
+    }
+
+    @InternalApi(Microservice.USER)
+    @PutMapping(value = "/staff/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Update a staff address")
+    public ResponseEntity<Void> updateStaffAddress(
+            @PathVariable Long id, @RequestBody @Valid UpdateStaffAddressRequest request
+    ) {
+        addressService.updateStaffAddress(id, request);
+        return ResponseEntity.noContent().build();
     }
 
 }

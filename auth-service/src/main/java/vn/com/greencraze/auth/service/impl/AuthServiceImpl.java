@@ -98,7 +98,7 @@ public class AuthServiceImpl implements IAuthService {
         Instant refreshTokenExpiredTime = Instant.now().plusMillis(appProperties.refreshTokenExpirationMillis());
 
         IdentityToken identityToken = identity.getIdentityTokens().stream()
-                .filter(token -> Objects.equals(token.getToken(), TokenType.REFRESH_TOKEN.toString()))
+                .filter(token -> token.getType() == TokenType.REFRESH_TOKEN)
                 .findFirst()
                 .orElse(null);
 
@@ -293,7 +293,7 @@ public class AuthServiceImpl implements IAuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("Identity", "id", identityId));
 
         IdentityToken identityToken = identity.getIdentityTokens().stream()
-                .filter(token -> Objects.equals(token.getToken(), TokenType.REFRESH_TOKEN.toString()))
+                .filter(token -> token.getType() == TokenType.REFRESH_TOKEN)
                 .findFirst()
                 .orElse(null);
 
@@ -330,12 +330,12 @@ public class AuthServiceImpl implements IAuthService {
 
         // Step 2: get otp of identity with request otp
         IdentityToken identityToken = identity.getIdentityTokens().stream()
-                .filter(token -> Objects.equals(token.getToken(), request.type().toString()))
+                .filter(token -> token.getType() == request.type())
                 .findFirst()
                 .orElse(null);
 
         // Step 3: validation otp
-        if (identityToken == null || !Objects.equals(identityToken.getToken(), request.OTP())) {
+        if (identityToken == null || !Objects.equals(identityToken.getToken(), request.otp())) {
             throw new TokenValidationException("Invalid OTP");
         }
 
@@ -367,7 +367,7 @@ public class AuthServiceImpl implements IAuthService {
 
         // Step 2: get token with type of request
         IdentityToken identityToken = identity.getIdentityTokens().stream()
-                .filter(token -> Objects.equals(token.getToken(), request.type().toString()))
+                .filter(token -> token.getType() == request.type())
                 .findFirst()
                 .orElse(null);
 
@@ -415,7 +415,7 @@ public class AuthServiceImpl implements IAuthService {
 
         // Step 2: get token with type FORGOT_PASSWORD_OTP
         IdentityToken identityToken = identity.getIdentityTokens().stream()
-                .filter(token -> Objects.equals(token.getToken(), TokenType.FORGOT_PASSWORD_OTP.toString()))
+                .filter(token -> token.getType() == TokenType.FORGOT_PASSWORD_OTP)
                 .findFirst()
                 .orElse(null);
 
@@ -423,12 +423,12 @@ public class AuthServiceImpl implements IAuthService {
         Instant otpTokenExpiredTime = Instant.now().plusMillis(appProperties.otpTokenExpirationMillis());
 
         if (identityToken == null) {
-            identity.setIdentityTokens(List.of(IdentityToken.builder()
+            identity.getIdentityTokens().add(IdentityToken.builder()
                     .identity(identity)
                     .token(otp)
                     .expiredAt(otpTokenExpiredTime)
                     .type(TokenType.FORGOT_PASSWORD_OTP)
-                    .build()));
+                    .build());
         } else {
             identityToken.setToken(otp);
             identityToken.setExpiredAt(otpTokenExpiredTime);
@@ -437,6 +437,15 @@ public class AuthServiceImpl implements IAuthService {
         identityRepository.save(identity);
 
         // Step 3: send email
+        producer.publish(SendEmailRequest.builder()
+                .event(EmailEvent.FORGOT_PASSWORD)
+                .email(identity.getUsername())
+                .payload(Map.of(
+                        "name", identity.getUsername(),
+                        "email", identity.getUsername(),
+                        "OTP", otp
+                ))
+                .build(), rabbitMQProperties.internalExchange(), rabbitMQProperties.mailRoutingKey());
 
         return RestResponse.ok(ForgotPasswordResponse.builder()
                 .isSuccess(true)
@@ -448,8 +457,8 @@ public class AuthServiceImpl implements IAuthService {
         // Step 1: verify otp forgot password
         verifyOTP(VerifyOTPRequest.builder()
                 .email(request.email())
-                .OTP(request.OTP())
-                .type(request.type())
+                .otp(request.otp())
+                .type(TokenType.FORGOT_PASSWORD_OTP)
                 .build());
 
         // Step 2: find identity and set new password

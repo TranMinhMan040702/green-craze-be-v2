@@ -12,7 +12,7 @@ public class OtpHelper {
         long number = Long.parseLong("1" + "0".repeat(6));
         Random random = new Random();
 
-        long result = random.nextInt() % number;
+        long result = Math.abs(random.nextLong() % number);
         return String.format("%0" + 6 + "d", result);
     }
 

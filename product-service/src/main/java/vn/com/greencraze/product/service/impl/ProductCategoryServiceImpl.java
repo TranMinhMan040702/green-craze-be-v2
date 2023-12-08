@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
-import vn.com.greencraze.commons.specification.BaseSpecification;
 import vn.com.greencraze.product.dto.request.category.CreateProductCategoryRequest;
 import vn.com.greencraze.product.dto.request.category.UpdateProductCategoryRequest;
 import vn.com.greencraze.product.dto.response.category.CreateProductCategoryResponse;
@@ -20,6 +19,7 @@ import vn.com.greencraze.product.dto.response.category.GetOneProductCategoryResp
 import vn.com.greencraze.product.entity.ProductCategory;
 import vn.com.greencraze.product.mapper.ProductCategoryMapper;
 import vn.com.greencraze.product.repository.ProductCategoryRepository;
+import vn.com.greencraze.product.repository.specification.ProductCategorySpecification;
 import vn.com.greencraze.product.service.IProductCategoryService;
 import vn.com.greencraze.product.service.IUploadService;
 
@@ -41,7 +41,7 @@ public class ProductCategoryServiceImpl implements IProductCategoryService {
             Integer page, Integer size, Boolean isSortAscending,
             String columnName, String search, Boolean all, Boolean status
     ) {
-        BaseSpecification<ProductCategory> productCategorySpecification = new BaseSpecification<>();
+        ProductCategorySpecification productCategorySpecification = new ProductCategorySpecification();
         Specification<ProductCategory> sortable = productCategorySpecification.sortable(isSortAscending, columnName);
         Specification<ProductCategory> searchable = productCategorySpecification.searchable(SEARCH_FIELDS, search);
         Specification<ProductCategory> filterableByStatus = productCategorySpecification.filterable(status);

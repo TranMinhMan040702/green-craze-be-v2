@@ -49,9 +49,7 @@ public class StaffController {
             @RequestParam(required = false) String search,
             @RequestParam(required = false) boolean all
     ) {
-        return ResponseEntity.ok(userProfileService.getListStaff(
-                page, size, isSortAscending, columnName, search, all)
-        );
+        return ResponseEntity.ok(userProfileService.getListStaff(page, size, isSortAscending, columnName, search, all));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -77,7 +75,7 @@ public class StaffController {
     @Operation(summary = "Update staff")
     public ResponseEntity<Void> updateStaff(@PathVariable Long id, @RequestBody @Valid UpdateStaffRequest request) {
         userProfileService.updateStaff(id, request);
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 
     // TODO: Giữ lại toggle

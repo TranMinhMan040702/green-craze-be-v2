@@ -5,6 +5,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.user.client.auth.dto.request.CreateIdentityRequest;
 import vn.com.greencraze.user.client.auth.dto.request.DisableListIdentityRequest;
 import vn.com.greencraze.user.client.auth.dto.request.UpdateIdentityRequest;
@@ -23,7 +24,7 @@ public interface AuthServiceClient {
     void disableListIdentity(@RequestBody @Valid DisableListIdentityRequest request);
 
     @PostMapping(BASE + "/identities")
-    CreateIdentityResponse createIdentity(@RequestBody @Valid CreateIdentityRequest request);
+    RestResponse<CreateIdentityResponse> createIdentity(@RequestBody @Valid CreateIdentityRequest request);
 
     @PutMapping(BASE + "/identities/update-identity")
     void updateIdentity(@RequestBody @Valid UpdateIdentityRequest request);

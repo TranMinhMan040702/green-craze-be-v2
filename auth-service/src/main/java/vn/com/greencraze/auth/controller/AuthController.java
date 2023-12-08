@@ -33,7 +33,9 @@ import vn.com.greencraze.auth.dto.response.auth.ValidateAccessTokenResponse;
 import vn.com.greencraze.auth.dto.response.auth.VerifyOTPResponse;
 import vn.com.greencraze.auth.service.IAuthService;
 import vn.com.greencraze.auth.service.ISystemService;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -47,12 +49,9 @@ public class AuthController {
     private final IAuthService authService;
     private final ISystemService systemService;
 
-    @PostMapping(
-            value = "/account-admin"
-    )
+    @PostMapping(value = "/account-admin")
     public ResponseEntity<Void> createAccountAdmin() {
         systemService.createAccountAdmin();
-
         return ResponseEntity.noContent().build();
     }
 
@@ -69,6 +68,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.authenticate(request));
     }
 
+    @InternalApi(Microservice.GATEWAY)
     @PostMapping(
             value = "/validate-access-token",
             consumes = MediaType.APPLICATION_JSON_VALUE,
@@ -118,7 +118,9 @@ public class AuthController {
     }
 
     @PutMapping(
-            value = "/register/resend"
+            value = "/register/resend",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Resend otp register")
@@ -142,7 +144,9 @@ public class AuthController {
     }
 
     @PutMapping(
-            value = "/forgot-password"
+            value = "/forgot-password",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Forgot password")
@@ -153,7 +157,9 @@ public class AuthController {
     }
 
     @PutMapping(
-            value = "/reset-password"
+            value = "/reset-password",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Reset password")
@@ -164,7 +170,9 @@ public class AuthController {
     }
 
     @PutMapping(
-            value = "/forgot-password/resend"
+            value = "/forgot-password/resend",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Resend otp forgot password")

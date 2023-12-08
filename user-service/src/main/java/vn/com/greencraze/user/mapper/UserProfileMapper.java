@@ -9,6 +9,7 @@ import org.mapstruct.Named;
 import vn.com.greencraze.user.client.address.dto.response.GetListAddressByUserIdResponse;
 import vn.com.greencraze.user.dto.request.user.CreateStaffRequest;
 import vn.com.greencraze.user.dto.request.user.CreateUserRequest;
+import vn.com.greencraze.user.dto.request.user.UpdateStaffRequest;
 import vn.com.greencraze.user.dto.request.user.UpdateUserRequest;
 import vn.com.greencraze.user.dto.response.user.AddressUserResponse;
 import vn.com.greencraze.user.dto.response.user.CreateStaffResponse;
@@ -67,6 +68,11 @@ public interface UserProfileMapper {
     @Mapping(source = "identity.status", target = "status")
     @Mapping(source = "identity.roles", target = "roles")
     CreateStaffResponse userProfileToCreateStaffResponse(UserProfile userProfile);
+
+    @Mapping(target = "avatar", ignore = true)
+    @Mapping(target = "email", ignore = true)
+    UserProfile updateUserProfileFromUpdateStaffRequest(
+            @MappingTarget UserProfile userProfile, UpdateStaffRequest updateStaffRequest);
 
     @BeanMapping(qualifiedByName = "getRoleName")
     String roleToName(RoleView role);
