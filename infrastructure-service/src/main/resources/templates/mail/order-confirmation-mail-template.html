@@ -151,7 +151,7 @@
                     </div>
                     <br class="mid">
                         <p>
-                            Xin chào <strong>{name}</strong>,
+                            Xin chào <strong th:text="${name}"></strong>,
                         </p>
                         <p>
                             Hệ thống đã nhận được yêu cầu đặt hàng từ quý khách. <br>Lời đầu tiên, chúng tôi xin cảm ơn chân thành đến quý khách vì đã tin tưởng dịch vụ của chúng tôi.
@@ -159,12 +159,12 @@
                     <br>
                         <p>Chi tiết đơn đặt hàng:</p>
                         <br>
-                        <p>Email đặt hàng: <strong>{email}</strong></p>
-                        <p>Tên người nhận: <strong>{receiver}</strong></p>
-                        <p>Điện thoại người nhận: <strong>{phone}</strong></p>
-                        <p>Địa chỉ nhận hàng: <strong>{address}</strong></p>
-                        <p>Phương thức thanh toán: <strong>{paymentMethod}</strong></p>
-                        <p>Tổng tiền: <strong>{totalPrice}</strong></p>
+                        <p>Email đặt hàng: <strong th:text="${email}"></strong></p>
+                        <p>Tên người nhận: <strong th:text="${receiver}"></strong></p>
+                        <p>Điện thoại người nhận: <strong th:text="${phone}"></strong></p>
+                        <p>Địa chỉ nhận hàng: <strong th:text="${address}"></strong></p>
+                        <p>Phương thức thanh toán: <strong th:text="${paymentMethod}"></strong></p>
+                        <p>Tổng tiền: <strong th:text="${totalPrice}"></strong></p>
                         <br>
                         <p>Trân trọng.</p>
                     </div>

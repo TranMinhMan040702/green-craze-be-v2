@@ -1,8 +1,11 @@
 package vn.com.greencraze.address.service;
 
 import vn.com.greencraze.address.dto.request.address.CreateAddressRequest;
+import vn.com.greencraze.address.dto.request.address.CreateStaffAddressRequest;
 import vn.com.greencraze.address.dto.request.address.UpdateAddressRequest;
+import vn.com.greencraze.address.dto.request.address.UpdateStaffAddressRequest;
 import vn.com.greencraze.address.dto.response.address.CreateAddressResponse;
+import vn.com.greencraze.address.dto.response.address.CreateStaffAddressResponse;
 import vn.com.greencraze.address.dto.response.address.GetListAddressByUserIdResponse;
 import vn.com.greencraze.address.dto.response.address.GetListAddressResponse;
 import vn.com.greencraze.address.dto.response.address.GetOneAddressResponse;
@@ -40,5 +43,9 @@ public interface IAddressService {
     void deleteOneAddress(Long id);
 
     void setAddressDefault(Long id);
+
+    RestResponse<CreateStaffAddressResponse> createStaffAddress(CreateStaffAddressRequest request);
+
+    void updateStaffAddress(Long id, UpdateStaffAddressRequest request);
 
 }

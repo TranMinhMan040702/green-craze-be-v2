@@ -88,7 +88,7 @@ public class IdentityServiceImpl implements IIdentityService {
         Identity identity = userProfileViewRepository.findById(userId)
                 .map(UserProfileView::getIdentity)
                 .orElseThrow(() -> new ResourceNotFoundException("UserId", "id", userId));
-        if (passwordEncoder.matches(request.oldPassword(), identity.getPassword())) {
+        if (passwordEncoder.matches(identity.getPassword(), request.oldPassword())) {
             throw new InvalidPasswordException("Old password invalid");
         }
 

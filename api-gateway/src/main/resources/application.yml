@@ -91,6 +91,29 @@ spring:
             - Path=/api/auths/forgot-password/resend
           filters:
             - SetPath=/core/auth/auths/forgot-password/resend
+        # > > RESOURCE::Identity
+        - id: private::auth::changePassword
+          uri: lb://auth-service
+          predicates:
+            - Method=PUT
+            - Path=/api/users/change-password
+          filters:
+            - SetPath=/core/auth/identities/change-password
+        # > > RESOURCE::Role
+        - id: private::auth::getListRole
+          uri: lb://auth-service
+          predicates:
+            - Method=GET
+            - Path=/api/roles
+          filters:
+            - SetPath=/core/auth/roles
+        - id: private::auth::getOneRole
+          uri: lb://auth-service
+          predicates:
+            - Method=GET
+            - Path=/api/roles/{id}
+          filters:
+            - SetPath=/core/auth/roles/{id}
         # > SERVICE::user
         # > > RESOURCE::User
         - id: private::user::getListUser
@@ -142,6 +165,13 @@ spring:
             - Path=/api/users/enable/{id}
           filters:
             - SetPath=/core/user/users/enable/{id}
+        - id: private::user::toggleUserStatus
+          uri: lb://user-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/users/{id}
+          filters:
+            - SetPath=/core/user/users/{id}
         # > > RESOURCE::Staff
         - id: private::user::getListStaff
           uri: lb://user-service
@@ -192,6 +222,13 @@ spring:
             - Path=/api/staffs/enable/{id}
           filters:
             - SetPath=/core/user/staffs/enable/{id}
+        - id: private::user::toggleStaffStatus
+          uri: lb://user-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/staffs/{id}
+          filters:
+            - SetPath=/core/user/staffs/{id}
         # > > RESOURCE::Cart
         - id: private::user::getCartByUser
           uri: lb://user-service
@@ -491,9 +528,9 @@ spring:
           uri: lb://product-service
           predicates:
             - Method=GET
-            - Path=/api/products/slug/{slug}
+            - Path=/api/products/detail/{slug}
           filters:
-            - SetPath=/core/product/products/slug/{slug}
+            - SetPath=/core/product/products/detail/{slug}
         - id: private::product::createProduct
           uri: lb://product-service
           predicates:
@@ -615,6 +652,63 @@ spring:
             - Path=/api/variants
           filters:
             - SetPath=/core/product/variants
+        # > > RESOURCE::Sale
+        - id: public::product::getListSale
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/sales
+          filters:
+            - SetPath=/core/product/sales
+        - id: public::product::getOneSale
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/sales/{id}
+          filters:
+            - SetPath=/core/product/sales/{id}
+        - id: private::product::createSale
+          uri: lb://product-service
+          predicates:
+            - Method=POST
+            - Path=/api/sales
+          filters:
+            - SetPath=/core/product/sales
+        - id: private::product::updateSale
+          uri: lb://product-service
+          predicates:
+            - Method=PUT
+            - Path=/api/sales/{id}
+          filters:
+            - SetPath=/core/product/sales/{id}
+        - id: private::product::deleteOneSale
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/sales/{id}
+          filters:
+            - SetPath=/core/product/sales/{id}
+        - id: private::product::deleteListSale
+          uri: lb://product-service
+          predicates:
+            - Method=DELETE
+            - Path=/api/sales
+          filters:
+            - SetPath=/core/product/sales
+        - id: private::product::applySale
+          uri: lb://product-service
+          predicates:
+            - Method=POST
+            - Path=/api/sales/apply
+          filters:
+            - SetPath=/core/product/sales/apply
+        - id: private::product::cancelSale
+          uri: lb://product-service
+          predicates:
+            - Method=POST
+            - Path=/api/sales/cancel
+          filters:
+            - SetPath=/core/product/sales/cancel
         # > SERVICE::order
         # > > RESOURCE::Delivery
         - id: public::order::getListDelivery
@@ -898,6 +992,20 @@ spring:
             - SetPath=/core/address/addresses/{id}
         # > SERVICE::inventory
         # > > RESOURCE::Docket
+        - id: private::inventory::createDocketWithTypeImport
+          uri: lb://inventory-service
+          predicates:
+            - Method=POST
+            - Path=/api/dockets
+          filters:
+            - SetPath=/core/inventory/dockets/import
+        - id: private::inventory::getListDocketByProduct
+          uri: lb://inventory-service
+          predicates:
+            - Method=GET
+            - Path=/api/dockets/{productId}
+          filters:
+            - SetPath=/core/inventory/dockets/{productId}
 
 management:
   endpoint:

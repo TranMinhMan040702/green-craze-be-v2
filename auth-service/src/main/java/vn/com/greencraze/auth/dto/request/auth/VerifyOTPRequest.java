@@ -10,7 +10,7 @@ public record VerifyOTPRequest(
         @NotBlank
         String email,
         @NotBlank
-        String OTP,
+        String otp,
         @NotNull
         TokenType type
 ) {}

@@ -79,12 +79,12 @@ public class UserController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update user")
-    public ResponseEntity<Void> updateUser(@RequestBody @Valid UpdateUserRequest request) {
+    public ResponseEntity<Void> updateUser(@Valid UpdateUserRequest request) {
         userProfileService.updateUser(request);
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 
     // TODO: Giữ lại toggle

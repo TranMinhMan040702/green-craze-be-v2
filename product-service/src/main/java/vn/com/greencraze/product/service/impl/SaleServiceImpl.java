@@ -83,6 +83,7 @@ public class SaleServiceImpl implements ISaleService {
                         .map(categoryId -> productCategoryRepository.findById(categoryId)
                                 .orElseThrow(() -> new ResourceNotFoundException("ProductCategory", "id", categoryId)))
                         .toList();
+        sale.setStatus(SaleStatus.INACTIVE);
         sale.setProductCategories(new HashSet<>(productCategories));
         sale.setImage(uploadService.uploadFile(request.image()));
         saleRepository.save(sale);

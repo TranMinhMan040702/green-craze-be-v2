@@ -30,6 +30,7 @@ public record GetOneSaleResponse(
 ) {
 
     public record ProductCategoryResponse(
+            Long id,
             String name,
             String parentName,
             String image
