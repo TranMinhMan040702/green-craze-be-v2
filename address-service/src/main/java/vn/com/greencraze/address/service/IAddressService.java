@@ -26,8 +26,6 @@ public interface IAddressService {
 
     RestResponse<GetOneAddressResponse> getDefaultAddress();
 
-    RestResponse<GetOneAddressResponse> getDefaultUserAddress(String userId);
-
     RestResponse<List<GetListProvinceResponse>> getListProvince();
 
     RestResponse<List<GetListDistrictResponse>> getListDistrictByProvince(long provinceId);
@@ -41,5 +39,10 @@ public interface IAddressService {
     void deleteOneAddress(Long id);
 
     void setAddressDefault(Long id);
+
+    //call from other service
+    RestResponse<GetOneAddressResponse> getOneAddressFromOtherService(Long id);
+
+    RestResponse<GetOneAddressResponse> getDefaultUserAddress(String userId);
 
 }

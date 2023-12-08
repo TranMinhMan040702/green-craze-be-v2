@@ -1,5 +1,6 @@
 package vn.com.greencraze.order.client.product;
 
+import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,13 +16,13 @@ public interface ProductServiceClient {
 
     String BASE = "/core/product";
 
-    @GetMapping(BASE + "/products/{id}/service")
+    @GetMapping(BASE + "/products/internal/{id}")
     RestResponse<GetOneProductResponse> getOneProduct(@PathVariable Long id);
 
-    @GetMapping(BASE + "/variants/{id}/service")
+    @GetMapping(BASE + "/variants/internal/{id}")
     RestResponse<GetOneVariantResponse> getOneVariant(@PathVariable Long id);
 
-    @PutMapping(BASE + "/products/update-quantity")
-    void updateProductQuantity(@RequestBody UpdateListProductQuantityRequest request);
+    @PutMapping(BASE + "/products/internal/update-quantity")
+    void updateProductQuantity(@RequestBody @Valid UpdateListProductQuantityRequest request);
 
 }

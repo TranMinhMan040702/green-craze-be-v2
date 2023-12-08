@@ -12,7 +12,7 @@ import vn.com.greencraze.user.dto.response.review.GetListReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetOneReviewResponse;
 import vn.com.greencraze.user.entity.Review;
 
-@Mapper(uses = {ReferenceMapper.class})
+@Mapper(uses = {ReferenceMapper.class, UserProfileMapper.class})
 public interface ReviewMapper {
 
     GetListReviewResponse reviewToGetListReviewResponse(Review review);
@@ -30,4 +30,5 @@ public interface ReviewMapper {
     GetListReviewResponse.ProductResponse productResponseToGetListReviewProductResponse(GetOneProductResponse productResponse);
 
     GetOneReviewResponse.ProductResponse productResponseToGetOneReviewProductResponse(GetOneProductResponse productResponse);
+
 }

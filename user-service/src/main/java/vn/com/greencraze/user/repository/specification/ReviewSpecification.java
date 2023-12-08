@@ -23,7 +23,7 @@ public class ReviewSpecification extends BaseSpecification<Review> {
                 wheres.add(isEqualRating);
             }
 
-            if (status != null) {
+            if (status != null && status) {
                 Predicate isEqualStatus = cb.equal(root.get("status"), status);
                 wheres.add(isEqualStatus);
             }

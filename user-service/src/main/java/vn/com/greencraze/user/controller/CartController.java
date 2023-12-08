@@ -99,12 +99,12 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(value = "/update-user-cart", consumes = MediaType.APPLICATION_JSON_VALUE)
+    // call from other service
+    @PutMapping(value = "/internal/update-user-cart", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a user cart")
     public ResponseEntity<Void> updateUserCart(@RequestBody @Valid UpdateUserCartRequest request) {
         cartService.updateUserCart(request);
-
         return ResponseEntity.noContent().build();
     }
 

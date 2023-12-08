@@ -144,11 +144,18 @@ public class AddressController {
     }
 
     // call from another service
-    @GetMapping(value = "/default/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/internal/default/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a default address")
     public ResponseEntity<RestResponse<GetOneAddressResponse>> getDefaultAddress(@PathVariable String userId) {
         return ResponseEntity.ok(addressService.getDefaultUserAddress(userId));
+    }
+
+    @GetMapping(value = "/internal/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get a address")
+    public ResponseEntity<RestResponse<GetOneAddressResponse>> getOneAddressFromOtherService(@PathVariable Long id) {
+        return ResponseEntity.ok(addressService.getOneAddressFromOtherService(id));
     }
 
 }

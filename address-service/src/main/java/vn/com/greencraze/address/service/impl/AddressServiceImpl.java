@@ -155,7 +155,7 @@ public class AddressServiceImpl implements IAddressService {
 
         Address address = addressMapper.createAddressRequestToAddress(request);
 
-        addressRepository.findAll().forEach(x -> {
+        addressRepository.findAllByUserId(userId).forEach(x -> {
             x.setIsDefault(false);
             addressRepository.save(x);
         });
@@ -212,13 +212,22 @@ public class AddressServiceImpl implements IAddressService {
         Address address = addressRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
 
-        addressRepository.findAll().forEach(x -> {
+        addressRepository.findAllByUserId(userId).forEach(x -> {
             x.setIsDefault(false);
             addressRepository.save(x);
         });
         address.setIsDefault(true);
 
         addressRepository.save(address);
+    }
+
+    //call from other serivce
+    @Override
+    public RestResponse<GetOneAddressResponse> getOneAddressFromOtherService(Long id) {
+        return addressRepository.findById(id)
+                .map(addressMapper::addressToGetOneAddressResponse)
+                .map(RestResponse::ok)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
     }
 
 }

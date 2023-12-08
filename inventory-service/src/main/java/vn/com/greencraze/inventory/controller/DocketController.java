@@ -35,7 +35,7 @@ public class DocketController {
     public ResponseEntity<Void> createDocketWithTypeImport(
             @RequestBody @Valid CreateDocketWithTypeImportRequest request) {
         docketService.createDocketWithTypeImport(request);
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping(value = "/export", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -44,7 +44,7 @@ public class DocketController {
     public ResponseEntity<Void> createDocketWithTypeExport(
             @RequestBody @Valid CreateDocketWithTypeExportRequest request) {
         docketService.createDocketWithTypeExport(request);
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping(value = "/{productId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -57,13 +57,13 @@ public class DocketController {
 
     //call from another service
 
-    @PostMapping(value = "/create-docket", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/internal/create-docket", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Create docket")
     public ResponseEntity<Void> createDocket(
             @RequestBody @Valid CreateDocketRequest request) {
         docketService.createDocket(request);
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.noContent().build();
     }
 
 }

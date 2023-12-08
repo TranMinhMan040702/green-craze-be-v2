@@ -14,9 +14,11 @@ public interface TransactionMapper {
     Transaction idToTransaction(String id);
 
     @Mapping(source = "order.code", target = "orderCode")
+    @Mapping(source = "completedAt", target = "completedAt")
     GetListTransactionResponse transactionToGetListTransactionResponse(Transaction transaction);
 
     @Mapping(source = "order.code", target = "orderCode")
+    @Mapping(source = "completedAt", target = "completedAt")
     GetOneTransactionResponse transactionToGetOneTransactionResponse(Transaction transaction);
 
 }

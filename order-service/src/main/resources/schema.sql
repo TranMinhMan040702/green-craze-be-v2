@@ -112,11 +112,11 @@ CREATE TABLE transaction
     created_by          VARCHAR(255)          NULL,
     updated_by          VARCHAR(255)          NULL,
     payment_method      VARCHAR(255)          NOT NULL,
-    paid_at             datetime              NOT NULL,
+    paid_at             datetime              NULL,
     total_pay           DECIMAL               NOT NULL,
-    completed_at        datetime              NOT NULL,
-    paypal_order_id     VARCHAR(255)          NOT NULL,
-    paypal_order_status VARCHAR(255)          NOT NULL,
+    completed_at        datetime              NULL,
+    paypal_order_id     VARCHAR(255)          NULL,
+    paypal_order_status VARCHAR(255)          NULL,
     order_id            BIGINT                NOT NULL,
     CONSTRAINT pk_transaction PRIMARY KEY (id)
 );

@@ -99,7 +99,7 @@ public class VariantController {
     }
 
     //call from other service
-    @GetMapping(value = "/{id}/service", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/internal/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a variant")
     public ResponseEntity<RestResponse<GetOneVariantResponse>> getOneVariantFromOtherService(@PathVariable Long id) {

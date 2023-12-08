@@ -1,5 +1,6 @@
 package vn.com.greencraze.user.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -238,6 +239,7 @@ public class CartServiceImpl implements ICartService {
     }
 
     @Override
+    @Transactional(rollbackOn = {Exception.class})
     public void updateUserCart(UpdateUserCartRequest request) {
         UserProfile user = userProfileRepository
                 .findById(request.userId())
@@ -247,13 +249,7 @@ public class CartServiceImpl implements ICartService {
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cart", request.userId()));
 
         for (Long id : request.variantItemIds()) {
-            CartItem cartItem = cart.getCartItems()
-                    .stream().filter(x -> Objects.equals(x.getCart().getId(), cart.getId())
-                            && Objects.equals(x.getVariantId(), id))
-                    .findFirst()
-                    .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cartItem", id));
-
-            cartItemRepository.delete(cartItem);
+            cartItemRepository.deleteByCartAndVariantId(cart, id);
         }
     }
 

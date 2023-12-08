@@ -25,6 +25,7 @@ import vn.com.greencraze.order.dto.request.order.CreateOrderRequest;
 import vn.com.greencraze.order.dto.request.order.UpdateOrderRequest;
 import vn.com.greencraze.order.dto.response.order.CreateOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetListOrderResponse;
+import vn.com.greencraze.order.dto.response.order.GetOneOrderItemResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderResponse;
 import vn.com.greencraze.order.enumeration.OrderStatus;
 import vn.com.greencraze.order.service.IOrderService;
@@ -51,7 +52,7 @@ public class OrderController {
             @RequestParam(defaultValue = "id") String columnName,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) boolean all,
-            @RequestParam(required = false) String orderStatus
+            @RequestParam(required = false) OrderStatus orderStatus
     ) {
         return ResponseEntity.ok(orderService.getListOrder(
                 page, size, isSortAscending, columnName, search, all, orderStatus));
@@ -96,17 +97,19 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOneOrderByCode(code));
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create an order")
-    public ResponseEntity<RestResponse<CreateOrderResponse>> createOrder(@RequestBody @Valid CreateOrderRequest request) {
+    public ResponseEntity<RestResponse<CreateOrderResponse>> createOrder(
+            @RequestBody @Valid CreateOrderRequest request
+    ) {
         RestResponse<CreateOrderResponse> response = orderService.createOrder(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
         return ResponseEntity.created(location).body(response);
     }
 
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a order")
     public ResponseEntity<Void> updateOrder(@PathVariable Long id, @RequestBody @Valid UpdateOrderRequest request) {
@@ -114,12 +117,20 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(value = "/paypal/{id}")
+    @PutMapping(value = "/paypal/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "Update a order")
+    @Operation(summary = "Complete paypal payment for order")
     public ResponseEntity<Void> completePaypalOrder(@PathVariable Long id, @RequestBody @Valid CompletePaypalOrderRequest request) {
         orderService.completePaypalOrder(id, request);
         return ResponseEntity.noContent().build();
+    }
+
+    // call from other service
+    @GetMapping(value = "/internal/order-items/{orderItemId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get an order item by id")
+    public ResponseEntity<RestResponse<GetOneOrderItemResponse>> getOneOrderItem(@PathVariable Long orderItemId) {
+        return ResponseEntity.ok(orderService.getOneOrderItem(orderItemId));
     }
 
 }
