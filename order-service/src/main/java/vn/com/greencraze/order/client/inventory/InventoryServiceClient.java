@@ -11,7 +11,7 @@ public interface InventoryServiceClient {
 
     String BASE = "/core/inventory";
 
-    @PostMapping(BASE + "/dockets/internal/create-docket")
+    @PostMapping(BASE + "/dockets/other/create-docket")
     void createDocket(@RequestBody @Valid CreateDocketRequest request);
 
 }

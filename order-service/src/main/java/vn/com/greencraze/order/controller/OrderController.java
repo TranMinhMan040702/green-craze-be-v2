@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 import vn.com.greencraze.order.dto.request.order.CompletePaypalOrderRequest;
 import vn.com.greencraze.order.dto.request.order.CreateOrderRequest;
 import vn.com.greencraze.order.dto.request.order.UpdateOrderRequest;
@@ -126,7 +128,8 @@ public class OrderController {
     }
 
     // call from other service
-    @GetMapping(value = "/internal/order-items/{orderItemId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @InternalApi(Microservice.USER)
+    @GetMapping(value = "/order-items/{orderItemId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get an order item by id")
     public ResponseEntity<RestResponse<GetOneOrderItemResponse>> getOneOrderItem(@PathVariable Long orderItemId) {

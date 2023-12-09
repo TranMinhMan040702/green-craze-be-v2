@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 import vn.com.greencraze.user.dto.request.review.CreateReviewRequest;
 import vn.com.greencraze.user.dto.request.review.ReplyReviewRequest;
 import vn.com.greencraze.user.dto.request.review.UpdateReviewRequest;
@@ -151,7 +153,8 @@ public class ReviewController {
     }
 
     // call from other services
-    @GetMapping(value = "/internal/order-review")
+    @InternalApi(Microservice.ORDER)
+    @GetMapping(value = "/order-review")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get order review")
     public ResponseEntity<RestResponse<GetOrderReviewResponse>> getOrderReview(

@@ -234,14 +234,16 @@ public class ProductController {
 
     // TODO: Xem lại luồng export product
     // call from another service
-    @GetMapping(value = "/internal/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @InternalApi({Microservice.USER, Microservice.ORDER})
+    @GetMapping(value = "/other/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a product from other service")
     public ResponseEntity<RestResponse<GetOneProductResponse>> getOneProductFromOtherService(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getOneProduct(id));
     }
 
-    @PutMapping(value = "/internal/update-quantity")
+    @InternalApi(Microservice.ORDER)
+    @PutMapping(value = "/update-quantity")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a product quantity")
     public ResponseEntity<Void> updateProductQuantity(@Valid @RequestBody UpdateListProductQuantityRequest request) {
@@ -267,7 +269,8 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(value = "/internal/{id}/update-review", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @InternalApi(Microservice.USER)
+    @PutMapping(value = "/{id}/update-review", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a product review")
     public ResponseEntity<Void> updateOneProductReview(@PathVariable Long id, @RequestBody @Valid UpdateOneProductReviewRequest request) {
@@ -275,7 +278,8 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping(value = "/internal/update-list-review", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @InternalApi(Microservice.USER)
+    @PutMapping(value = "/update-list-review", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update list product review")
     public ResponseEntity<Void> updateListProductReview(@RequestBody @Valid UpdateListProductReviewRequest request) {

@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 import vn.com.greencraze.inventory.dto.request.CreateDocketRequest;
 import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeExportRequest;
 import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeImportRequest;
@@ -61,7 +63,8 @@ public class DocketController {
         return ResponseEntity.ok(docketService.getListDocketByProduct(productId));
     }
 
-    @PostMapping(value = "/internal/create-docket", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @InternalApi(Microservice.ORDER)
+    @PostMapping(value = "/other/create-docket", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Create docket")
     public ResponseEntity<Void> createDocket(

@@ -149,8 +149,8 @@ public class AddressController {
         return ResponseEntity.noContent().build();
     }
 
-    // call from another service
-    @GetMapping(value = "/internal/default/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @InternalApi(Microservice.ORDER)
+    @GetMapping(value = "/other/default/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a default address")
     public ResponseEntity<RestResponse<GetOneAddressResponse>> getDefaultAddress(@PathVariable String userId) {
@@ -158,7 +158,8 @@ public class AddressController {
     }
 
 
-    @GetMapping(value = "/internal/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @InternalApi(Microservice.ORDER)
+    @GetMapping(value = "/other/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a address")
     public ResponseEntity<RestResponse<GetOneAddressResponse>> getOneAddressFromOtherService(@PathVariable Long id) {

@@ -228,8 +228,9 @@ public class AddressServiceImpl implements IAddressService {
     public RestResponse<GetOneAddressResponse> getOneAddressFromOtherService(Long id) {
         return addressRepository.findById(id)
                 .map(addressMapper::addressToGetOneAddressResponse)
-                .map(RestResponse::ok);
-      }
+                .map(RestResponse::ok)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
+    }
 
     @Override
     public RestResponse<CreateStaffAddressResponse> createStaffAddress(CreateStaffAddressRequest request) {

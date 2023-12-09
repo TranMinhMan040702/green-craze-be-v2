@@ -123,8 +123,8 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    //call from other service
-    @GetMapping(value = "/internal/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @InternalApi(Microservice.ORDER)
+    @GetMapping(value = "/other/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a user")
     public ResponseEntity<RestResponse<GetOneUserResponse>> getOneUserFromOtherService(@PathVariable String id) {

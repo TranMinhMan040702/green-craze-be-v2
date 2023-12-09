@@ -19,13 +19,13 @@ public interface UserServiceClient {
 
     String BASE = "/core/user";
 
-    @GetMapping(BASE + "/users/internal/{id}")
+    @GetMapping(BASE + "/users/other/{id}")
     RestResponse<GetOneUserResponse> getOneUser(@PathVariable String id);
 
-    @GetMapping(BASE + "/reviews/internal/order-review")
+    @GetMapping(BASE + "/reviews/order-review")
     RestResponse<GetOrderReviewResponse> getOrderReview(@RequestParam List<Long> orderItemIds);
 
-    @PutMapping(BASE + "/carts/internal/update-user-cart")
+    @PutMapping(BASE + "/carts/update-user-cart")
     void updateUserCart(@RequestBody @Valid UpdateUserCartRequest request);
 
 }

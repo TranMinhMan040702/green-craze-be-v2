@@ -16,13 +16,13 @@ public interface ProductServiceClient {
 
     String BASE = "/core/product";
 
-    @GetMapping(BASE + "/products/internal/{id}")
+    @GetMapping(BASE + "/products/other/{id}")
     RestResponse<GetOneProductResponse> getOneProduct(@PathVariable Long id);
 
-    @GetMapping(BASE + "/variants/internal/{id}")
+    @GetMapping(BASE + "/variants/other/{id}")
     RestResponse<GetOneVariantResponse> getOneVariant(@PathVariable Long id);
 
-    @PutMapping(BASE + "/products/internal/update-quantity")
+    @PutMapping(BASE + "/products/update-quantity")
     void updateProductQuantity(@RequestBody @Valid UpdateListProductQuantityRequest request);
 
 }
