@@ -56,4 +56,6 @@ public interface IUserProfileService {
 
     Long getTotalUser();
 
+    List<String> getAllUserId();
+
 }

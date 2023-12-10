@@ -52,6 +52,7 @@ import vn.com.greencraze.user.service.IUserProfileService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -339,6 +340,14 @@ public class UserProfileServiceImpl implements IUserProfileService {
     @Override
     public Long getTotalUser() {
         return userProfileRepository.count();
+    }
+
+    @Override
+    public List<String> getAllUserId() {
+        return userProfileRepository.findAll()
+                .stream()
+                .map(UserProfile::getId)
+                .collect(Collectors.toList());
     }
 
 }

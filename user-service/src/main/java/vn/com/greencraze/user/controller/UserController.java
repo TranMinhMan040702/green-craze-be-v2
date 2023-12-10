@@ -53,8 +53,7 @@ public class UserController {
             @RequestParam(required = false) boolean all
     ) {
         return ResponseEntity.ok(userProfileService.getListUser(
-                page, size, isSortAscending, columnName, search, all)
-        );
+                page, size, isSortAscending, columnName, search, all));
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -137,6 +136,14 @@ public class UserController {
     @Operation(summary = "Get total user")
     public ResponseEntity<Long> getTotalUser() {
         return ResponseEntity.ok(userProfileService.getTotalUser());
+    }
+
+    @InternalApi(Microservice.INFRASTRUCTURE)
+    @GetMapping("/get-all-user-id")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get total user")
+    public ResponseEntity<List<String>> getAllUserId() {
+        return ResponseEntity.ok(userProfileService.getAllUserId());
     }
 
 }

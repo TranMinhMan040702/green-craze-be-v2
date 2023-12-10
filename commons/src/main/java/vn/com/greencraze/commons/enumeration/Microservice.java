@@ -8,5 +8,6 @@ public enum Microservice {
     PRODUCT,
     ORDER,
     INVENTORY,
-    META
+    META,
+    INFRASTRUCTURE
 }

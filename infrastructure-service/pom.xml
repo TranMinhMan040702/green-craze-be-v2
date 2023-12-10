@@ -18,6 +18,7 @@
         <java.version>17</java.version>
         <amqp.version>0.0.1-SNAPSHOT</amqp.version>
         <commons.version>0.0.1-SNAPSHOT</commons.version>
+        <springdoc-openapi-starter-webmvc-ui.version>2.2.0</springdoc-openapi-starter-webmvc-ui.version>
         <spring-cloud.version>2022.0.4</spring-cloud.version>
         <cloudinary.version>1.33.0</cloudinary.version>
     </properties>
@@ -81,14 +82,23 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
         <dependency>
-            <groupId>vn.com.greencraze.amqp</groupId>
-            <artifactId>amqp</artifactId>
-            <version>${amqp.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
         <dependency>
             <groupId>com.cloudinary</groupId>
             <artifactId>cloudinary-http44</artifactId>
             <version>${cloudinary.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc-openapi-starter-webmvc-ui.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>vn.com.greencraze.amqp</groupId>
+            <artifactId>amqp</artifactId>
+            <version>${amqp.version}</version>
         </dependency>
         <dependency>
             <groupId>vn.com.greencraze</groupId>

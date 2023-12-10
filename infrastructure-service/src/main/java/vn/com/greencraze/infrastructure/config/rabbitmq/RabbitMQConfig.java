@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    @Value("${rabbitmq.exchanges.topic}")
+    @Value("${rabbitmq.exchanges.direct}")
     private String internalExchange;
 
     @Value("${rabbitmq.queues.mail}")
@@ -19,6 +19,12 @@ public class RabbitMQConfig {
 
     @Value("${rabbitmq.routing-key.mail}")
     private String mailRoutingKey;
+
+    @Value("${rabbitmq.queues.notification}")
+    private String notificationQueue;
+
+    @Value("${rabbitmq.routing-key.notification}")
+    private String notificationRoutingKey;
 
     @Bean
     public DirectExchange internalExchange() {
@@ -36,6 +42,19 @@ public class RabbitMQConfig {
                 .bind(mailQueue())
                 .to(internalExchange())
                 .with(this.mailRoutingKey);
+    }
+
+    @Bean
+    public Queue notificationQueue() {
+        return new Queue(this.notificationQueue);
+    }
+
+    @Bean
+    public Binding notificationBinding() {
+        return BindingBuilder
+                .bind(notificationQueue())
+                .to(internalExchange())
+                .with(this.notificationRoutingKey);
     }
 
 }

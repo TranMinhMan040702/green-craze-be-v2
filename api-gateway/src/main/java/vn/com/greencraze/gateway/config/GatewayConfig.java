@@ -8,10 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
-import vn.com.greencraze.gateway.dto.SimpleRouteDefinition;
-import vn.com.greencraze.gateway.util.RouteHelper;
-
-import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -27,11 +23,11 @@ public class GatewayConfig {
         return WebClient.builder().clientConnector(new ReactorClientHttpConnector(httpClient));
     }
 
-    @Bean
-    public List<SimpleRouteDefinition> simpleRouteDefinitions() {
-        return gatewayProperties.getRoutes().stream()
-                .map(RouteHelper::mapToSimpleRouteDefinition)
-                .toList();
-    }
+    //    @Bean
+    //    public List<SimpleRouteDefinition> simpleRouteDefinitions() {
+    //        return gatewayProperties.getRoutes().stream()
+    //                .map(RouteHelper::mapToSimpleRouteDefinition)
+    //                .toList();
+    //    }
 
 }

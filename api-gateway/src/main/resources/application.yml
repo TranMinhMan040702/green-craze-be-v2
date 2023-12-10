@@ -1,6 +1,5 @@
 server:
   port: 7168
-  forward-headers-strategy: framework
 
 spring:
   application:
@@ -22,12 +21,12 @@ spring:
         cors-configurations:
           '[/**]':
             allowedOrigins:
-              - "http://localhost:5173"
+              - "http://localhost:3000"
             allowedHeaders: "*"
             allowedMethods: "*"
       routes:
         # > SERVICE::auth
-        # > > RESOURCE::Auth
+        # > > RESOURCE::Auth // TODO
         - id: public::auth::login
           uri: lb://auth-service
           predicates:
@@ -1056,6 +1055,35 @@ spring:
             - Path=/api/statistics/sale-latest
           filters:
             - SetPath=/core/meta/statistics/sale-latest
+        # > SERVICE::infrastructure
+        # > > WebSocket // TODO
+        - id: public::infrastructure::connectWebSocket
+          uri: lb:ws://infrastructure-service
+          predicates:
+            - Path=/core/infrastructure/**
+        # > > Notification
+        - id: private::infrastructure::getListNotification
+          uri: lb://infrastructure-service
+          predicates:
+            - Method=GET
+            - Path=/api/notifications
+          filters:
+            - SetPath=/core/infrastructure/notifications
+        - id: private::infrastructure::updateNotification
+          uri: lb://infrastructure-service
+          predicates:
+            - Method=PATCH
+            - Path=/api/notifications/{id}
+          filters:
+            - SetPath=/core/infrastructure/notifications/{id}
+        - id: private::infrastructure::updateAllNotification
+          uri: lb://infrastructure-service
+          predicates:
+            - Method=PUT
+            - Path=/api/notifications/all
+          filters:
+            - SetPath=/core/infrastructure/notifications/all
+
 
 management:
   endpoint:

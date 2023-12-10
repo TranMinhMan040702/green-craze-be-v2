@@ -5,7 +5,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ServerWebExchange;
-import org.springframework.web.util.UriTemplate;
 import vn.com.greencraze.gateway.exception.InvalidRequestException;
 
 import java.util.function.Consumer;
@@ -31,11 +30,6 @@ public class RequestHelper {
                         .headers(headersConsumer)
                         .build()
         ).build();
-    }
-
-    private static boolean isMatchingUri(String sourcePath, String requestPath) {
-        UriTemplate uriTemplate = new UriTemplate(sourcePath);
-        return uriTemplate.matches(requestPath);
     }
 
     public static boolean isPrivate(@Nullable Route route) {
