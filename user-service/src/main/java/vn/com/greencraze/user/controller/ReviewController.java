@@ -20,8 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 import vn.com.greencraze.user.dto.request.review.CreateReviewRequest;
 import vn.com.greencraze.user.dto.request.review.ReplyReviewRequest;
 import vn.com.greencraze.user.dto.request.review.UpdateReviewRequest;
@@ -29,10 +31,13 @@ import vn.com.greencraze.user.dto.response.review.CreateReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetListReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetOneReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetOrderReviewResponse;
+import vn.com.greencraze.user.dto.response.review.GetTop5ReviewLatest;
 import vn.com.greencraze.user.service.IReviewService;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/reviews")
@@ -67,10 +72,11 @@ public class ReviewController {
         return ResponseEntity.ok(reviewService.getOneReview(id));
     }
 
+    @InternalApi(Microservice.META)
     @GetMapping(value = "/top5-review-latest", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get top 5 latest reviews")
-    public ResponseEntity<RestResponse<List<GetListReviewResponse>>> getTop5ReviewLatest() {
+    public ResponseEntity<List<GetTop5ReviewLatest>> getTop5ReviewLatest() {
         return ResponseEntity.ok(reviewService.getTop5ReviewLatest());
     }
 
@@ -158,6 +164,16 @@ public class ReviewController {
             @RequestParam List<Long> orderItemIds
     ) {
         return ResponseEntity.ok(reviewService.getOrderReview(orderItemIds));
+    }
+
+    @InternalApi(Microservice.META)
+    @GetMapping(value = "/rating-created-at")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get review by created at and rating")
+    public ResponseEntity<Map<String, Long>> getReviewByRatingAndCreatedAt(
+            @RequestParam Instant startDate, @RequestParam Instant endDate
+    ) {
+        return ResponseEntity.ok(reviewService.getReviewByRatingAndCreatedAt(startDate, endDate));
     }
 
 }

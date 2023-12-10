@@ -149,7 +149,6 @@ public class AddressController {
         return ResponseEntity.noContent().build();
     }
 
-    // call from another service
     @GetMapping(value = "/internal/default/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a default address")

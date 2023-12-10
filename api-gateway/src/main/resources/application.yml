@@ -287,13 +287,6 @@ spring:
             - Path=/api/reviews/{id}
           filters:
             - SetPath=/core/user/reviews/{id}
-        - id: private::user::getTop5ReviewLatest
-          uri: lb://user-service
-          predicates:
-            - Method=GET
-            - Path=/api/reviews/top5-review-latest
-          filters:
-            - SetPath=/core/user/reviews/top5-review-latest
         - id: public::user::getCountReview
           uri: lb://user-service
           predicates:
@@ -660,7 +653,7 @@ spring:
             - Path=/api/sales
           filters:
             - SetPath=/core/product/sales
-        - id: public::product::getOneSale
+        - id: private::product::getOneSale
           uri: lb://product-service
           predicates:
             - Method=GET
@@ -804,13 +797,6 @@ spring:
             - Path=/api/transactions
           filters:
             - SetPath=/core/order/transactions
-        - id: private::order::getTop5TransactionLatest
-          uri: lb://order-service
-          predicates:
-            - Method=GET
-            - Path=/api/transactions/top5-transaction-latest
-          filters:
-            - SetPath=/core/order/transactions/top5-transaction-latest
         - id: private::order::getOneTransaction
           uri: lb://order-service
           predicates:
@@ -876,13 +862,6 @@ spring:
             - Path=/api/orders/me/list
           filters:
             - SetPath=/core/order/orders/me/list
-        - id: private::order::getTop5OrderLatest
-          uri: lb://order-service
-          predicates:
-            - Method=GET
-            - Path=/api/orders/top5-order-latest
-          filters:
-            - SetPath=/core/order/orders/top5-order-latest
         - id: private::order::getOneOrder
           uri: lb://order-service
           predicates:
@@ -1006,6 +985,77 @@ spring:
             - Path=/api/dockets/{productId}
           filters:
             - SetPath=/core/inventory/dockets/{productId}
+        # > SERVICE::Meta
+        - id: private::meta::statisticTotal
+          uri: lb://meta-service
+          predicates:
+            - Method=GET
+            - Path=/api/statistics/total
+          filters:
+            - SetPath=/core/meta/statistics/total
+        - id: private::meta::statisticRevenueExpense
+          uri: lb://meta-service
+          predicates:
+            - Method=GET
+            - Path=/api/statistics/revenue-expense
+          filters:
+            - SetPath=/core/meta/statistics/revenue-expense
+        - id: private::meta::statisticTopSellingProduct
+          uri: lb://meta-service
+          predicates:
+            - Method=GET
+            - Path=/api/statistics/top-selling-product
+          filters:
+            - SetPath=/core/meta/statistics/top-selling-product
+        - id: private::meta::statisticTopSellingProductYear
+          uri: lb://meta-service
+          predicates:
+            - Method=GET
+            - Path=/api/statistics/top-selling-product-year
+          filters:
+            - SetPath=/core/meta/statistics/top-selling-product-year
+        - id: private::meta::statisticOrderStatus
+          uri: lb://meta-service
+          predicates:
+            - Method=GET
+            - Path=/api/statistics/order-status
+          filters:
+            - SetPath=/core/meta/statistics/order-status
+        - id: private::meta::statisticReview
+          uri: lb://meta-service
+          predicates:
+            - Method=GET
+            - Path=/api/statistics/rating
+          filters:
+            - SetPath=/core/meta/statistics/rating
+        - id: private::meta::getTop5OrderLatest
+          uri: lb://meta-service
+          predicates:
+            - Method=GET
+            - Path=/api/statistics/top5-order-latest
+          filters:
+            - SetPath=/core/meta/statistics/top5-order-latest
+        - id: private::meta::getTop5TransactionLatest
+          uri: lb://meta-service
+          predicates:
+            - Method=GET
+            - Path=/api/statistics/top5-transaction-latest
+          filters:
+            - SetPath=/core/meta/statistics/top5-transaction-latest
+        - id: private::meta::getTop5ReviewLatest
+          uri: lb://meta-service
+          predicates:
+            - Method=GET
+            - Path=/api/statistics/top5-review-latest
+          filters:
+            - SetPath=/core/meta/statistics/top5-review-latest
+        - id: private::meta::getSaleLatest
+          uri: lb://meta-service
+          predicates:
+            - Method=GET
+            - Path=/api/statistics/sale-latest
+          filters:
+            - SetPath=/core/meta/statistics/sale-latest
 
 management:
   endpoint:

@@ -8,6 +8,7 @@ import vn.com.greencraze.product.dto.request.sale.UpdateSaleRequest;
 import vn.com.greencraze.product.dto.response.sale.CreateSaleResponse;
 import vn.com.greencraze.product.dto.response.sale.GetListSaleResponse;
 import vn.com.greencraze.product.dto.response.sale.GetOneSaleResponse;
+import vn.com.greencraze.product.dto.response.sale.GetSaleLatestResponse;
 import vn.com.greencraze.product.entity.ProductCategory;
 import vn.com.greencraze.product.entity.Sale;
 
@@ -17,6 +18,8 @@ public interface SaleMapper {
     GetListSaleResponse saleToGetListSaleResponse(Sale sale);
 
     GetOneSaleResponse saleToGetOneSaleResponse(Sale sale);
+
+    GetSaleLatestResponse saleToGetSaleLatestResponse(Sale sale);
 
     @Mapping(target = "image", ignore = true)
     Sale createSaleRequestToSale(CreateSaleRequest createSaleRequest);

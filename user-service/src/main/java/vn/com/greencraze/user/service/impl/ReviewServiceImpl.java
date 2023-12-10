@@ -25,6 +25,7 @@ import vn.com.greencraze.user.dto.response.review.CreateReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetListReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetOneReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetOrderReviewResponse;
+import vn.com.greencraze.user.dto.response.review.GetTop5ReviewLatest;
 import vn.com.greencraze.user.entity.Review;
 import vn.com.greencraze.user.entity.UserProfile;
 import vn.com.greencraze.user.mapper.ReviewMapper;
@@ -37,8 +38,10 @@ import vn.com.greencraze.user.service.IUploadService;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -119,17 +122,19 @@ public class ReviewServiceImpl implements IReviewService {
     }
 
     @Override
-    public RestResponse<List<GetListReviewResponse>> getTop5ReviewLatest() {
+    public List<GetTop5ReviewLatest> getTop5ReviewLatest() {
         ReviewSpecification reviewSpecification = new ReviewSpecification();
         Specification<Review> sortable = reviewSpecification.sortable(false, "createdAt");
-
         Pageable pageable = PageRequest.of(0, 5);
 
-        Page<GetListReviewResponse> responses = reviewRepository
-                .findAll(sortable, pageable)
-                .map(this::mapReviewToGetListReviewResponse);
+        List<GetTop5ReviewLatest> responses = new ArrayList<>();
+        List<Review> reviews = reviewRepository.findAll(sortable, pageable).getContent();
 
-        return RestResponse.ok(responses.getContent());
+        for (Review review : reviews) {
+            GetOneProductResponse product = productServiceClient.getOneProduct(review.getProductId()).data();
+            responses.add(reviewMapper.reviewToGetTop5ReviewLatest(review).withProductName(product.name()));
+        }
+        return responses;
     }
 
     @Override
@@ -317,6 +322,15 @@ public class ReviewServiceImpl implements IReviewService {
             reviewedDate = reviewTimes.stream().max(Instant::compareTo).get();
 
         return RestResponse.ok(new GetOrderReviewResponse(isReview, reviewedDate));
+    }
+
+    @Override
+    public Map<String, Long> getReviewByRatingAndCreatedAt(Instant startDate, Instant endDate) {
+        Map<String, Long> response = new HashMap<>();
+        for (int i = 1; i <= 5; i++) {
+            response.put(String.valueOf(i), reviewRepository.countByRatingAndCreatedAtBetween(i, startDate, endDate));
+        }
+        return response;
     }
 
 }

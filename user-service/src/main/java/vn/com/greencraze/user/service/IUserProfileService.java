@@ -54,4 +54,6 @@ public interface IUserProfileService {
 
     void toggleStaffStatus(Long id);
 
+    Long getTotalUser();
+
 }

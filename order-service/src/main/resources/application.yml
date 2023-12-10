@@ -76,12 +76,12 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    #    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_order
-    #    username: avnadmin
-    #    password: AVNS_ICGL1LOHUwComp9Dj2e
-    url: jdbc:mysql://localhost:3306/core_order
-    username: root
-    password: Nms10102002
+    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_order
+    username: avnadmin
+    password: AVNS_ICGL1LOHUwComp9Dj2e
+  #    url: jdbc:mysql://localhost:3306/core_order
+  #    username: root
+  #    password: Nms10102002
   rabbitmq:
     host: localhost
     port: 5672

@@ -7,6 +7,7 @@ import vn.com.greencraze.product.dto.request.sale.UpdateSaleRequest;
 import vn.com.greencraze.product.dto.response.sale.CreateSaleResponse;
 import vn.com.greencraze.product.dto.response.sale.GetListSaleResponse;
 import vn.com.greencraze.product.dto.response.sale.GetOneSaleResponse;
+import vn.com.greencraze.product.dto.response.sale.GetSaleLatestResponse;
 
 import java.util.List;
 
@@ -28,5 +29,7 @@ public interface ISaleService {
     void applySale(Long id);
 
     void cancelSale(Long id);
+
+    GetSaleLatestResponse getSaleLatest();
 
 }

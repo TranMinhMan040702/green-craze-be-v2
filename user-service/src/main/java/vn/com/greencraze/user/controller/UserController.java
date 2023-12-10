@@ -131,5 +131,12 @@ public class UserController {
         return ResponseEntity.ok(userProfileService.getOneUser(id));
     }
 
+    @InternalApi(Microservice.META)
+    @GetMapping("/total")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get total user")
+    public ResponseEntity<Long> getTotalUser() {
+        return ResponseEntity.ok(userProfileService.getTotalUser());
+    }
 
 }

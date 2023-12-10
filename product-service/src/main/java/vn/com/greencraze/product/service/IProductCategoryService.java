@@ -15,7 +15,7 @@ public interface IProductCategoryService {
 
     RestResponse<ListResponse<GetListProductCategoryResponse>> getListProductCategory(
             Integer page, Integer size, Boolean isSortAscending,
-            String columnName, String search, Boolean all, Boolean status);
+            String columnName, String search, Boolean all, Boolean status, Long parentCategoryId);
 
     RestResponse<GetOneProductCategoryResponse> getOneProductCategory(Long id);
 

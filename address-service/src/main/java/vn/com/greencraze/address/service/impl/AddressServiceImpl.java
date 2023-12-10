@@ -102,8 +102,6 @@ public class AddressServiceImpl implements IAddressService {
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "userId", userId));
     }
 
-    // TODO: GetListUserAddress
-
     @Override
     public RestResponse<GetOneAddressResponse> getDefaultUserAddress(String userId) {
         return addressRepository.findByUserIdAndIsDefault(userId, true)
@@ -228,8 +226,9 @@ public class AddressServiceImpl implements IAddressService {
     public RestResponse<GetOneAddressResponse> getOneAddressFromOtherService(Long id) {
         return addressRepository.findById(id)
                 .map(addressMapper::addressToGetOneAddressResponse)
-                .map(RestResponse::ok);
-      }
+                .map(RestResponse::ok)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
+    }
 
     @Override
     public RestResponse<CreateStaffAddressResponse> createStaffAddress(CreateStaffAddressRequest request) {

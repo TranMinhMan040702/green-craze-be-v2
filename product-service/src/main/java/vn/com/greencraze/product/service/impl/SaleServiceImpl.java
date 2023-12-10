@@ -15,6 +15,7 @@ import vn.com.greencraze.product.dto.request.sale.UpdateSaleRequest;
 import vn.com.greencraze.product.dto.response.sale.CreateSaleResponse;
 import vn.com.greencraze.product.dto.response.sale.GetListSaleResponse;
 import vn.com.greencraze.product.dto.response.sale.GetOneSaleResponse;
+import vn.com.greencraze.product.dto.response.sale.GetSaleLatestResponse;
 import vn.com.greencraze.product.entity.Product;
 import vn.com.greencraze.product.entity.ProductCategory;
 import vn.com.greencraze.product.entity.Sale;
@@ -35,6 +36,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -184,6 +186,12 @@ public class SaleServiceImpl implements ISaleService {
 
         sale.setStatus(SaleStatus.INACTIVE);
         saleRepository.save(sale);
+    }
+
+    @Override
+    public GetSaleLatestResponse getSaleLatest() {
+        Optional<Sale> sale = saleRepository.findByStatus(SaleStatus.ACTIVE);
+        return sale.map(saleMapper::saleToGetSaleLatestResponse).orElse(null);
     }
 
 }

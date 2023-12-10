@@ -13,7 +13,6 @@
     <modules>
         <module>api-gateway</module>
         <module>eureka-service</module>
-        <module>commons</module>
         <module>auth-service</module>
         <module>product-service</module>
         <module>order-service</module>
@@ -22,7 +21,9 @@
         <module>post-service</module>
         <module>address-service</module>
         <module>infrastructure-service</module>
+        <module>meta-service</module>
         <module>amqp</module>
+        <module>commons</module>
     </modules>
 
 </project>

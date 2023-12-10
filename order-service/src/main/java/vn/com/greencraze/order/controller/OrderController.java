@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 import vn.com.greencraze.order.dto.request.order.CompletePaypalOrderRequest;
 import vn.com.greencraze.order.dto.request.order.CreateOrderRequest;
 import vn.com.greencraze.order.dto.request.order.UpdateOrderRequest;
@@ -27,11 +29,14 @@ import vn.com.greencraze.order.dto.response.order.CreateOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetListOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderItemResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderResponse;
+import vn.com.greencraze.order.dto.response.order.GetTop5OrderLatestResponse;
 import vn.com.greencraze.order.enumeration.OrderStatus;
 import vn.com.greencraze.order.service.IOrderService;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/orders")
@@ -74,11 +79,11 @@ public class OrderController {
                 page, size, isSortAscending, columnName, search, all, orderStatus));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @InternalApi(Microservice.META)
     @GetMapping(value = "/top5-order-latest", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "Get a list of user order")
-    public ResponseEntity<RestResponse<List<GetListOrderResponse>>> getTop5OrderLatest() {
+    @Operation(summary = "Get top 5 order latest")
+    public ResponseEntity<List<GetTop5OrderLatestResponse>> getTop5OrderLatest() {
         return ResponseEntity.ok(orderService.getTop5OrderLatest());
     }
 
@@ -131,6 +136,34 @@ public class OrderController {
     @Operation(summary = "Get an order item by id")
     public ResponseEntity<RestResponse<GetOneOrderItemResponse>> getOneOrderItem(@PathVariable Long orderItemId) {
         return ResponseEntity.ok(orderService.getOneOrderItem(orderItemId));
+    }
+
+    @InternalApi(Microservice.META)
+    @GetMapping("/total/status/delivered")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get total order with status delivered")
+    public ResponseEntity<Long> getTotalOrderWithStatusDelivered() {
+        return ResponseEntity.ok(orderService.getTotalOrderWithStatusDelivered());
+    }
+
+    @InternalApi(Microservice.META)
+    @GetMapping("/top-selling-product")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get top selling product")
+    public ResponseEntity<Map<String, Long>> getTopSellingProduct(
+            @RequestParam Instant startDate, @RequestParam Instant endDate
+    ) {
+        return ResponseEntity.ok(orderService.getTopSellingProduct(startDate, endDate));
+    }
+
+    @InternalApi(Microservice.META)
+    @GetMapping("/order-total-by-status")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get total order with status")
+    public ResponseEntity<Map<String, Long>> getOrderTotalByStatus(
+            @RequestParam Instant startDate, @RequestParam Instant endDate
+    ) {
+        return ResponseEntity.ok(orderService.getOrderTotalByStatus(startDate, endDate));
     }
 
 }

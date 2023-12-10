@@ -49,10 +49,11 @@ public class ProductCategoryController {
             @RequestParam(defaultValue = "id") String columnName,
             @RequestParam(required = false) String search,
             @RequestParam(required = false) boolean all,
-            @RequestParam(required = false) boolean status
+            @RequestParam(required = false) boolean status,
+            @RequestParam(required = false) Long parentCategoryId
     ) {
         return ResponseEntity.ok(productCategoryService.getListProductCategory(
-                page, size, isSortAscending, columnName, search, all, status));
+                page, size, isSortAscending, columnName, search, all, status, parentCategoryId));
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

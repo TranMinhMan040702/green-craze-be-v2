@@ -336,4 +336,9 @@ public class UserProfileServiceImpl implements IUserProfileService {
                 .build());
     }
 
+    @Override
+    public Long getTotalUser() {
+        return userProfileRepository.count();
+    }
+
 }

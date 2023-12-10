@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import vn.com.greencraze.user.entity.Review;
 import vn.com.greencraze.user.entity.UserProfile;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,5 +16,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecif
     Optional<List<Review>> findByProductIdAndStatus(Long productId, boolean status);
 
     Review findByOrderItemId(Long orderItemId);
+
+    Long countByRatingAndCreatedAtBetween(Integer rating, Instant startDate, Instant endDate);
 
 }

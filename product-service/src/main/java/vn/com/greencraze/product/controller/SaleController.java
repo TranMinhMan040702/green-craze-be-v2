@@ -18,13 +18,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 import vn.com.greencraze.product.dto.request.sale.CreateSaleRequest;
 import vn.com.greencraze.product.dto.request.sale.UpdateSaleRequest;
 import vn.com.greencraze.product.dto.response.sale.CreateSaleResponse;
 import vn.com.greencraze.product.dto.response.sale.GetListSaleResponse;
 import vn.com.greencraze.product.dto.response.sale.GetOneSaleResponse;
+import vn.com.greencraze.product.dto.response.sale.GetSaleLatestResponse;
 import vn.com.greencraze.product.service.ISaleService;
 
 import java.net.URI;
@@ -58,6 +61,14 @@ public class SaleController {
     @Operation(summary = "Get a sale")
     public ResponseEntity<RestResponse<GetOneSaleResponse>> getOneSale(@PathVariable Long id) {
         return ResponseEntity.ok(saleService.getOneSale(id));
+    }
+
+    @InternalApi(Microservice.META)
+    @GetMapping(value = "/sale-latest", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get a sale latest")
+    public ResponseEntity<GetSaleLatestResponse> getSaleLatest() {
+        return ResponseEntity.ok(saleService.getSaleLatest());
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

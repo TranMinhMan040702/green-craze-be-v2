@@ -6,6 +6,8 @@ import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeExportRequest
 import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeImportRequest;
 import vn.com.greencraze.inventory.dto.response.GetListDocketByProductResponse;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 public interface IDocketService {
@@ -18,5 +20,9 @@ public interface IDocketService {
 
     // call from another service
     void createDocket(CreateDocketRequest request);
+
+    BigDecimal getExpense();
+
+    BigDecimal getExpenseByCreatedAt(Instant startDate, Instant endDate);
 
 }

@@ -46,8 +46,11 @@ import vn.com.greencraze.product.dto.response.product.GetOneProductResponse;
 import vn.com.greencraze.product.service.IProductImageService;
 import vn.com.greencraze.product.service.IProductService;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/products")
@@ -233,7 +236,6 @@ public class ProductController {
     }
 
     // TODO: Xem lại luồng export product
-    // call from another service
     @GetMapping(value = "/internal/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a product from other service")
@@ -281,6 +283,22 @@ public class ProductController {
     public ResponseEntity<Void> updateListProductReview(@RequestBody @Valid UpdateListProductReviewRequest request) {
         productService.updateListProductReview(request);
         return ResponseEntity.noContent().build();
+    }
+
+    @InternalApi(Microservice.INVENTORY)
+    @GetMapping("/cost")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get list product cost")
+    public ResponseEntity<Map<Long, BigDecimal>> getListProductCost(@RequestParam Set<Long> ids) {
+        return ResponseEntity.ok(productService.getListProductCost(ids));
+    }
+
+    @InternalApi(Microservice.ORDER)
+    @GetMapping("/product-with-variant")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get list product with variant")
+    public ResponseEntity<Map<String, List<Long>>> getListProductWithVariant() {
+        return ResponseEntity.ok(productService.getListProductWithVariant());
     }
 
 }
