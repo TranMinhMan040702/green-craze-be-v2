@@ -17,7 +17,10 @@ import vn.com.greencraze.product.dto.response.product.GetListSearchingProductRes
 import vn.com.greencraze.product.dto.response.product.GetOneProductBySlugResponse;
 import vn.com.greencraze.product.dto.response.product.GetOneProductResponse;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface IProductService {
 
@@ -53,5 +56,9 @@ public interface IProductService {
     void updateOneProductReview(Long id, UpdateOneProductReviewRequest request);
 
     void updateListProductReview(UpdateListProductReviewRequest request);
+
+    Map<Long, BigDecimal> getListProductCost(Set<Long> ids);
+
+    Map<String, List<Long>> getListProductWithVariant();
 
 }

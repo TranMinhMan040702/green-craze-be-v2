@@ -10,6 +10,7 @@ import vn.com.greencraze.user.dto.request.review.UpdateReviewRequest;
 import vn.com.greencraze.user.dto.response.review.CreateReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetListReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetOneReviewResponse;
+import vn.com.greencraze.user.dto.response.review.GetTop5ReviewLatest;
 import vn.com.greencraze.user.entity.Review;
 
 @Mapper(uses = {ReferenceMapper.class, UserProfileMapper.class})
@@ -18,6 +19,8 @@ public interface ReviewMapper {
     GetListReviewResponse reviewToGetListReviewResponse(Review review);
 
     GetOneReviewResponse reviewToGetOneReviewResponse(Review review);
+
+    GetTop5ReviewLatest reviewToGetTop5ReviewLatest(Review review);
 
     CreateReviewResponse reviewToCreateReviewResponse(Review review);
 

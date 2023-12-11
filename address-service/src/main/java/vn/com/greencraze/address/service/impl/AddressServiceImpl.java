@@ -102,8 +102,6 @@ public class AddressServiceImpl implements IAddressService {
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "userId", userId));
     }
 
-    // TODO: GetListUserAddress
-
     @Override
     public RestResponse<GetOneAddressResponse> getDefaultUserAddress(String userId) {
         return addressRepository.findByUserIdAndIsDefault(userId, true)

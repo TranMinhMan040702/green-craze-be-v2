@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.inventory.client.product.ProductServiceClient;
-import vn.com.greencraze.inventory.client.product.dto.ExportProductRequest;
-import vn.com.greencraze.inventory.client.product.dto.ImportProductRequest;
+import vn.com.greencraze.inventory.client.product.dto.request.ExportProductRequest;
+import vn.com.greencraze.inventory.client.product.dto.request.ImportProductRequest;
 import vn.com.greencraze.inventory.dto.request.CreateDocketRequest;
 import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeExportRequest;
 import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeImportRequest;
@@ -16,8 +16,13 @@ import vn.com.greencraze.inventory.mapper.DocketMapper;
 import vn.com.greencraze.inventory.repository.DocketRepository;
 import vn.com.greencraze.inventory.service.IDocketService;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -87,6 +92,36 @@ public class DocketServiceImpl implements IDocketService {
                     .build();
             docketRepository.save(docket);
         }
+    }
+
+    @Override
+    public BigDecimal getExpense() {
+        List<Docket> dockets = docketRepository.findAllByType(DocketType.IMPORT);
+        Set<Long> productIds = dockets.stream()
+                .map(Docket::getProductId)
+                .collect(Collectors.toSet());
+
+        Map<Long, BigDecimal> productCost = productServiceClient.getListProductCost(productIds);
+
+        return dockets.stream()
+                .map(docket -> productCost.get(docket.getProductId())
+                        .multiply(BigDecimal.valueOf(docket.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Override
+    public BigDecimal getExpenseByCreatedAt(Instant startDate, Instant endDate) {
+        List<Docket> dockets = docketRepository.findAllByTypeAndCreatedAtBetween(DocketType.IMPORT, startDate, endDate);
+        Set<Long> productIds = dockets.stream()
+                .map(Docket::getProductId)
+                .collect(Collectors.toSet());
+
+        Map<Long, BigDecimal> productCost = productServiceClient.getListProductCost(productIds);
+
+        return dockets.stream()
+                .map(docket -> productCost.get(docket.getProductId())
+                        .multiply(BigDecimal.valueOf(docket.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
 }

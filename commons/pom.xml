@@ -18,6 +18,8 @@
         <java.version>17</java.version>
         <rsql-jpa-spring-boot-starter.verison>6.0.6</rsql-jpa-spring-boot-starter.verison>
         <org.mapstruct.version>1.5.5.Final</org.mapstruct.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -41,11 +43,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.github.perplexhub</groupId>
-            <artifactId>rsql-jpa-spring-boot-starter</artifactId>
-            <version>${rsql-jpa-spring-boot-starter.verison}</version>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>

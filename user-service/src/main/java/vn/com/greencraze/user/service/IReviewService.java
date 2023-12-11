@@ -9,8 +9,11 @@ import vn.com.greencraze.user.dto.response.review.CreateReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetListReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetOneReviewResponse;
 import vn.com.greencraze.user.dto.response.review.GetOrderReviewResponse;
+import vn.com.greencraze.user.dto.response.review.GetTop5ReviewLatest;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 public interface IReviewService {
 
@@ -20,7 +23,7 @@ public interface IReviewService {
 
     RestResponse<List<Long>> getCountReview(Long productId);
 
-    RestResponse<List<GetListReviewResponse>> getTop5ReviewLatest();
+    List<GetTop5ReviewLatest> getTop5ReviewLatest();
 
     RestResponse<GetOneReviewResponse> getOneReview(Long id);
 
@@ -40,5 +43,7 @@ public interface IReviewService {
 
     // call from other services
     RestResponse<GetOrderReviewResponse> getOrderReview(List<Long> orderItemIds);
+
+    Map<String, Long> getReviewByRatingAndCreatedAt(Instant startDate, Instant endDate);
 
 }

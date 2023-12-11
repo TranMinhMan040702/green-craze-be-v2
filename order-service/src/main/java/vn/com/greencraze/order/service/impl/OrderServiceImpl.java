@@ -37,11 +37,13 @@ import vn.com.greencraze.order.dto.response.order.GetListOrderItemResponse;
 import vn.com.greencraze.order.dto.response.order.GetListOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderItemResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderResponse;
+import vn.com.greencraze.order.dto.response.order.GetTop5OrderLatestResponse;
 import vn.com.greencraze.order.entity.Delivery;
 import vn.com.greencraze.order.entity.Order;
 import vn.com.greencraze.order.entity.OrderItem;
 import vn.com.greencraze.order.entity.PaymentMethod;
 import vn.com.greencraze.order.entity.Transaction;
+import vn.com.greencraze.order.entity.query.OrderItemQuery;
 import vn.com.greencraze.order.enumeration.OrderStatus;
 import vn.com.greencraze.order.enumeration.PaymentCode;
 import vn.com.greencraze.order.mapper.OrderItemMapper;
@@ -60,12 +62,14 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -132,17 +136,15 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public RestResponse<List<GetListOrderResponse>> getTop5OrderLatest() {
+    public List<GetTop5OrderLatestResponse> getTop5OrderLatest() {
         OrderSpecification orderSpecification = new OrderSpecification();
         Specification<Order> sortable = orderSpecification.sortable(false, "createdAt");
-        Pageable pageable = PageRequest.of(1, 5);
+        Pageable pageable = PageRequest.of(0, 5);
 
-        List<GetListOrderResponse> orders = orderRepository
+        return orderRepository
                 .findAll(sortable, pageable)
-                .map(this::mapOrderToGetListOrderResponse)
+                .map(orderMapper::orderToGetTop5OrderLatestResponse)
                 .getContent();
-
-        return RestResponse.ok(orders);
     }
 
     private GetListOrderResponse mapOrderToGetListOrderResponse(Order order) {
@@ -537,6 +539,27 @@ public class OrderServiceImpl implements IOrderService {
         handleChangeStatus(order, request);
 
         orderRepository.save(order);
+
+        // TODO: update order c#, notifi update status order
+
+        //        GetOneVariantResponse variantResponse = productServiceClient.getOneVariant(
+        //                Objects.requireNonNull(order.getOrderItems().stream()
+        //                                .findFirst()
+        //                                .orElse(null))
+        //                        .getVariantId()).data();
+        //
+        //        producer.publish(CreateNotificationRequest.builder()
+        //                        .userId(order.getUserId())
+        //                        .type(NotificationType.ORDER)
+        //                        .content(String.format("Đơn hàng %s của bạn đã chuyển sang trạng thái %s",
+        //                                order.getCode(), order.getStatus().name()))
+        //                        .title("Cập nhật đơn hàng")
+        //                        .anchor("#")
+        //                        .image(variantResponse)
+        //                        .build(),
+        //                rabbitMQProperties.internalExchange(),
+        //                rabbitMQProperties.notificationRoutingKey());
+
     }
 
     @Transactional(rollbackOn = {ResourceNotFoundException.class})
@@ -556,8 +579,7 @@ public class OrderServiceImpl implements IOrderService {
 
         orderRepository.save(order);
 
-        // pub message to create notify
-        createNotify(order);
+        // TODO: create notify Thanh toán thành công
     }
 
     // call from other service
@@ -568,5 +590,45 @@ public class OrderServiceImpl implements IOrderService {
                 .map(RestResponse::ok)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "orderItemId", orderItemId));
     }
+
+    @Override
+    public Long getTotalOrderWithStatusDelivered() {
+        return orderRepository.countByStatus(OrderStatus.DELIVERED);
+    }
+
+    @Override
+    public Map<String, Long> getTopSellingProduct(Instant startDate, Instant endDate) {
+        Map<String, Long> productWithQuantity = new HashMap<>();
+        Map<String, List<Long>> data = productServiceClient.getListProductWithVariant();
+
+        List<OrderItemQuery> orderItemQueries = orderItemRepository.findAllByCreatedAt(startDate, endDate);
+
+        orderItemQueries.forEach(orderItemQuery ->
+                data.entrySet().stream()
+                        .filter(entry -> entry.getValue() != null
+                                && entry.getValue().contains(orderItemQuery.getVariantId()))
+                        .findFirst()
+                        .ifPresent(entry -> productWithQuantity.merge(entry.getKey(),
+                                orderItemQuery.getTotalQuantity(), Long::sum)));
+
+        if (productWithQuantity.size() < 5) {
+            data.entrySet().stream()
+                    .filter(entry -> !productWithQuantity.containsKey(entry.getKey()))
+                    .limit(5 - productWithQuantity.size())
+                    .forEach(entry -> productWithQuantity.put(entry.getKey(), 0L));
+        }
+
+        return productWithQuantity;
+    }
+
+    @Override
+    public Map<String, Long> getOrderTotalByStatus(Instant startDate, Instant endDate) {
+        return OrderStatus.Status().stream()
+                .collect(Collectors.toMap(
+                        OrderStatus::name,
+                        status -> orderRepository.countByStatusAndCreatedAtBetween(status, startDate, endDate)
+                ));
+    }
+
 
 }

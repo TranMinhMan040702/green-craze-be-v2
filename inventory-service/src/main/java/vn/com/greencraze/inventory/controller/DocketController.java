@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import vn.com.greencraze.commons.annotation.InternalApi;
@@ -24,6 +25,8 @@ import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeImportRequest
 import vn.com.greencraze.inventory.dto.response.GetListDocketByProductResponse;
 import vn.com.greencraze.inventory.service.IDocketService;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 @RestController
@@ -71,6 +74,24 @@ public class DocketController {
             @RequestBody @Valid CreateDocketRequest request) {
         docketService.createDocket(request);
         return ResponseEntity.noContent().build();
+    }
+
+    @InternalApi(Microservice.META)
+    @GetMapping("/expense")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get expense")
+    public ResponseEntity<BigDecimal> getExpense() {
+        return ResponseEntity.ok(docketService.getExpense());
+    }
+
+    @InternalApi(Microservice.META)
+    @GetMapping("/expense-by-created-at")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get expense by created at")
+    public ResponseEntity<BigDecimal> getExpenseByCreatedAt(
+            @RequestParam Instant startDate, @RequestParam Instant endDate
+    ) {
+        return ResponseEntity.ok(docketService.getExpenseByCreatedAt(startDate, endDate));
     }
 
 }
