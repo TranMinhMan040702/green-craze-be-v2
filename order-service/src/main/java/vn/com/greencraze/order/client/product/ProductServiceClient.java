@@ -11,6 +11,9 @@ import vn.com.greencraze.order.client.product.dto.request.UpdateListProductQuant
 import vn.com.greencraze.order.client.product.dto.response.GetOneProductResponse;
 import vn.com.greencraze.order.client.product.dto.response.GetOneVariantResponse;
 
+import java.util.List;
+import java.util.Map;
+
 @FeignClient("product-service")
 public interface ProductServiceClient {
 
@@ -24,5 +27,8 @@ public interface ProductServiceClient {
 
     @PutMapping(BASE + "/products/internal/update-quantity")
     void updateProductQuantity(@RequestBody @Valid UpdateListProductQuantityRequest request);
+
+    @GetMapping(BASE + "/products/product-with-variant")
+    Map<String, List<Long>> getListProductWithVariant();
 
 }

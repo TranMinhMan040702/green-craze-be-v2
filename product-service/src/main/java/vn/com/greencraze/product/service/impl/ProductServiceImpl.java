@@ -39,9 +39,13 @@ import vn.com.greencraze.product.repository.specification.ProductSpecification;
 import vn.com.greencraze.product.service.IProductService;
 import vn.com.greencraze.product.service.IUploadService;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -247,6 +251,26 @@ public class ProductServiceImpl implements IProductService {
         for (UpdateListProductReviewRequest.UpdateOneProductReview item : request.productReviews()) {
             updateOneProductReview(item.productId(), new UpdateOneProductReviewRequest(item.rating()));
         }
+    }
+
+    @Override
+    public Map<Long, BigDecimal> getListProductCost(Set<Long> ids) {
+        return ids.stream()
+                .collect(Collectors.toMap(
+                        id -> id,
+                        id -> productRepository.findById(id)
+                                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id))
+                                .getCost()));
+    }
+
+    @Override
+    public Map<String, List<Long>> getListProductWithVariant() {
+        Map<String, List<Long>> response = new HashMap<>();
+        List<Product> products = productRepository.findAll();
+        for (Product product : products) {
+            response.put(product.getName(), product.getVariants().stream().map(Variant::getId).toList());
+        }
+        return response;
     }
 
 }

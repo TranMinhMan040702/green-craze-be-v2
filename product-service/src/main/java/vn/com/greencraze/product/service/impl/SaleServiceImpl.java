@@ -7,14 +7,18 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import vn.com.greencraze.amqp.RabbitMQMessageProducer;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.NotificationType;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
+import vn.com.greencraze.product.config.property.RabbitMQProperties;
 import vn.com.greencraze.product.dto.request.sale.CreateSaleRequest;
 import vn.com.greencraze.product.dto.request.sale.UpdateSaleRequest;
 import vn.com.greencraze.product.dto.response.sale.CreateSaleResponse;
 import vn.com.greencraze.product.dto.response.sale.GetListSaleResponse;
 import vn.com.greencraze.product.dto.response.sale.GetOneSaleResponse;
+import vn.com.greencraze.product.dto.response.sale.GetSaleLatestResponse;
 import vn.com.greencraze.product.entity.Product;
 import vn.com.greencraze.product.entity.ProductCategory;
 import vn.com.greencraze.product.entity.Sale;
@@ -25,6 +29,7 @@ import vn.com.greencraze.product.exception.SaleDateException;
 import vn.com.greencraze.product.exception.SaleExpiredException;
 import vn.com.greencraze.product.exception.SaleInactiveException;
 import vn.com.greencraze.product.mapper.SaleMapper;
+import vn.com.greencraze.product.rabbitmq.dto.request.CreateNotificationRequest;
 import vn.com.greencraze.product.repository.ProductCategoryRepository;
 import vn.com.greencraze.product.repository.SaleRepository;
 import vn.com.greencraze.product.repository.specification.SaleSpecification;
@@ -35,6 +40,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +52,10 @@ public class SaleServiceImpl implements ISaleService {
     private final IUploadService uploadService;
 
     private final SaleMapper saleMapper;
+
+    private final RabbitMQMessageProducer producer;
+
+    private final RabbitMQProperties rabbitMQProperties;
 
     private static final String RESOURCE_NAME = "Sale";
     private static final List<String> SEARCH_FIELDS = List.of("name");
@@ -156,11 +166,19 @@ public class SaleServiceImpl implements ISaleService {
                 }
             }
         }
-
         sale.setStatus(SaleStatus.ACTIVE);
         saleRepository.save(sale);
 
-        // TODO: send Notify
+        producer.publish(CreateNotificationRequest.builder()
+                        .type(NotificationType.SALE)
+                        .content(String.format("Đợt khuyến mãi hiện đang có mặt tại cửa hàng, giảm giá lên tới %.1f",
+                                sale.getPromotionalPercent()))
+                        .title(sale.getName())
+                        .anchor("#")
+                        .image(sale.getImage())
+                        .build(),
+                rabbitMQProperties.internalExchange(),
+                rabbitMQProperties.notificationRoutingKey());
     }
 
     @Override
@@ -184,6 +202,12 @@ public class SaleServiceImpl implements ISaleService {
 
         sale.setStatus(SaleStatus.INACTIVE);
         saleRepository.save(sale);
+    }
+
+    @Override
+    public GetSaleLatestResponse getSaleLatest() {
+        Optional<Sale> sale = saleRepository.findByStatus(SaleStatus.ACTIVE);
+        return sale.map(saleMapper::saleToGetSaleLatestResponse).orElse(null);
     }
 
 }

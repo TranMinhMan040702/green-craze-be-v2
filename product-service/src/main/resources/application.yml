@@ -63,6 +63,10 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
 
+rabbitmq:
+  internal-exchange: internal.exchange
+  notification-routing-key: notification.routing_key
+
 springdoc:
   use-fqn: true
   swagger-ui:
@@ -82,12 +86,18 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    #    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_product
-    #    username: avnadmin
-    #    password: AVNS_ICGL1LOHUwComp9Dj2e
-    url: jdbc:mysql://localhost:3306/core_product
-    username: root
-    password: Nms10102002
+    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_product
+    username: avnadmin
+    password: AVNS_ICGL1LOHUwComp9Dj2e
+  #    url: jdbc:mysql://localhost:3306/core_product
+  #    username: root
+  #    password: Nms10102002
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
 cloudinary:
   cloud-name: dwoejm4g6
   api-key: 531723158945791

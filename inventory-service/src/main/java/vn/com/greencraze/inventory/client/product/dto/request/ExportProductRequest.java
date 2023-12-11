@@ -1,4 +1,4 @@
-package vn.com.greencraze.inventory.client.product.dto;
+package vn.com.greencraze.inventory.client.product.dto.request;
 
 import lombok.Builder;
 

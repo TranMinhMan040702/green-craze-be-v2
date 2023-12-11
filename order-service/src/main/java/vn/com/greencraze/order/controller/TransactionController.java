@@ -13,11 +13,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 import vn.com.greencraze.order.dto.response.transaction.GetListTransactionResponse;
 import vn.com.greencraze.order.dto.response.transaction.GetOneTransactionResponse;
+import vn.com.greencraze.order.dto.response.transaction.GetTop5TransactionLatestResponse;
 import vn.com.greencraze.order.service.ITransactionService;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.List;
 
 @RestController
 @RequestMapping("/transactions")
@@ -43,11 +50,11 @@ public class TransactionController {
                 page, size, isSortAscending, columnName, search, all));
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @InternalApi(Microservice.META)
     @GetMapping(value = "/top5-transaction-latest", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a top 5 latest of transactions")
-    public ResponseEntity<RestResponse<ListResponse<GetListTransactionResponse>>> getTop5TransactionLatest() {
+    public ResponseEntity<List<GetTop5TransactionLatestResponse>> getTop5TransactionLatest() {
         return ResponseEntity.ok(transactionService.getTop5TransactionLatest());
     }
 
@@ -57,6 +64,24 @@ public class TransactionController {
     @Operation(summary = "Get a transaction")
     public ResponseEntity<RestResponse<GetOneTransactionResponse>> getOneTransaction(@PathVariable Long id) {
         return ResponseEntity.ok(transactionService.getOneTransaction(id));
+    }
+
+    @InternalApi(Microservice.META)
+    @GetMapping("/revenue")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get revenue")
+    public ResponseEntity<BigDecimal> getRevenue() {
+        return ResponseEntity.ok(transactionService.getRevenue());
+    }
+
+    @InternalApi(Microservice.META)
+    @GetMapping("/revenue-by-created-at")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get revenue by created at")
+    public ResponseEntity<BigDecimal> getRevenueByCreatedAt(
+            @RequestParam Instant startDate, @RequestParam Instant endDate
+    ) {
+        return ResponseEntity.ok(transactionService.getRevenueByCreatedAt(startDate, endDate));
     }
 
 }

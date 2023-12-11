@@ -9,9 +9,12 @@ import vn.com.greencraze.order.dto.response.order.CreateOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetListOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderItemResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderResponse;
+import vn.com.greencraze.order.dto.response.order.GetTop5OrderLatestResponse;
 import vn.com.greencraze.order.enumeration.OrderStatus;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 public interface IOrderService {
 
@@ -23,7 +26,7 @@ public interface IOrderService {
             Integer page, Integer size, Boolean isSortAscending, String columnName,
             String search, Boolean all, OrderStatus status);
 
-    RestResponse<List<GetListOrderResponse>> getTop5OrderLatest();
+    List<GetTop5OrderLatestResponse> getTop5OrderLatest();
 
     RestResponse<GetOneOrderResponse> getOneOrder(Long id);
 
@@ -37,5 +40,11 @@ public interface IOrderService {
 
     // call from other service
     RestResponse<GetOneOrderItemResponse> getOneOrderItem(Long orderItemId);
+
+    Long getTotalOrderWithStatusDelivered();
+
+    Map<String, Long> getTopSellingProduct(Instant startDate, Instant endDate);
+
+    Map<String, Long> getOrderTotalByStatus(Instant startDate, Instant endDate);
 
 }

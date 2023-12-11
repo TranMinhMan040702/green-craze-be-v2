@@ -2,7 +2,6 @@ server:
   port: 7257
   servlet:
     context-path: /core/infrastructure
-  forward-headers-strategy: framework
 
 spring:
   application:
@@ -12,11 +11,8 @@ spring:
   web:
     resources:
       add-mappings: false
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
-      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
   mail:
     default-encoding: UTF-8
     host: smtp.gmail.com
@@ -54,22 +50,28 @@ eureka:
   instance:
     prefer-ip-address: true
   client:
-    enabled: false
-    register-with-eureka: false
-    fetch-registry: false
+    enabled: true
+    register-with-eureka: true
+    fetch-registry: true
 
 rabbitmq:
   exchanges:
-    topic: internal.exchange
+    direct: internal.exchange
   queues:
     mail: mail.queue
+    notification: notification.queue
   routing-key:
     mail: mail.routing_key
+    notification: notification.routing_key
 ---
 spring:
   config:
     activate:
       on-profile: dev
+  datasource:
+    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_infrastructure
+    username: avnadmin
+    password: AVNS_ICGL1LOHUwComp9Dj2e
   rabbitmq:
     host: localhost
     port: 5672
