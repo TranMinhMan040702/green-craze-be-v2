@@ -267,14 +267,16 @@ public class AuthServiceImpl implements IAuthService {
                     .build());
             // send email otp
             producer.publish(SendEmailRequest.builder()
-                    .event(EmailEvent.CONFIRM_REGISTRATION)
-                    .email(identity.getUsername())
-                    .payload(Map.of(
-                            "name", identity.getUsername(), // TODO
-                            "email", identity.getUsername(),
-                            "OTP", otp
-                    ))
-                    .build(), rabbitMQProperties.internalExchange(), rabbitMQProperties.mailRoutingKey());
+                            .event(EmailEvent.CONFIRM_REGISTRATION)
+                            .email(identity.getUsername())
+                            .payload(Map.of(
+                                    "name", identity.getUsername(),
+                                    "email", identity.getUsername(),
+                                    "OTP", otp
+                            ))
+                            .build(),
+                    rabbitMQProperties.internalExchange(),
+                    rabbitMQProperties.mailRoutingKey());
         }
 
         return RestResponse.ok(RegisterResponse.builder()
@@ -389,14 +391,16 @@ public class AuthServiceImpl implements IAuthService {
 
         // Step 5: send email for user
         producer.publish(SendEmailRequest.builder()
-                .event(EmailEvent.CONFIRM_REGISTRATION)
-                .email(identity.getUsername())
-                .payload(Map.of(
-                        "name", identity.getUsername(), // TODO
-                        "email", identity.getUsername(),
-                        "OTP", otp
-                ))
-                .build(), rabbitMQProperties.internalExchange(), rabbitMQProperties.mailRoutingKey());
+                        .event(EmailEvent.CONFIRM_REGISTRATION)
+                        .email(identity.getUsername())
+                        .payload(Map.of(
+                                "name", identity.getUsername(),
+                                "email", identity.getUsername(),
+                                "OTP", otp
+                        ))
+                        .build(),
+                rabbitMQProperties.internalExchange(),
+                rabbitMQProperties.mailRoutingKey());
 
         return RestResponse.ok(ResendOTPResponse.builder()
                 .isSuccess(true)
@@ -438,14 +442,16 @@ public class AuthServiceImpl implements IAuthService {
 
         // Step 3: send email
         producer.publish(SendEmailRequest.builder()
-                .event(EmailEvent.FORGOT_PASSWORD)
-                .email(identity.getUsername())
-                .payload(Map.of(
-                        "name", identity.getUsername(),
-                        "email", identity.getUsername(),
-                        "OTP", otp
-                ))
-                .build(), rabbitMQProperties.internalExchange(), rabbitMQProperties.mailRoutingKey());
+                        .event(EmailEvent.FORGOT_PASSWORD)
+                        .email(identity.getUsername())
+                        .payload(Map.of(
+                                "name", identity.getUsername(),
+                                "email", identity.getUsername(),
+                                "OTP", otp
+                        ))
+                        .build(),
+                rabbitMQProperties.internalExchange(),
+                rabbitMQProperties.mailRoutingKey());
 
         return RestResponse.ok(ForgotPasswordResponse.builder()
                 .isSuccess(true)

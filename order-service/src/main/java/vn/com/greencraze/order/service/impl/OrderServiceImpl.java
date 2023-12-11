@@ -535,6 +535,27 @@ public class OrderServiceImpl implements IOrderService {
         handleChangeStatus(order, request);
 
         orderRepository.save(order);
+
+        // TODO: update order c#, notifi update status order
+
+        //        GetOneVariantResponse variantResponse = productServiceClient.getOneVariant(
+        //                Objects.requireNonNull(order.getOrderItems().stream()
+        //                                .findFirst()
+        //                                .orElse(null))
+        //                        .getVariantId()).data();
+        //
+        //        producer.publish(CreateNotificationRequest.builder()
+        //                        .userId(order.getUserId())
+        //                        .type(NotificationType.ORDER)
+        //                        .content(String.format("Đơn hàng %s của bạn đã chuyển sang trạng thái %s",
+        //                                order.getCode(), order.getStatus().name()))
+        //                        .title("Cập nhật đơn hàng")
+        //                        .anchor("#")
+        //                        .image(variantResponse)
+        //                        .build(),
+        //                rabbitMQProperties.internalExchange(),
+        //                rabbitMQProperties.notificationRoutingKey());
+
     }
 
     @Transactional(rollbackOn = {ResourceNotFoundException.class})
@@ -554,8 +575,7 @@ public class OrderServiceImpl implements IOrderService {
 
         orderRepository.save(order);
 
-        // pub message to create notify
-        createNotify(order);
+        // TODO: create notify Thanh toán thành công
     }
 
     // call from other service

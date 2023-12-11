@@ -11,11 +11,8 @@ spring:
   web:
     resources:
       add-mappings: false
-  autoconfigure:
-    exclude:
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
-      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
-      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
   mail:
     default-encoding: UTF-8
     host: smtp.gmail.com

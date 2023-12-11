@@ -57,6 +57,11 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
 
+rabbitmq:
+  internal-exchange: internal.exchange
+  mail-routing-key: mail.routing_key
+  notification-routing-key: notification.routing_key
+
 springdoc:
   use-fqn: true
   swagger-ui:
@@ -87,10 +92,6 @@ spring:
     port: 5672
     username: guest
     password: guest
-
-rabbitmq:
-  internal-exchange: internal.exchange
-  mail-routing-key: mail.routing_key
 
 cloudinary:
   cloud-name: dwoejm4g6

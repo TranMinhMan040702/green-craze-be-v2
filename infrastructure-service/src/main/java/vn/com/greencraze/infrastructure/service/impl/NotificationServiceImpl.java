@@ -45,12 +45,14 @@ public class NotificationServiceImpl implements INotificationService {
     @Override
     public RestResponse<ListResponse<GetListNotificationResponse>> getListNotification(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all) {
+        String userId = authFacade.getUserId();
         NotificationSpecification notificationSpecification = new NotificationSpecification();
         Specification<Notification> sortable = notificationSpecification.sortable(isSortAscending, columnName);
         Specification<Notification> searchable = notificationSpecification.searchable(SEARCH_FIELDS, search);
+        Specification<Notification> filterableByUserId = notificationSpecification.filterable(userId);
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
         Page<GetListNotificationResponse> responses = notificationRepository
-                .findAll(sortable.and(searchable), pageable)
+                .findAll(sortable.and(searchable).and(filterableByUserId), pageable)
                 .map(notificationMapper::notificationToGetListNotificationResponse);
         return RestResponse.ok(ListResponse.of(responses));
     }
