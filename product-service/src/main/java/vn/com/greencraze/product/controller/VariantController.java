@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 import vn.com.greencraze.product.dto.request.variant.CreateVariantRequest;
 import vn.com.greencraze.product.dto.request.variant.UpdateVariantRequest;
 import vn.com.greencraze.product.dto.response.variant.CreateVariantResponse;
@@ -99,7 +101,8 @@ public class VariantController {
     }
 
     //call from other service
-    @GetMapping(value = "/internal/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @InternalApi({Microservice.USER, Microservice.ORDER})
+    @GetMapping(value = "/other/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a variant")
     public ResponseEntity<RestResponse<GetOneVariantResponse>> getOneVariantFromOtherService(@PathVariable Long id) {

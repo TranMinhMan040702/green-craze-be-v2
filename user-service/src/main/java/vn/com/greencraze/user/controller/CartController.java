@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.Microservice;
 import vn.com.greencraze.user.dto.request.cart.CreateCartItemRequest;
 import vn.com.greencraze.user.dto.request.cart.UpdateCartItemRequest;
 import vn.com.greencraze.user.dto.request.cart.UpdateUserCartRequest;
@@ -99,8 +101,8 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
 
-    // call from other service
-    @PutMapping(value = "/internal/update-user-cart", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @InternalApi(Microservice.ORDER)
+    @PutMapping(value = "/update-user-cart", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a user cart")
     public ResponseEntity<Void> updateUserCart(@RequestBody @Valid UpdateUserCartRequest request) {

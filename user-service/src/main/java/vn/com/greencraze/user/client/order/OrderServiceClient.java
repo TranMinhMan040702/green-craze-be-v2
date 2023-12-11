@@ -11,7 +11,7 @@ public interface OrderServiceClient {
 
     String BASE = "/core/order";
 
-    @GetMapping(BASE + "/orders/internal/order-items/{orderItemId}")
+    @GetMapping(BASE + "/orders/order-items/{orderItemId}")
     RestResponse<GetOneOrderItemResponse> GetOneOrderItem(@PathVariable Long orderItemId);
 
 }

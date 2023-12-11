@@ -11,10 +11,10 @@ public interface AddressServiceClient {
 
     String BASE = "/core/address";
 
-    @GetMapping(BASE + "/addresses/internal/{id}")
+    @GetMapping(BASE + "/addresses/other/{id}")
     RestResponse<GetOneAddressResponse> getOneAddress(@PathVariable Long id);
 
-    @GetMapping(BASE + "/addresses/internal/default/{userId}")
+    @GetMapping(BASE + "/addresses/other/default/{userId}")
     RestResponse<GetOneAddressResponse> getDefaultAddress(@PathVariable String userId);
 
 }

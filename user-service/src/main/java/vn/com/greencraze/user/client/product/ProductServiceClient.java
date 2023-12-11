@@ -17,16 +17,16 @@ public interface ProductServiceClient {
 
     String BASE = "/core/product";
 
-    @GetMapping(BASE + "/products/internal/{id}")
+    @GetMapping(BASE + "/products/other/{id}")
     RestResponse<GetOneProductResponse> getOneProduct(@PathVariable Long id);
 
-    @GetMapping(BASE + "/variants/internal/{id}")
+    @GetMapping(BASE + "/variants/other/{id}")
     RestResponse<GetOneVariantResponse> getOneVariant(@PathVariable Long id);
 
-    @PutMapping(BASE + "/products/internal/{id}/update-review")
+    @PutMapping(BASE + "/products/{id}/update-review")
     void updateProductReview(@PathVariable Long id, @RequestBody @Valid UpdateOneProductReviewRequest request);
 
-    @PutMapping(BASE + "/products/internal/update-list-review")
+    @PutMapping(BASE + "/products/update-list-review")
     void updateListProductReview(@RequestBody @Valid UpdateListProductReviewRequest request);
 
 

@@ -131,7 +131,8 @@ public class OrderController {
     }
 
     // call from other service
-    @GetMapping(value = "/internal/order-items/{orderItemId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @InternalApi(Microservice.USER)
+    @GetMapping(value = "/order-items/{orderItemId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get an order item by id")
     public ResponseEntity<RestResponse<GetOneOrderItemResponse>> getOneOrderItem(@PathVariable Long orderItemId) {

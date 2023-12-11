@@ -66,7 +66,8 @@ public class DocketController {
         return ResponseEntity.ok(docketService.getListDocketByProduct(productId));
     }
 
-    @PostMapping(value = "/internal/create-docket", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @InternalApi(Microservice.ORDER)
+    @PostMapping(value = "/other/create-docket", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Create docket")
     public ResponseEntity<Void> createDocket(

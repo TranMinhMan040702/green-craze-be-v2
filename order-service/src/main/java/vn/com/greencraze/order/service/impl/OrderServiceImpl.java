@@ -59,10 +59,12 @@ import vn.com.greencraze.order.repository.specification.OrderSpecification;
 import vn.com.greencraze.order.service.IOrderService;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -402,6 +404,8 @@ public class OrderServiceImpl implements IOrderService {
         String addressDetail = address.street() + ", " + address.ward().name()
                 + ", " + address.district().name() + ", " + address.province().name();
 
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+
         // send email order
         producer.publish(SendEmailRequest.builder()
                 .event(EmailEvent.ORDER_CONFIRMATION)
@@ -411,7 +415,7 @@ public class OrderServiceImpl implements IOrderService {
                         "email", address.email(),
                         "receiver", address.receiver(),
                         "phone", address.phone(),
-                        "totalPrice", order.getTotalAmount(),
+                        "totalPrice", numberFormat.format(order.getTotalAmount()),
                         "paymentMethod", order.getTransaction().getPaymentMethod(),
                         "address", addressDetail
                 ))

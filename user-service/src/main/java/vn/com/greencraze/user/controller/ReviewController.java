@@ -157,7 +157,8 @@ public class ReviewController {
     }
 
     // call from other services
-    @GetMapping(value = "/internal/order-review")
+    @InternalApi(Microservice.ORDER)
+    @GetMapping(value = "/order-review")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get order review")
     public ResponseEntity<RestResponse<GetOrderReviewResponse>> getOrderReview(
