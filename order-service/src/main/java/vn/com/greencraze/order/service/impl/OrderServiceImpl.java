@@ -620,6 +620,37 @@ public class OrderServiceImpl implements IOrderService {
         orderRepository.save(order);
 
         try {
+            RestResponse<GetOneUserResponse> userResp = userServiceClient.getOneUser(userId);
+            if (userResp == null) {
+                throw new ResourceNotFoundException(RESOURCE_NAME, "userId", userId);
+            }
+            GetOneUserResponse user = userResp.data();
+
+            RestResponse<GetOneAddressResponse> addressResp = addressServiceClient.getDefaultAddress(userId);
+            if (addressResp == null) {
+                throw new ResourceNotFoundException(RESOURCE_NAME, "userId", userId);
+            }
+            GetOneAddressResponse address = addressResp.data();
+            String addressDetail = address.street() + ", " + address.ward().name()
+                    + ", " + address.district().name() + ", " + address.province().name();
+
+            NumberFormat numberFormat = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+
+            // send email order
+            producer.publish(SendEmailRequest.builder()
+                    .event(EmailEvent.ORDER_CONFIRMATION)
+                    .email(user.email())
+                    .payload(Map.of(
+                            "name", user.firstName() + " " + user.lastName(),
+                            "email", address.email(),
+                            "receiver", address.receiver(),
+                            "phone", address.phone(),
+                            "totalPrice", numberFormat.format(order.getTotalAmount()),
+                            "paymentMethod", order.getTransaction().getPaymentMethod(),
+                            "address", addressDetail
+                    ))
+                    .build(), rabbitMQProperties.internalExchange(), rabbitMQProperties.mailRoutingKey());
+
             GetOneProductResponse productResponse = productServiceClient.getOneProductByVariant(
                     Objects.requireNonNull(order.getOrderItems().stream()
                                     .findFirst()

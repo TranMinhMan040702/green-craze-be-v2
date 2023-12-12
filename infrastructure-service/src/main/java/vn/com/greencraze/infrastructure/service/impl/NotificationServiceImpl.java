@@ -93,7 +93,7 @@ public class NotificationServiceImpl implements INotificationService {
             throw new InvalidUserIdException("Invalid user id");
         }
         notificationRepository.save(notificationMapper.createNotificationRequestToNotification(request));
-        long count = notificationRepository.count();
+        long count = notificationRepository.countByUserIdAndStatus(request.userId(), false);
         simpMessagingTemplate.convertAndSendToUser(request.userId(), "/notifications",
                 CreateNotificationResponse.builder()
                         .title(request.title())
@@ -107,14 +107,15 @@ public class NotificationServiceImpl implements INotificationService {
         for (String userId : userIds) {
             notificationRepository.save(notificationMapper
                     .createNotificationRequestToNotification(request.withUserId(userId)));
+
+            long count = notificationRepository.countByUserIdAndStatus(userId, false);
+            simpMessagingTemplate.convertAndSendToUser(userId, "/notifications",
+                    CreateNotificationResponse.builder()
+                            .title(request.title())
+                            .content(request.content())
+                            .count(count)
+                            .build());
         }
-        long count = notificationRepository.count();
-        simpMessagingTemplate.convertAndSend("/notifications",
-                CreateNotificationResponse.builder()
-                        .title(request.title())
-                        .content(request.content())
-                        .count(count)
-                        .build());
     }
 
 }
