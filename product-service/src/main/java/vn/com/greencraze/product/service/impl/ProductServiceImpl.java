@@ -35,6 +35,7 @@ import vn.com.greencraze.product.repository.BrandRepository;
 import vn.com.greencraze.product.repository.ProductCategoryRepository;
 import vn.com.greencraze.product.repository.ProductRepository;
 import vn.com.greencraze.product.repository.UnitRepository;
+import vn.com.greencraze.product.repository.VariantRepository;
 import vn.com.greencraze.product.repository.specification.ProductSpecification;
 import vn.com.greencraze.product.service.IProductService;
 import vn.com.greencraze.product.service.IUploadService;
@@ -55,6 +56,7 @@ public class ProductServiceImpl implements IProductService {
     private final ProductCategoryRepository productCategoryRepository;
     private final BrandRepository brandRepository;
     private final UnitRepository unitRepository;
+    private final VariantRepository variantRepository;
 
     private final ProductMapper productMapper;
 
@@ -271,6 +273,17 @@ public class ProductServiceImpl implements IProductService {
             response.put(product.getName(), product.getVariants().stream().map(Variant::getId).toList());
         }
         return response;
+    }
+
+    @Override
+    public RestResponse<GetOneProductResponse> getOneProductByVariant(Long variantId) {
+        Variant variant = variantRepository.findById(variantId)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "variantId", variantId));
+        
+        return productRepository.findById(variant.getProduct().getId())
+                .map(productMapper::productToGetOneProductResponse)
+                .map(RestResponse::ok)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "productId", variant.getProduct().getId()));
     }
 
 }

@@ -2,9 +2,11 @@ package vn.com.greencraze.order.rabbitmq.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import lombok.With;
 import vn.com.greencraze.commons.enumeration.NotificationType;
 
 @Builder
+@With
 public record CreateNotificationRequest(
         String userId,
         @NotNull
@@ -17,4 +19,5 @@ public record CreateNotificationRequest(
         String anchor,
         @NotNull
         String image
-) {}
+) {
+}

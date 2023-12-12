@@ -245,6 +245,14 @@ public class ProductController {
     }
 
     @InternalApi(Microservice.ORDER)
+    @GetMapping(value = "/other/variant/{variantId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get a product by variant from other service")
+    public ResponseEntity<RestResponse<GetOneProductResponse>> getOneProductByVariant(@PathVariable Long variantId) {
+        return ResponseEntity.ok(productService.getOneProductByVariant(variantId));
+    }
+
+    @InternalApi(Microservice.ORDER)
     @PutMapping(value = "/update-quantity")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Update a product quantity")
