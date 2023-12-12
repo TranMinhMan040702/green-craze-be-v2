@@ -12,6 +12,7 @@ import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.auth.AuthFacade;
 import vn.com.greencraze.commons.enumeration.EmailEvent;
+import vn.com.greencraze.commons.enumeration.NotificationType;
 import vn.com.greencraze.commons.exception.InvalidRequestException;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.order.client.address.AddressServiceClient;
@@ -48,6 +49,7 @@ import vn.com.greencraze.order.enumeration.OrderStatus;
 import vn.com.greencraze.order.enumeration.PaymentCode;
 import vn.com.greencraze.order.mapper.OrderItemMapper;
 import vn.com.greencraze.order.mapper.OrderMapper;
+import vn.com.greencraze.order.rabbitmq.dto.request.CreateNotificationRequest;
 import vn.com.greencraze.order.rabbitmq.dto.request.SendEmailRequest;
 import vn.com.greencraze.order.repository.DeliveryRepository;
 import vn.com.greencraze.order.repository.OrderCancelReasonRepository;
@@ -124,12 +126,13 @@ public class OrderServiceImpl implements IOrderService {
         OrderSpecification orderSpecification = new OrderSpecification();
         Specification<Order> sortable = orderSpecification.sortable(isSortAscending, columnName);
         Specification<Order> searchable = orderSpecification.searchable(SEARCH_FIELDS, search);
-        Specification<Order> filterable = orderSpecification.filterable(userId, status);
+        Specification<Order> filterableByStatus = orderSpecification.filterableByStatus(status);
+        Specification<Order> filterableByUser = orderSpecification.filterableByUser(userId);
 
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
 
         Page<GetListOrderResponse> orders = orderRepository
-                .findAll(sortable.and(searchable).and(filterable), pageable)
+                .findAll(sortable.and(searchable).and(filterableByStatus).and(filterableByUser), pageable)
                 .map(this::mapOrderToGetListOrderResponse);
 
         return RestResponse.ok(ListResponse.of(orders));
@@ -389,37 +392,66 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     private void createNotify(Order order) {
-        String userId = authFacade.getUserId();
-        RestResponse<GetOneUserResponse> userResp = userServiceClient.getOneUser(userId);
-        if (userResp == null) {
-            throw new ResourceNotFoundException(RESOURCE_NAME, "userId", userId);
+        GetOneProductResponse productResponse = productServiceClient.getOneProductByVariant(
+                Objects.requireNonNull(order.getOrderItems().stream()
+                                .findFirst()
+                                .orElse(null))
+                        .getVariantId()).data();
+
+        CreateNotificationRequest req = CreateNotificationRequest.builder()
+                .userId(order.getUserId())
+                .type(NotificationType.ORDER)
+                .content(String.format("Đơn hàng #%s của bạn đang được chúng tôi xử lý",
+                        order.getCode()))
+                .title("Đặt hàng thành công")
+                .anchor("/user/order/" + order.getCode())
+                .image(Objects.requireNonNull(productResponse.images().stream()
+                                .findFirst()
+                                .orElse(null))
+                        .image())
+                .build();
+        if (Objects.equals(order.getTransaction().getPaymentMethod(), PaymentCode.PAYPAL.name())) {
+            req = req.withContent(String.format("Đơn hàng #%s của bạn cần phải thanh toán qua Paypal, " +
+                                    "vui lòng thanh toán để đơn hàng được xử lý",
+                            order.getCode()))
+                    .withTitle("Thanh toán đơn hàng")
+                    .withAnchor("/checkout/payment/" + order.getCode());
+        } else {
+            String userId = authFacade.getUserId();
+            RestResponse<GetOneUserResponse> userResp = userServiceClient.getOneUser(userId);
+            if (userResp == null) {
+                throw new ResourceNotFoundException(RESOURCE_NAME, "userId", userId);
+            }
+            GetOneUserResponse user = userResp.data();
+
+            RestResponse<GetOneAddressResponse> addressResp = addressServiceClient.getDefaultAddress(userId);
+            if (addressResp == null) {
+                throw new ResourceNotFoundException(RESOURCE_NAME, "userId", userId);
+            }
+            GetOneAddressResponse address = addressResp.data();
+            String addressDetail = address.street() + ", " + address.ward().name()
+                    + ", " + address.district().name() + ", " + address.province().name();
+
+            NumberFormat numberFormat = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+
+            // send email order
+            producer.publish(SendEmailRequest.builder()
+                    .event(EmailEvent.ORDER_CONFIRMATION)
+                    .email(user.email())
+                    .payload(Map.of(
+                            "name", user.firstName() + " " + user.lastName(),
+                            "email", address.email(),
+                            "receiver", address.receiver(),
+                            "phone", address.phone(),
+                            "totalPrice", numberFormat.format(order.getTotalAmount()),
+                            "paymentMethod", order.getTransaction().getPaymentMethod(),
+                            "address", addressDetail
+                    ))
+                    .build(), rabbitMQProperties.internalExchange(), rabbitMQProperties.mailRoutingKey());
         }
-        GetOneUserResponse user = userResp.data();
-
-        RestResponse<GetOneAddressResponse> addressResp = addressServiceClient.getDefaultAddress(userId);
-        if (addressResp == null) {
-            throw new ResourceNotFoundException(RESOURCE_NAME, "userId", userId);
-        }
-        GetOneAddressResponse address = addressResp.data();
-        String addressDetail = address.street() + ", " + address.ward().name()
-                + ", " + address.district().name() + ", " + address.province().name();
-
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
-
-        // send email order
-        producer.publish(SendEmailRequest.builder()
-                .event(EmailEvent.ORDER_CONFIRMATION)
-                .email(user.email())
-                .payload(Map.of(
-                        "name", user.firstName() + " " + user.lastName(),
-                        "email", address.email(),
-                        "receiver", address.receiver(),
-                        "phone", address.phone(),
-                        "totalPrice", numberFormat.format(order.getTotalAmount()),
-                        "paymentMethod", order.getTransaction().getPaymentMethod(),
-                        "address", addressDetail
-                ))
-                .build(), rabbitMQProperties.internalExchange(), rabbitMQProperties.mailRoutingKey());
+        producer.publish(req,
+                rabbitMQProperties.internalExchange(),
+                rabbitMQProperties.notificationRoutingKey());
     }
 
     private boolean hasInRole(String role) {
@@ -441,8 +473,11 @@ public class OrderServiceImpl implements IOrderService {
         // create docket in inventory service
         createDocket(request.items(), order.getId(), "EXPORT");
 
-        // pub message to notify in infrastructure service
-        createNotify(order);
+        try {
+            // pub message to notify in infrastructure service
+            createNotify(order);
+        } catch (Exception ignored) {
+        }
 
         return RestResponse.ok(orderMapper.orderToCreateOrderResponse(order));
     }
@@ -540,26 +575,31 @@ public class OrderServiceImpl implements IOrderService {
 
         orderRepository.save(order);
 
-        // TODO: update order c#, notifi update status order
+        try {
+            GetOneProductResponse productResponse = productServiceClient.getOneProductByVariant(
+                    Objects.requireNonNull(order.getOrderItems().stream()
+                                    .findFirst()
+                                    .orElse(null))
+                            .getVariantId()).data();
 
-        //        GetOneVariantResponse variantResponse = productServiceClient.getOneVariant(
-        //                Objects.requireNonNull(order.getOrderItems().stream()
-        //                                .findFirst()
-        //                                .orElse(null))
-        //                        .getVariantId()).data();
-        //
-        //        producer.publish(CreateNotificationRequest.builder()
-        //                        .userId(order.getUserId())
-        //                        .type(NotificationType.ORDER)
-        //                        .content(String.format("Đơn hàng %s của bạn đã chuyển sang trạng thái %s",
-        //                                order.getCode(), order.getStatus().name()))
-        //                        .title("Cập nhật đơn hàng")
-        //                        .anchor("#")
-        //                        .image(variantResponse)
-        //                        .build(),
-        //                rabbitMQProperties.internalExchange(),
-        //                rabbitMQProperties.notificationRoutingKey());
+            CreateNotificationRequest req = CreateNotificationRequest.builder()
+                    .userId(order.getUserId())
+                    .type(NotificationType.ORDER)
+                    .content(String.format("Đơn hàng #%s của bạn đã chuyển sang trạng thái %s",
+                            order.getCode(), order.getStatus().name()))
+                    .title("Cập nhật trạng thái đơn hàng")
+                    .anchor("/user/order/" + order.getCode())
+                    .image(Objects.requireNonNull(productResponse.images().stream()
+                                    .findFirst()
+                                    .orElse(null))
+                            .image())
+                    .build();
 
+            producer.publish(req,
+                    rabbitMQProperties.internalExchange(),
+                    rabbitMQProperties.notificationRoutingKey());
+        } catch (Exception ignored) {
+        }
     }
 
     @Transactional(rollbackOn = {ResourceNotFoundException.class})
@@ -579,7 +619,31 @@ public class OrderServiceImpl implements IOrderService {
 
         orderRepository.save(order);
 
-        // TODO: create notify Thanh toán thành công
+        try {
+            GetOneProductResponse productResponse = productServiceClient.getOneProductByVariant(
+                    Objects.requireNonNull(order.getOrderItems().stream()
+                                    .findFirst()
+                                    .orElse(null))
+                            .getVariantId()).data();
+
+            CreateNotificationRequest req = CreateNotificationRequest.builder()
+                    .userId(order.getUserId())
+                    .type(NotificationType.ORDER)
+                    .content(String.format("Đơn hàng #%s của bạn đã thanh toán thành công và đang được chúng tôi xử lý",
+                            order.getCode()))
+                    .title("Thanh toán thành công")
+                    .anchor("/user/order/" + order.getCode())
+                    .image(Objects.requireNonNull(productResponse.images().stream()
+                                    .findFirst()
+                                    .orElse(null))
+                            .image())
+                    .build();
+
+            producer.publish(req,
+                    rabbitMQProperties.internalExchange(),
+                    rabbitMQProperties.notificationRoutingKey());
+        } catch (Exception ignored) {
+        }
     }
 
     // call from other service

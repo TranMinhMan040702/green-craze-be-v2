@@ -22,6 +22,9 @@ public interface ProductServiceClient {
     @GetMapping(BASE + "/products/other/{id}")
     RestResponse<GetOneProductResponse> getOneProduct(@PathVariable Long id);
 
+    @GetMapping(BASE + "/products/other/variant/{variantId}")
+    RestResponse<GetOneProductResponse> getOneProductByVariant(@PathVariable Long variantId);
+
     @GetMapping(BASE + "/variants/other/{id}")
     RestResponse<GetOneVariantResponse> getOneVariant(@PathVariable Long id);
 

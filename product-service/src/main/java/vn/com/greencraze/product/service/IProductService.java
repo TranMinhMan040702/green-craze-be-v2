@@ -61,4 +61,6 @@ public interface IProductService {
 
     Map<String, List<Long>> getListProductWithVariant();
 
+    RestResponse<GetOneProductResponse> getOneProductByVariant(Long variantId);
+
 }
