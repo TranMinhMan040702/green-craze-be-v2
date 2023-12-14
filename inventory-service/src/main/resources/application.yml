@@ -34,6 +34,9 @@ spring:
             logger-level: full
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
   endpoints:
     web:
       exposure:
@@ -101,7 +104,7 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://green_craze-core-eureka-service:7230/eureka
+      defaultZone: http://green-craze-eureka-service:7230/eureka
 
 ---
 spring:
@@ -116,5 +119,5 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://green_craze-core-eureka-service:7230/eureka
+      defaultZone: http://green-craze-eureka-service:7230/eureka
 

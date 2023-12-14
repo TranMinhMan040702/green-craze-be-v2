@@ -31,6 +31,9 @@ spring:
     protocol: smtp
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
   endpoints:
     web:
       exposure:
@@ -94,6 +97,15 @@ spring:
   config:
     activate:
       on-profile: stag
+  datasource:
+    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_infrastructure
+    username: avnadmin
+    password: AVNS_ICGL1LOHUwComp9Dj2e
+  rabbitmq:
+    host: green-craze-rabbitmq
+    port: 5672
+    username: guest
+    password: guest
 
 cloudinary:
   cloud-name: dwoejm4g6
@@ -104,13 +116,22 @@ cloudinary:
 eureka:
   client:
     service-url:
-      defaultZone: http://green_craze-core-eureka-service:7230/eureka
+      defaultZone: http://green-craze-eureka-service:7230/eureka
 
 ---
 spring:
   config:
     activate:
       on-profile: prod
+  datasource:
+    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_infrastructure
+    username: avnadmin
+    password: AVNS_ICGL1LOHUwComp9Dj2e
+  rabbitmq:
+    host: green-craze-rabbitmq
+    port: 5672
+    username: guest
+    password: guest
 
 cloudinary:
   cloud-name: dwoejm4g6
@@ -121,4 +142,4 @@ cloudinary:
 eureka:
   client:
     service-url:
-      defaultZone: http://green_craze-core-eureka-service:7230/eureka
+      defaultZone: http://green-craze-eureka-service:7230/eureka

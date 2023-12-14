@@ -40,6 +40,9 @@ spring:
             logger-level: full
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
   endpoints:
     web:
       exposure:
@@ -85,9 +88,7 @@ spring:
     url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_product
     username: avnadmin
     password: AVNS_ICGL1LOHUwComp9Dj2e
-#    url: jdbc:mysql://localhost:3306/core_product
-#    username: root
-#    password: Nms10102002
+
 cloudinary:
   cloud-name: dwoejm4g6
   api-key: 531723158945791
@@ -105,9 +106,9 @@ spring:
     activate:
       on-profile: stag
   datasource:
-    url: jdbc:mysql://localhost:3306/core_product
-    username: root
-    password: 1234
+    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_product
+    username: avnadmin
+    password: AVNS_ICGL1LOHUwComp9Dj2e
 
 cloudinary:
   cloud-name: dwoejm4g6
@@ -118,7 +119,7 @@ cloudinary:
 eureka:
   client:
     service-url:
-      defaultZone: http://green_craze-core-eureka-service:7230/eureka
+      defaultZone: http://green-craze-eureka-service:7230/eureka
 
 ---
 spring:
@@ -126,9 +127,9 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:mysql://localhost:3306/core_product
-    username: root
-    password: 1234
+    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_product
+    username: avnadmin
+    password: AVNS_ICGL1LOHUwComp9Dj2e
 
 cloudinary:
   cloud-name: dwoejm4g6
@@ -139,5 +140,5 @@ cloudinary:
 eureka:
   client:
     service-url:
-      defaultZone: http://green_craze-core-eureka-service:7230/eureka
+      defaultZone: http://green-craze-eureka-service:7230/eureka
 

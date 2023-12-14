@@ -1086,6 +1086,9 @@ spring:
 
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
   endpoint:
     gateway:
       enabled: true
