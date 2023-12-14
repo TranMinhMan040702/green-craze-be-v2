@@ -1,0 +1,11 @@
+FROM bellsoft/liberica-runtime-container:jre-17-slim-musl
+
+ARG SERVICE_NAME
+
+ENV SERVICE_NAME_ENV=${SERVICE_NAME}
+
+WORKDIR /service
+
+COPY target/${SERVICE_NAME}-0.0.1-SNAPSHOT.jar /service
+
+ENTRYPOINT java -jar ${SERVICE_NAME_ENV}-0.0.1-SNAPSHOT.jar

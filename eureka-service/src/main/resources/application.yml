@@ -10,6 +10,15 @@ spring:
     loadbalancer:
       enabled: true
 
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 eureka:
   instance:
     hostname: localhost
@@ -31,9 +40,16 @@ spring:
     activate:
       on-profile: stag
 
+eureka:
+  instance:
+    hostname: green-craze-eureka-service
+
 ---
 spring:
   config:
     activate:
       on-profile: prod
 
+eureka:
+  instance:
+    hostname: green-craze-eureka-service

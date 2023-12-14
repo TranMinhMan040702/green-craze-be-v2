@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.RestResponse;
-import vn.com.greencraze.commons.enumeration.Microservice;
 import vn.com.greencraze.inventory.dto.request.CreateDocketRequest;
 import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeExportRequest;
 import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeImportRequest;
@@ -66,7 +64,7 @@ public class DocketController {
         return ResponseEntity.ok(docketService.getListDocketByProduct(productId));
     }
 
-    @InternalApi(Microservice.ORDER)
+    //    @InternalApi(Microservice.ORDER)
     @PostMapping(value = "/other/create-docket", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "Create docket")
@@ -76,7 +74,7 @@ public class DocketController {
         return ResponseEntity.noContent().build();
     }
 
-    @InternalApi(Microservice.META)
+    //    @InternalApi(Microservice.META)
     @GetMapping("/expense")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get expense")
@@ -84,7 +82,7 @@ public class DocketController {
         return ResponseEntity.ok(docketService.getExpense());
     }
 
-    @InternalApi(Microservice.META)
+    //    @InternalApi(Microservice.META)
     @GetMapping("/expense-by-created-at")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get expense by created at")

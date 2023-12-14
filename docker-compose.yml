@@ -1,4 +1,7 @@
 version: "3.8"
+
+name: green-craze-core
+
 services:
   green-craze-rabbitmq:
     image: rabbitmq:3.9.11-management-alpine
@@ -6,3 +9,225 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - green-craze-network
+
+  green-craze-eureka-service:
+    container_name: green-craze-eureka-service
+    image: green-craze-eureka-service
+    restart: unless-stopped
+    build:
+      context: ./eureka-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: eureka-service
+    environment:
+      SPRING_PROFILES_ACTIVE: stag
+    ports:
+      - "7230:7230"
+    # volumes:
+    #   - /logs/eureka-service-logs:/logs/eureka-service-logs
+    networks:
+      - green-craze-network
+
+  green-craze-api-gateway:
+    container_name: green-craze-api-gateway
+    image: green-craze-api-gateway
+    restart: unless-stopped
+    depends_on:
+      - green-craze-eureka-service
+      - green-craze-rabbitmq
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: api-gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: stag
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
+    ports:
+      - "7168:7168"
+    # volumes:
+    #   - /logs/api-gateway-logs:/logs/api-gateway-logs
+    networks:
+      - green-craze-network
+
+  green-craze-auth-service:
+    container_name: green-craze-auth-service
+    image: green-craze-auth-service
+    restart: unless-stopped
+    depends_on:
+      - green-craze-eureka-service
+      - green-craze-rabbitmq
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: auth-service
+    environment:
+      SPRING_PROFILES_ACTIVE: stag
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
+    ports:
+      - "7250:7250"
+    # volumes:
+    #   - /logs/auth-service-logs:/logs/auth-service-logs
+    networks:
+      - green-craze-network
+
+  green-craze-product-service:
+    container_name: green-craze-product-service
+    image: green-craze-product-service
+    restart: unless-stopped
+    depends_on:
+      - green-craze-eureka-service
+      - green-craze-rabbitmq
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: product-service
+    environment:
+      SPRING_PROFILES_ACTIVE: stag
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
+    ports:
+      - "7251:7251"
+    # volumes:
+    #   - /logs/product-service-logs:/logs/product-service-logs
+    networks:
+      - green-craze-network
+
+  green-craze-order-service:
+    container_name: green-craze-order-service
+    image: green-craze-order-service
+    restart: unless-stopped
+    depends_on:
+      - green-craze-eureka-service
+      - green-craze-rabbitmq
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: order-service
+    environment:
+      SPRING_PROFILES_ACTIVE: stag
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
+    ports:
+      - "7252:7252"
+    # volumes:
+    #   - /logs/order-service-logs:/logs/order-service-logs
+    networks:
+      - green-craze-network
+
+  green-craze-user-service:
+    container_name: green-craze-user-service
+    image: green-craze-user-service
+    restart: unless-stopped
+    depends_on:
+      - green-craze-eureka-service
+      - green-craze-rabbitmq
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: user-service
+    environment:
+      SPRING_PROFILES_ACTIVE: stag
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
+    ports:
+      - "7253:7253"
+    # volumes:
+    #   - /logs/user-service-logs:/logs/user-service-logs
+    networks:
+      - green-craze-network
+
+  green-craze-inventory-service:
+    container_name: green-craze-inventory-service
+    image: green-craze-inventory-service
+    restart: unless-stopped
+    depends_on:
+      - green-craze-eureka-service
+      - green-craze-rabbitmq
+    build:
+      context: ./inventory-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: inventory-service
+    environment:
+      SPRING_PROFILES_ACTIVE: stag
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
+    ports:
+      - "7254:7254"
+    # volumes:
+    #   - /logs/inventory-service-logs:/logs/inventory-service-logs
+    networks:
+      - green-craze-network
+
+  green-craze-address-service:
+    container_name: green-craze-address-service
+    image: green-craze-address-service
+    restart: unless-stopped
+    depends_on:
+      - green-craze-eureka-service
+      - green-craze-rabbitmq
+    build:
+      context: ./address-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: address-service
+    environment:
+      SPRING_PROFILES_ACTIVE: stag
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
+    ports:
+      - "7256:7256"
+    # volumes:
+    #   - /logs/address-service-logs:/logs/address-service-logs
+    networks:
+      - green-craze-network
+
+  green-craze-infrastructure-service:
+    container_name: green-craze-infrastructure-service
+    image: green-craze-infrastructure-service
+    restart: unless-stopped
+    depends_on:
+      - green-craze-eureka-service
+      - green-craze-rabbitmq
+    build:
+      context: ./infrastructure-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: infrastructure-service
+    environment:
+      SPRING_PROFILES_ACTIVE: stag
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
+    ports:
+      - "7257:7257"
+    # volumes:
+    #   - /logs/infrastructure-service-logs:/logs/infrastructure-service-logs
+    networks:
+      - green-craze-network
+
+  green-craze-meta-service:
+    container_name: green-craze-meta-service
+    image: green-craze-meta-service
+    restart: unless-stopped
+    depends_on:
+      - green-craze-eureka-service
+      - green-craze-rabbitmq
+    build:
+      context: ./meta-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: meta-service
+    environment:
+      SPRING_PROFILES_ACTIVE: stag
+      MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
+    ports:
+      - "7258:7258"
+    # volumes:
+    #   - /logs/meta-service-logs:/logs/meta-service-logs
+    networks:
+      - green-craze-network
+
+networks:
+  green-craze-network:
+    external: true
