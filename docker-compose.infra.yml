@@ -3,6 +3,15 @@ version: "3.8"
 name: green-craze-infra
 
 services:
+  green-craze-rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3.9.11-management-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - green-craze-network
+
   green-craze-zipkin:
     container_name: zipkin
     image: openzipkin/zipkin
@@ -12,26 +21,26 @@ services:
     networks:
       - green-craze-network
 
-#   green-craze-prometheus:
-#     container_name: prometheus
-#     image: prom/prometheus
-#     restart: unless-stopped
-#     command:
-#       - --config.file=/etc/prometheus/prometheus.yml
-#     volumes:
-#       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-#     ports:
-#       - "9090:9090"
-#     networks:
-#       - green-craze-network
+  green-craze-prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - green-craze-network
 
-#   green-craze-grafana:
-#     container_name: grafana
-#     image: grafana/grafana
-#     ports:
-#       - "3000:3000"
-#     networks:
-#       - green-craze-network
+  green-craze-grafana:
+    container_name: grafana
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - green-craze-network
 
 networks:
   green-craze-network:

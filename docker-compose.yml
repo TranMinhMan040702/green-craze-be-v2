@@ -3,21 +3,12 @@ version: "3.8"
 name: green-craze-core
 
 services:
-  green-craze-rabbitmq:
-    image: rabbitmq:3.9.11-management-alpine
-    container_name: green-craze-rabbitmq
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    networks:
-      - green-craze-network
-
   green-craze-eureka-service:
     container_name: green-craze-eureka-service
     image: green-craze-eureka-service
     restart: unless-stopped
     build:
-      context: ./eureka-service
+      context: ./services/eureka-service
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: eureka-service
@@ -36,9 +27,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
-      - green-craze-rabbitmq
     build:
-      context: ./api-gateway
+      context: ./services/api-gateway
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: api-gateway
@@ -58,9 +48,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
-      - green-craze-rabbitmq
     build:
-      context: ./auth-service
+      context: ./services/auth-service
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: auth-service
@@ -80,9 +69,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
-      - green-craze-rabbitmq
     build:
-      context: ./product-service
+      context: ./services/product-service
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: product-service
@@ -102,9 +90,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
-      - green-craze-rabbitmq
     build:
-      context: ./order-service
+      context: ./services/order-service
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: order-service
@@ -124,9 +111,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
-      - green-craze-rabbitmq
     build:
-      context: ./user-service
+      context: ./services/user-service
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: user-service
@@ -146,9 +132,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
-      - green-craze-rabbitmq
     build:
-      context: ./inventory-service
+      context: ./services/inventory-service
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: inventory-service
@@ -168,9 +153,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
-      - green-craze-rabbitmq
     build:
-      context: ./address-service
+      context: ./services/address-service
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: address-service
@@ -190,9 +174,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
-      - green-craze-rabbitmq
     build:
-      context: ./infrastructure-service
+      context: ./services/infrastructure-service
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: infrastructure-service
@@ -212,9 +195,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
-      - green-craze-rabbitmq
     build:
-      context: ./meta-service
+      context: ./services/meta-service
       dockerfile: Dockerfile
       args:
         SERVICE_NAME: meta-service
