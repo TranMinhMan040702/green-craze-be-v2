@@ -1066,6 +1066,13 @@ spring:
           uri: lb://infrastructure-service
           predicates:
             - Method=GET
+            - Path=/api/notifications/count
+          filters:
+            - SetPath=/core/infrastructure/notifications/count
+        - id: private::infrastructure::getCountNotification
+          uri: lb://infrastructure-service
+          predicates:
+            - Method=GET
             - Path=/api/notifications
           filters:
             - SetPath=/core/infrastructure/notifications

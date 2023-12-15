@@ -14,6 +14,7 @@ import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.infrastructure.client.user.UserServiceClient;
 import vn.com.greencraze.infrastructure.dto.request.CreateNotificationRequest;
 import vn.com.greencraze.infrastructure.dto.response.CreateNotificationResponse;
+import vn.com.greencraze.infrastructure.dto.response.GetCountNotificationResponse;
 import vn.com.greencraze.infrastructure.dto.response.GetListNotificationResponse;
 import vn.com.greencraze.infrastructure.entity.Notification;
 import vn.com.greencraze.infrastructure.exception.InvalidUserIdException;
@@ -55,6 +56,15 @@ public class NotificationServiceImpl implements INotificationService {
                 .findAll(sortable.and(searchable).and(filterableByUserId), pageable)
                 .map(notificationMapper::notificationToGetListNotificationResponse);
         return RestResponse.ok(ListResponse.of(responses));
+    }
+
+    @Override
+    public RestResponse<GetCountNotificationResponse> getCountNotification() {
+        String userId = authFacade.getUserId();
+        long count = notificationRepository.countByUserIdAndStatus(userId, false);
+        return RestResponse.ok(GetCountNotificationResponse.builder()
+                .count(count)
+                .build());
     }
 
     @Override

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.infrastructure.dto.response.GetCountNotificationResponse;
 import vn.com.greencraze.infrastructure.dto.response.GetListNotificationResponse;
 import vn.com.greencraze.infrastructure.service.INotificationService;
 
@@ -40,6 +41,13 @@ public class NotificationController {
     ) {
         return ResponseEntity.ok(notificationService.getListNotification(
                 page, size, isSortAscending, columnName, search, all));
+    }
+
+    @GetMapping(value = "/count", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get count notifications")
+    public ResponseEntity<RestResponse<GetCountNotificationResponse>> getCountNotification() {
+        return ResponseEntity.ok(notificationService.getCountNotification());
     }
 
     @PatchMapping("/{id}")
