@@ -29,6 +29,7 @@ import vn.com.greencraze.order.client.user.dto.response.GetOneUserResponse;
 import vn.com.greencraze.order.client.user.dto.response.GetOrderReviewResponse;
 import vn.com.greencraze.order.config.property.RabbitMQProperties;
 import vn.com.greencraze.order.constant.OrderConstants;
+import vn.com.greencraze.order.cronjob.JobManager;
 import vn.com.greencraze.order.dto.request.order.CompletePaypalOrderRequest;
 import vn.com.greencraze.order.dto.request.order.CreateOrderItemRequest;
 import vn.com.greencraze.order.dto.request.order.CreateOrderRequest;
@@ -97,6 +98,9 @@ public class OrderServiceImpl implements IOrderService {
     private final RabbitMQMessageProducer producer;
 
     private final AuthFacade authFacade;
+
+    private final JobManager jobManager;
+
     private static final String RESOURCE_NAME = "Order";
     private static final List<String> SEARCH_FIELDS = List.of("code");
 
@@ -332,9 +336,7 @@ public class OrderServiceImpl implements IOrderService {
     }
 
     private void updateProduct(List<CreateOrderItemRequest> items) {
-        UpdateListProductQuantityRequest request = new UpdateListProductQuantityRequest(
-                new ArrayList<>()
-        );
+        UpdateListProductQuantityRequest request = new UpdateListProductQuantityRequest(new ArrayList<>());
 
         for (CreateOrderItemRequest item : items) {
 
@@ -343,13 +345,8 @@ public class OrderServiceImpl implements IOrderService {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", item.variantId());
             GetOneVariantResponse variant = variantResp.data();
 
-            request.quantityItems().add(
-                    new UpdateListProductQuantityRequest.ProductQuantityItem(
-                            variant.productId(),
-                            variant.quantity() * item.quantity()
-                    )
-            );
-
+            request.quantityItems().add(new UpdateListProductQuantityRequest.ProductQuantityItem(
+                    variant.productId(), variant.quantity() * item.quantity()));
         }
 
         productServiceClient.updateProductQuantity(request);
@@ -363,10 +360,7 @@ public class OrderServiceImpl implements IOrderService {
             variantIds.add(item.variantId());
         }
 
-        UpdateUserCartRequest request = new UpdateUserCartRequest(
-                userId,
-                variantIds
-        );
+        UpdateUserCartRequest request = new UpdateUserCartRequest(userId, variantIds);
 
         userServiceClient.updateUserCart(request);
     }
@@ -381,11 +375,8 @@ public class OrderServiceImpl implements IOrderService {
             }
             GetOneVariantResponse variant = variantResp.data();
 
-            request.productDockets().add(
-                    new CreateDocketRequest.ProductDocket(
-                            variant.productId(),
-                            variant.quantity() * item.quantity())
-            );
+            request.productDockets().add(new CreateDocketRequest.ProductDocket(
+                    variant.productId(), variant.quantity() * item.quantity()));
         }
 
         inventoryServiceClient.createDocket(request);
@@ -432,6 +423,7 @@ public class OrderServiceImpl implements IOrderService {
             String addressDetail = address.street() + ", " + address.ward().name()
                     + ", " + address.district().name() + ", " + address.province().name();
 
+            // TODO: refactor Locale
             NumberFormat numberFormat = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
 
             // send email order
@@ -478,6 +470,9 @@ public class OrderServiceImpl implements IOrderService {
             createNotify(order);
         } catch (Exception ignored) {
         }
+
+        // auto Hủy đơn sau 10p
+        jobManager.execute(order.getId());
 
         return RestResponse.ok(orderMapper.orderToCreateOrderResponse(order));
     }
@@ -631,25 +626,29 @@ public class OrderServiceImpl implements IOrderService {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "userId", userId);
             }
             GetOneAddressResponse address = addressResp.data();
+            // TODO: refactor format String
             String addressDetail = address.street() + ", " + address.ward().name()
                     + ", " + address.district().name() + ", " + address.province().name();
 
+            // TODO: refactor replace Locale
             NumberFormat numberFormat = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
 
             // send email order
             producer.publish(SendEmailRequest.builder()
-                    .event(EmailEvent.ORDER_CONFIRMATION)
-                    .email(user.email())
-                    .payload(Map.of(
-                            "name", user.firstName() + " " + user.lastName(),
-                            "email", address.email(),
-                            "receiver", address.receiver(),
-                            "phone", address.phone(),
-                            "totalPrice", numberFormat.format(order.getTotalAmount()),
-                            "paymentMethod", order.getTransaction().getPaymentMethod(),
-                            "address", addressDetail
-                    ))
-                    .build(), rabbitMQProperties.internalExchange(), rabbitMQProperties.mailRoutingKey());
+                            .event(EmailEvent.ORDER_CONFIRMATION)
+                            .email(user.email())
+                            .payload(Map.of(
+                                    "name", user.firstName() + " " + user.lastName(),
+                                    "email", address.email(),
+                                    "receiver", address.receiver(),
+                                    "phone", address.phone(),
+                                    "totalPrice", numberFormat.format(order.getTotalAmount()),
+                                    "paymentMethod", order.getTransaction().getPaymentMethod(),
+                                    "address", addressDetail
+                            ))
+                            .build(),
+                    rabbitMQProperties.internalExchange(),
+                    rabbitMQProperties.mailRoutingKey());
 
             GetOneProductResponse productResponse = productServiceClient.getOneProductByVariant(
                     Objects.requireNonNull(order.getOrderItems().stream()
@@ -657,20 +656,18 @@ public class OrderServiceImpl implements IOrderService {
                                     .orElse(null))
                             .getVariantId()).data();
 
-            CreateNotificationRequest req = CreateNotificationRequest.builder()
-                    .userId(order.getUserId())
-                    .type(NotificationType.ORDER)
-                    .content(String.format("Đơn hàng #%s của bạn đã thanh toán thành công và đang được chúng tôi xử lý",
-                            order.getCode()))
-                    .title("Thanh toán thành công")
-                    .anchor("/user/order/" + order.getCode())
-                    .image(Objects.requireNonNull(productResponse.images().stream()
-                                    .findFirst()
-                                    .orElse(null))
-                            .image())
-                    .build();
-
-            producer.publish(req,
+            producer.publish(CreateNotificationRequest.builder()
+                            .userId(order.getUserId())
+                            .type(NotificationType.ORDER)
+                            .content(String.format("Đơn hàng #%s của bạn đã thanh toán thành công và đang được chúng tôi xử lý",
+                                    order.getCode()))
+                            .title("Thanh toán thành công")
+                            .anchor("/user/order/" + order.getCode())
+                            .image(Objects.requireNonNull(productResponse.images().stream()
+                                            .findFirst()
+                                            .orElse(null))
+                                    .image())
+                            .build(),
                     rabbitMQProperties.internalExchange(),
                     rabbitMQProperties.notificationRoutingKey());
         } catch (Exception ignored) {
@@ -724,6 +721,5 @@ public class OrderServiceImpl implements IOrderService {
                         status -> orderRepository.countByStatusAndCreatedAtBetween(status, startDate, endDate)
                 ));
     }
-
 
 }
