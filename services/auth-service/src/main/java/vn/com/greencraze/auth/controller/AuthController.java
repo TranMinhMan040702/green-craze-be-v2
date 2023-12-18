@@ -32,7 +32,6 @@ import vn.com.greencraze.auth.dto.response.auth.ResetPasswordResponse;
 import vn.com.greencraze.auth.dto.response.auth.ValidateAccessTokenResponse;
 import vn.com.greencraze.auth.dto.response.auth.VerifyOTPResponse;
 import vn.com.greencraze.auth.service.IAuthService;
-import vn.com.greencraze.auth.service.ISystemService;
 import vn.com.greencraze.commons.annotation.InternalApi;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.enumeration.Microservice;
@@ -47,13 +46,6 @@ import java.security.GeneralSecurityException;
 public class AuthController {
 
     private final IAuthService authService;
-    private final ISystemService systemService;
-
-    @PostMapping(value = "/account-admin")
-    public ResponseEntity<Void> createAccountAdmin() {
-        systemService.createAccountAdmin();
-        return ResponseEntity.noContent().build();
-    }
 
     @PostMapping(
             value = "/login",
