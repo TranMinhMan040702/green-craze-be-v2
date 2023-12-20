@@ -1,0 +1,146 @@
+server:
+  port: 7250
+  servlet:
+    context-path: /core/auth
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: auth-service
+  profiles:
+    active: dev
+  web:
+    resources:
+      add-mappings: false
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+        generate_statistics: true
+    show-sql: true
+  sql:
+    init:
+      mode: never
+  cloud:
+    openfeign:
+      lazy-attributes-resolution: true
+      client:
+        config:
+          default:
+            logger-level: full
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+
+logging:
+  level:
+    web: trace
+    org.hibernate.orm.jdbc.bind: trace
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    enabled: true
+    register-with-eureka: true
+    fetch-registry: true
+
+springdoc:
+  use-fqn: true
+  swagger-ui:
+    operations-sorter: method
+    tags-sorter: alpha
+    doc-expansion: none
+    display-request-duration: true
+    show-extensions: true
+    show-common-extensions: true
+    default-model-expand-depth: 10
+    default-models-expand-depth: 10
+    display-operation-id: true
+
+app:
+  access-token-expiration-millis: 86400000 # 1day
+  refresh-token-expiration-millis: 604800000 # 7day
+  otp-token-expiration-millis: 300000 # 5p
+  issuer: https://api.green-craze-v1.com.vn
+  signing-key: GreenCrazeV1_ManSonCodeNhuQuanQue
+  client-id: 841642161726-v3mbpdq17eajakh8duatq7kvah65lk83.apps.googleusercontent.com
+
+rabbitmq:
+  internal-exchange: internal.exchange
+  mail-routing-key: mail.routing_key
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_auth
+    username: avnadmin
+    password: AVNS_ICGL1LOHUwComp9Dj2e
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:7230/eureka
+
+---
+spring:
+  config:
+    activate:
+      on-profile: stag
+  datasource:
+    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_auth
+    username: avnadmin
+    password: AVNS_ICGL1LOHUwComp9Dj2e
+  rabbitmq:
+    host: green-craze-rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://green-craze-eureka-service:7230/eureka
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_auth
+    username: avnadmin
+    password: AVNS_ICGL1LOHUwComp9Dj2e
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://green-craze-eureka-service:7230/eureka

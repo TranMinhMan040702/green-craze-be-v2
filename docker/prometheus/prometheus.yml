@@ -1,0 +1,74 @@
+global:
+   scrape_interval: 10s
+   evaluation_interval: 10s
+
+scrape_configs:
+   - job_name: "eureka-service"
+     metrics_path: /actuator/prometheus
+     static_configs:
+        - targets: ["green-craze-eureka-service:7230"]
+          labels:
+             application: "Eureka Service Application"
+
+   - job_name: "api-gateway"
+     metrics_path: /actuator/prometheus
+     static_configs:
+        - targets: ["green-craze-api-gateway:7168"]
+          labels:
+             application: "API Gateway Application"
+
+   - job_name: "auth-service"
+     metrics_path: /core/auth/actuator/prometheus
+     static_configs:
+        - targets: ["green-craze-auth-service:7250"]
+          labels:
+             application: "Auth Service Application"
+
+   - job_name: "product-service"
+     metrics_path: /core/product/actuator/prometheus
+     static_configs:
+        - targets: ["green-craze-product-service:7251"]
+          labels:
+             application: "Product Service Application"
+
+   - job_name: "order-service"
+     metrics_path: /core/order/actuator/prometheus
+     static_configs:
+        - targets: ["green-craze-order-service:7252"]
+          labels:
+             application: "Order Service Application"
+
+   - job_name: "user-service"
+     metrics_path: /core/user/actuator/prometheus
+     static_configs:
+        - targets: ["green-craze-user-service:7253"]
+          labels:
+             application: "User Service Application"
+
+   - job_name: "inventory-service"
+     metrics_path: /core/inventory/actuator/prometheus
+     static_configs:
+        - targets: ["green-craze-inventory-service:7254"]
+          labels:
+             application: "Inventory Service Application"
+
+   - job_name: "address-service"
+     metrics_path: /core/address/actuator/prometheus
+     static_configs:
+        - targets: ["green-craze-address-service:7256"]
+          labels:
+             application: "Address Service Application"
+
+   - job_name: "infrastructure-service"
+     metrics_path: /core/infrastructure/actuator/prometheus
+     static_configs:
+        - targets: ["green-craze-infrastructure-service:7257"]
+          labels:
+             application: "Infrastructure Service Application"
+
+   - job_name: "meta-service"
+     metrics_path: /core/meta/actuator/prometheus
+     static_configs:
+        - targets: ["green-craze-meta-service:7258"]
+          labels:
+             application: "Meta Service Application"
