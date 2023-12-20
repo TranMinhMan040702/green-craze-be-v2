@@ -153,6 +153,10 @@ public class CartServiceImpl implements ICartService {
 
         if (cartItem != null) {
             cartItem.setQuantity(cartItem.getQuantity() + request.quantity());
+            if ((long) cartItem.getQuantity() * variant.quantity() > product.actualInventory())
+                throw new InvalidRequestException(
+                        "Unexpected quantity, it must be less than or equal to product in inventory"
+                );
         } else {
             cartItem = cartMapper.createCartItemRequestToCartItem(request);
             cartItem.setCart(cart);
@@ -178,7 +182,7 @@ public class CartServiceImpl implements ICartService {
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cart", userId));
 
         CartItem cartItem = cart.getCartItems()
-                .stream().filter(x -> Objects.equals(x.getCart().getId(), cart.getId()))
+                .stream().filter(x -> Objects.equals(x.getId(), id))
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cartItem", id));
 
@@ -198,13 +202,20 @@ public class CartServiceImpl implements ICartService {
             throw new InvalidRequestException("Unexpected variantId, product is not active");
         }
 
+        cartItem.setQuantity(request.quantity());
+
         long quantity = product.actualInventory();
-        if (quantity < (request.quantity() * variant.quantity().longValue()))
+        if (quantity < (request.quantity() * variant.quantity().longValue())){
+            cartItem.setQuantity((int) (quantity / variant.quantity()));
+            if(cartItem.getQuantity() > 0){
+                cartItemRepository.save(cartItem);
+            }else{
+                cartItemRepository.deleteById(id);
+            }
             throw new InvalidRequestException(
                     "Unexpected quantity, it must be less than or equal to product in inventory"
             );
-
-        cartItem.setQuantity(request.quantity());
+        }
 
         cartItemRepository.save(cartItem);
     }

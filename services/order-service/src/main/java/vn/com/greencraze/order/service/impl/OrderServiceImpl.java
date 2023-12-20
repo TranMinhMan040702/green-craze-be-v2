@@ -65,6 +65,7 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -288,6 +289,8 @@ public class OrderServiceImpl implements IOrderService {
                 .paymentStatus(false)
                 .build();
 
+        HashMap<Long, Long> productActualQuantity = new HashMap<>();
+
         for (CreateOrderItemRequest oi : request.items()) {
             // get variant from product service
             RestResponse<GetOneVariantResponse> variantResp = productServiceClient.getOneVariant(oi.variantId());
@@ -302,10 +305,18 @@ public class OrderServiceImpl implements IOrderService {
             }
             GetOneProductResponse product = productResp.data();
 
-            long q = (long) variant.quantity() * oi.quantity();
-            if (q > product.actualInventory()) {
-                throw new InvalidRequestException("Current quantity of product is not enough");
+            if (!productActualQuantity.containsKey(product.id()))
+            {
+                productActualQuantity.put(product.id(), product.actualInventory());
             }
+
+            long q = (long) variant.quantity() * oi.quantity();
+            if (q > productActualQuantity.get(product.id())) {
+                throw new InvalidRequestException(
+                        "Unexpected quantity, it must be less than or equal to product in inventory"
+                );
+            }
+            productActualQuantity.put(product.id(), productActualQuantity.get(product.id()) - q) ;
 
             BigDecimal variantPrice = variant.totalPrice().multiply(BigDecimal.valueOf(oi.quantity()));
 
