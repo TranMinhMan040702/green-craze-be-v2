@@ -104,7 +104,7 @@ public class ProductServiceImpl implements IProductService {
             String search, Boolean all, Boolean status, FilterProductRequest filter
     ) {
         ProductSpecification productSpecification = new ProductSpecification();
-        Specification<Product> sortable = productSpecification.sortable(isSortAscending, columnName);
+        Specification<Product> sortable = productSpecification.sortablePrice(isSortAscending, columnName);
         Specification<Product> searchable = productSpecification.searchable(SEARCH_FIELDS, search);
         Specification<Product> filterableByStatus = productSpecification.filterable(status);
         Specification<Product> filterable = productSpecification.filterable(filter);
@@ -279,7 +279,7 @@ public class ProductServiceImpl implements IProductService {
     public RestResponse<GetOneProductResponse> getOneProductByVariant(Long variantId) {
         Variant variant = variantRepository.findById(variantId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "variantId", variantId));
-        
+
         return productRepository.findById(variant.getProduct().getId())
                 .map(productMapper::productToGetOneProductResponse)
                 .map(RestResponse::ok)
