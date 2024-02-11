@@ -1,6 +1,6 @@
 # Green Craze
 
-## Contributor
+## Contributors
 - Tran Minh Man     -     20110301
 - Nguyen Minh Son   -     20110713
 
@@ -8,14 +8,14 @@
 -  Green Craze is a project on Software Engineering. This project is an e-commerce project built
    based on microservice architecture.
 
-![Microservice.drawio (2).png](..%2F..%2F..%2F..%2FHCMUTE%2FNam4%2FHK1%2FTieuLuanChuyenNganh%2Flogo%2FMicroservice.drawio%20%282%29.png)
+![Microservice drawio (2)](https://github.com/TranMinhMan040702/green-craze-be-v2/assets/96435164/3a9432e5-8685-47e1-ad65-13b95166958b)
 
 ## Technologies and frameworks
 - Java 17.
 - Spring boot 3.
 - Spring Cloud Gateway, Open Feign,...
 - Web socket.
-- MySql
+- MySql.
 - RabbitMq.
 - Docker, Docker Compose.
 - Grafana Stack: Prometheus and Grafana.
