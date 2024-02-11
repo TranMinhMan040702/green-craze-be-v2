@@ -188,8 +188,9 @@ public class ReviewServiceImpl implements IReviewService {
 
         double rating = 5.0;
         if (!reviews.isEmpty()) {
-            rating = reviews.stream().reduce(0.0,
-                    (a, b) -> a + b.getRating(), Double::sum) / reviews.size();
+            //            rating = Math.round(reviews.stream().reduce(0.0,
+            //                    (a, b) -> a + b.getRating(), Double::sum) / reviews.size());
+            rating = Math.round((reviews.stream().mapToDouble(Review::getRating).average().orElse(0.0)) * 10.0) / 10.0;
         }
 
         productServiceClient.updateProductReview(productId, new UpdateOneProductReviewRequest(rating));
