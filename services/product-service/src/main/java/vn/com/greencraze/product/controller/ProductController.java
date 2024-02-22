@@ -78,6 +78,23 @@ public class ProductController {
                 page, size, isSortAscending, columnName, search, all, status, categorySlug));
     }
 
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping(value = "/admin", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get a list of products for admin")
+    public ResponseEntity<RestResponse<ListResponse<GetListProductResponse>>> getListProductForAdmin(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "true") boolean isSortAscending,
+            @RequestParam(defaultValue = "id") String columnName,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) boolean all,
+            @RequestParam(required = false) boolean status
+    ) {
+        return ResponseEntity.ok(productService.getListProductForAdmin(
+                page, size, isSortAscending, columnName, search, all, status));
+    }
+
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Get a list of searching product")

@@ -5,6 +5,7 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.specification.BaseSpecification;
 import vn.com.greencraze.product.dto.request.product.FilterProductRequest;
 import vn.com.greencraze.product.entity.Brand;
@@ -16,6 +17,7 @@ import vn.com.greencraze.product.enumeration.ProductStatus;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class ProductSpecification extends BaseSpecification<Product> {
 
     public Specification<Product> sortablePrice(Boolean isSortAscending, String columnName) {
@@ -31,15 +33,28 @@ public class ProductSpecification extends BaseSpecification<Product> {
         };
     }
 
-    public Specification<Product> filterable(String categorySlug) {
-        List<Predicate> wheres = new ArrayList<>();
+    public Specification<Product> isActiveCategory(Boolean isActive) {
         return (root, query, cb) -> {
+            if (isActive != null) {
+                Join<Product, ProductCategory> category = root.join("productCategory");
+                return cb.equal(category.get("status"), true);
+            }
+            return cb.conjunction();
+        };
+    }
+
+    public Specification<Product> filterable(String categorySlug) {
+        return (root, query, cb) -> {
+            Predicate predicate = cb.conjunction();
             if (categorySlug != null) {
                 Join<Product, ProductCategory> category = root.join("productCategory");
-                Predicate isEqualCategorySlug = cb.equal(category.get("slug"), categorySlug);
-                wheres.add(isEqualCategorySlug);
+                predicate = cb.and(
+                        predicate,
+                        cb.equal(category.get("slug"), categorySlug),
+                        cb.equal(category.get("status"), true)
+                );
             }
-            return cb.and(wheres.toArray(new Predicate[0]));
+            return predicate;
         };
     }
 

@@ -28,6 +28,12 @@ public interface IProductService {
             Integer page, Integer size, Boolean isSortAscending, String columnName,
             String search, Boolean all, Boolean status, String categorySlug);
 
+    // TODO: getListProductForAdmin
+    RestResponse<ListResponse<GetListProductResponse>> getListProductForAdmin(
+            Integer page, Integer size, Boolean isSortAscending,
+            String columnName, String search, Boolean all, Boolean status
+    );
+
     RestResponse<ListResponse<GetListSearchingProductResponse>> getListSearchingProduct(String search);
 
     RestResponse<ListResponse<GetListFilteringProductResponse>> getListFilteringProduct(
