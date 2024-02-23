@@ -260,8 +260,9 @@ public class OrderServiceImpl implements IOrderService {
 
     private Order initOrder(CreateOrderRequest request) {
         String userId = authFacade.getUserId();
-        // get default address
-        RestResponse<GetOneAddressResponse> address = addressServiceClient.getDefaultAddress(userId);
+
+        // get chosen address
+        RestResponse<GetOneAddressResponse> address = addressServiceClient.getOneAddress(request.addressId());
         if (address == null) {
             throw new ResourceNotFoundException(RESOURCE_NAME, "addressId", userId);
         }

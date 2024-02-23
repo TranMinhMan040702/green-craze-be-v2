@@ -11,6 +11,8 @@ public record CreateOrderRequest(
         Long paymentMethodId,
         @NotNull
         Long deliveryId,
+        @NotNull
+        Long addressId,
         @NotEmpty
         @NotNull
         List<CreateOrderItemRequest> items
