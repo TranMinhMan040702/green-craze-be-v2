@@ -509,6 +509,14 @@ spring:
             - Path=/api/products
           filters:
             - SetPath=/core/product/products
+        ## TODO
+        - id: private::product::getListProductForAdmin
+          uri: lb://product-service
+          predicates:
+            - Method=GET
+            - Path=/api/products/admin
+          filters:
+            - SetPath=/core/product/products/admin
         - id: public::product::getListSearchingProduct
           uri: lb://product-service
           predicates:

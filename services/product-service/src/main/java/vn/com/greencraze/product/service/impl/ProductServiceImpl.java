@@ -58,6 +58,8 @@ public class ProductServiceImpl implements IProductService {
     private final UnitRepository unitRepository;
     private final VariantRepository variantRepository;
 
+    private final ProductSpecification productSpecification;
+
     private final ProductMapper productMapper;
 
     private final IUploadService uploadService;
@@ -72,28 +74,46 @@ public class ProductServiceImpl implements IProductService {
             Integer page, Integer size, Boolean isSortAscending, String columnName,
             String search, Boolean all, Boolean status, String categorySlug
     ) {
-        ProductSpecification productSpecification = new ProductSpecification();
         Specification<Product> sortable = productSpecification.sortable(isSortAscending, columnName);
         Specification<Product> searchable = productSpecification.searchable(SEARCH_FIELDS, search);
         Specification<Product> filterableByCategorySlug = productSpecification.filterable(categorySlug);
         Specification<Product> filterableByStatus = productSpecification.filterable(status);
+        Specification<Product> activeCategory = productSpecification.isActiveCategory(true);
 
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
         Page<GetListProductResponse> responses = productRepository
-                .findAll(sortable.and(searchable).and(filterableByCategorySlug).and(filterableByStatus), pageable)
+                .findAll(sortable.and(searchable).and(filterableByCategorySlug).and(filterableByStatus).and(activeCategory),
+                        pageable)
                 .map(productMapper::productToGetListProductResponse);
-        return RestResponse.created(ListResponse.of(responses));
+        return RestResponse.ok(ListResponse.of(responses));
+    }
+
+    // TODO: getListProductForAdmin
+    @Override
+    public RestResponse<ListResponse<GetListProductResponse>> getListProductForAdmin(
+            Integer page, Integer size, Boolean isSortAscending,
+            String columnName, String search, Boolean all, Boolean status
+    ) {
+        Specification<Product> sortable = productSpecification.sortable(isSortAscending, columnName);
+        Specification<Product> searchable = productSpecification.searchable(SEARCH_FIELDS, search);
+        Specification<Product> filterableByStatus = productSpecification.filterable(status);
+
+        Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
+        Page<GetListProductResponse> responses = productRepository
+                .findAll(sortable.and(searchable).and(filterableByStatus), pageable)
+                .map(productMapper::productToGetListProductResponse);
+        return RestResponse.ok(ListResponse.of(responses));
     }
 
     @Override
     public RestResponse<ListResponse<GetListSearchingProductResponse>> getListSearchingProduct(String search) {
-        ProductSpecification productSpecification = new ProductSpecification();
         Specification<Product> searchable = productSpecification.searchable(SEARCH_FIELDS, search);
         Specification<Product> filterableByStatus = productSpecification.filterable(true);
+        Specification<Product> activeCategory = productSpecification.isActiveCategory(true);
 
         Pageable pageable = PageRequest.of(0, 5);
         Page<GetListSearchingProductResponse> responses = productRepository
-                .findAll(searchable.and(filterableByStatus), pageable)
+                .findAll(searchable.and(filterableByStatus).and(activeCategory), pageable)
                 .map(productMapper::productToGetListSearchingProductResponse);
         return RestResponse.created(ListResponse.of(responses));
     }
@@ -103,11 +123,11 @@ public class ProductServiceImpl implements IProductService {
             Integer page, Integer size, Boolean isSortAscending, String columnName,
             String search, Boolean all, Boolean status, FilterProductRequest filter
     ) {
-        ProductSpecification productSpecification = new ProductSpecification();
         Specification<Product> sortable = productSpecification.sortablePrice(isSortAscending, columnName);
         Specification<Product> searchable = productSpecification.searchable(SEARCH_FIELDS, search);
         Specification<Product> filterableByStatus = productSpecification.filterable(status);
         Specification<Product> filterable = productSpecification.filterable(filter);
+
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
         Page<GetListFilteringProductResponse> responses = productRepository
                 .findAll(sortable.and(searchable).and(filterable).and(filterableByStatus), pageable)
