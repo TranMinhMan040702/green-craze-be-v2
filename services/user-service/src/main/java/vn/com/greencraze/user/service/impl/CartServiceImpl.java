@@ -206,12 +206,12 @@ public class CartServiceImpl implements ICartService {
 
         long quantity = product.actualInventory();
         if (quantity < (request.quantity() * variant.quantity().longValue())){
-            cartItem.setQuantity((int) (quantity / variant.quantity()));
-            if(cartItem.getQuantity() > 0){
-                cartItemRepository.save(cartItem);
-            }else{
-                cartItemRepository.deleteById(id);
-            }
+//            cartItem.setQuantity((int) (quantity / variant.quantity()));
+//            if(cartItem.getQuantity() > 0){
+//                cartItemRepository.save(cartItem);
+//            }else{
+//                cartItemRepository.deleteById(id);
+//            }
             throw new InvalidRequestException(
                     "Unexpected quantity, it must be less than or equal to product in inventory"
             );
