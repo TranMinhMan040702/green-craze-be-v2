@@ -12,6 +12,7 @@ import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.enumeration.NotificationType;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
+import vn.com.greencraze.product.backgroundjob.JobManager;
 import vn.com.greencraze.product.config.property.RabbitMQProperties;
 import vn.com.greencraze.product.dto.request.sale.CreateSaleRequest;
 import vn.com.greencraze.product.dto.request.sale.UpdateSaleRequest;
@@ -52,6 +53,8 @@ public class SaleServiceImpl implements ISaleService {
     private final IUploadService uploadService;
 
     private final SaleMapper saleMapper;
+
+    private final JobManager jobManager;
 
     private final RabbitMQMessageProducer producer;
 
@@ -97,6 +100,9 @@ public class SaleServiceImpl implements ISaleService {
         sale.setProductCategories(new HashSet<>(productCategories));
         sale.setImage(uploadService.uploadFile(request.image()));
         saleRepository.save(sale);
+
+        jobManager.handleSaleJobExecution(sale.getId());
+
         return RestResponse.created(saleMapper.saleToCreateSaleResponse(sale));
     }
 
@@ -107,8 +113,12 @@ public class SaleServiceImpl implements ISaleService {
         }
 
         Sale sale = saleRepository.findById(id)
-                .map(s -> saleMapper.updateSaleFromUpdateSaleRequest(s, request))
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
+
+        boolean isStartDateChanged = sale.getStartDate().compareTo(request.startDate()) != 0;
+        boolean isEndDateChanged = sale.getEndDate().compareTo(request.endDate()) != 0;
+
+        sale = saleMapper.updateSaleFromUpdateSaleRequest(sale, request);
 
         if (request.image() != null) {
             sale.setImage(uploadService.uploadFile(request.image()));
@@ -122,6 +132,14 @@ public class SaleServiceImpl implements ISaleService {
                         .toList();
         sale.setProductCategories(new HashSet<>(productCategories));
         saleRepository.save(sale);
+
+        if(isStartDateChanged) {
+            jobManager.applySaleJobExecution(sale.getId(), request.startDate());
+        }
+
+        if(isEndDateChanged) {
+            jobManager.cancelSaleJobExecution(sale.getId(), request.endDate());
+        }
     }
 
     @Override
