@@ -41,8 +41,11 @@ public class CartServiceImpl implements ICartService {
     private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;
     private final UserProfileRepository userProfileRepository;
+
     private final CartMapper cartMapper;
+
     private final ProductServiceClient productServiceClient;
+
     private final AuthFacade authFacade;
     private static final String RESOURCE_NAME = "Cart";
 
@@ -205,13 +208,13 @@ public class CartServiceImpl implements ICartService {
         cartItem.setQuantity(request.quantity());
 
         long quantity = product.actualInventory();
-        if (quantity < (request.quantity() * variant.quantity().longValue())){
-//            cartItem.setQuantity((int) (quantity / variant.quantity()));
-//            if(cartItem.getQuantity() > 0){
-//                cartItemRepository.save(cartItem);
-//            }else{
-//                cartItemRepository.deleteById(id);
-//            }
+        if (quantity < (request.quantity() * variant.quantity().longValue())) {
+            //            cartItem.setQuantity((int) (quantity / variant.quantity()));
+            //            if(cartItem.getQuantity() > 0){
+            //                cartItemRepository.save(cartItem);
+            //            }else{
+            //                cartItemRepository.deleteById(id);
+            //            }
             throw new InvalidRequestException(
                     "Unexpected quantity, it must be less than or equal to product in inventory"
             );

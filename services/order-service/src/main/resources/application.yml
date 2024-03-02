@@ -32,6 +32,11 @@ spring:
         config:
           default:
             logger-level: full
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      retries: 1000
 
 management:
   tracing:
@@ -92,6 +97,8 @@ spring:
     port: 5672
     username: guest
     password: guest
+  kafka:
+    bootstrap-servers: localhost:29092
 
 cloudinary:
   cloud-name: dwoejm4g6

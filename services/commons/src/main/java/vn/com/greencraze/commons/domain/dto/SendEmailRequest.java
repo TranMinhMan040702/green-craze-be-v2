@@ -1,4 +1,4 @@
-package vn.com.greencraze.order.rabbitmq.dto.request;
+package vn.com.greencraze.commons.domain.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -15,5 +15,4 @@ public record SendEmailRequest(
         String email,
         @NotNull(message = "request has no payload")
         Map<String, Object> payload
-) {
-}
+) {}

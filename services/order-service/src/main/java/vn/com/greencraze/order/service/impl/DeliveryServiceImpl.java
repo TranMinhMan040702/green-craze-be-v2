@@ -29,7 +29,9 @@ import java.util.List;
 public class DeliveryServiceImpl implements IDeliveryService {
 
     private final DeliveryRepository deliveryRepository;
+
     private final DeliveryMapper deliveryMapper;
+
     private final IUploadService uploadService;
 
     private static final String RESOURCE_NAME = "Delivery";

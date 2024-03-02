@@ -1,4 +1,4 @@
-package vn.com.greencraze.order.rabbitmq.dto.request;
+package vn.com.greencraze.commons.domain.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
@@ -19,5 +19,4 @@ public record CreateNotificationRequest(
         String anchor,
         @NotNull
         String image
-) {
-}
+) {}

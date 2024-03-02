@@ -1,22 +1,25 @@
-package vn.com.greencraze.infrastructure.rabbitmq;
+package vn.com.greencraze.infrastructure.listener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import vn.com.greencraze.commons.domain.KafkaGroupIds;
+import vn.com.greencraze.commons.domain.KafkaIds;
+import vn.com.greencraze.commons.domain.Topics;
 import vn.com.greencraze.commons.domain.dto.CreateNotificationRequest;
 import vn.com.greencraze.infrastructure.service.INotificationService;
 
-@Component
 @Slf4j
+@Component
 @RequiredArgsConstructor
-public class NotificationConsumer {
+public class NotificationListener {
 
     private final INotificationService notificationService;
 
-    @RabbitListener(queues = "${rabbitmq.queues.notification}")
+    @KafkaListener(id = KafkaIds.PRODUCT, topics = Topics.NOTIFICATION, groupId = KafkaGroupIds.NOTIFICATION)
     public void consumer(CreateNotificationRequest request) {
-        log.info("Consumed {} from queue", request);
+        log.info("Received: {}", request);
         notificationService.createNotification(request);
     }
 

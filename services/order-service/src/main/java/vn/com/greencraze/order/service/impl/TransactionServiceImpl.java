@@ -30,6 +30,7 @@ import java.util.List;
 public class TransactionServiceImpl implements ITransactionService {
 
     private final TransactionRepository transactionRepository;
+
     private final TransactionMapper transactionMapper;
 
     private final UserServiceClient userServiceClient;

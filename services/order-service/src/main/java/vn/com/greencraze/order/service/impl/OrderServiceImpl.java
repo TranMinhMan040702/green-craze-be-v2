@@ -7,10 +7,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import vn.com.greencraze.amqp.RabbitMQMessageProducer;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.auth.AuthFacade;
+import vn.com.greencraze.commons.domain.dto.CreateNotificationRequest;
+import vn.com.greencraze.commons.domain.dto.SendEmailRequest;
 import vn.com.greencraze.commons.enumeration.EmailEvent;
 import vn.com.greencraze.commons.enumeration.NotificationType;
 import vn.com.greencraze.commons.exception.InvalidRequestException;
@@ -27,7 +28,6 @@ import vn.com.greencraze.order.client.user.UserServiceClient;
 import vn.com.greencraze.order.client.user.dto.request.UpdateUserCartRequest;
 import vn.com.greencraze.order.client.user.dto.response.GetOneUserResponse;
 import vn.com.greencraze.order.client.user.dto.response.GetOrderReviewResponse;
-import vn.com.greencraze.order.config.property.RabbitMQProperties;
 import vn.com.greencraze.order.constant.OrderConstants;
 import vn.com.greencraze.order.cronjob.JobManager;
 import vn.com.greencraze.order.dto.request.order.CompletePaypalOrderRequest;
@@ -50,8 +50,7 @@ import vn.com.greencraze.order.enumeration.OrderStatus;
 import vn.com.greencraze.order.enumeration.PaymentCode;
 import vn.com.greencraze.order.mapper.OrderItemMapper;
 import vn.com.greencraze.order.mapper.OrderMapper;
-import vn.com.greencraze.order.rabbitmq.dto.request.CreateNotificationRequest;
-import vn.com.greencraze.order.rabbitmq.dto.request.SendEmailRequest;
+import vn.com.greencraze.order.producer.KafkaProducer;
 import vn.com.greencraze.order.repository.DeliveryRepository;
 import vn.com.greencraze.order.repository.OrderCancelReasonRepository;
 import vn.com.greencraze.order.repository.OrderItemRepository;
@@ -65,7 +64,6 @@ import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -94,9 +92,7 @@ public class OrderServiceImpl implements IOrderService {
     private final UserServiceClient userServiceClient;
     private final InventoryServiceClient inventoryServiceClient;
 
-    private final RabbitMQProperties rabbitMQProperties;
-
-    private final RabbitMQMessageProducer producer;
+    private final KafkaProducer kafkaProducer;
 
     private final AuthFacade authFacade;
 
@@ -306,8 +302,7 @@ public class OrderServiceImpl implements IOrderService {
             }
             GetOneProductResponse product = productResp.data();
 
-            if (!productActualQuantity.containsKey(product.id()))
-            {
+            if (!productActualQuantity.containsKey(product.id())) {
                 productActualQuantity.put(product.id(), product.actualInventory());
             }
 
@@ -317,7 +312,7 @@ public class OrderServiceImpl implements IOrderService {
                         "Unexpected quantity, it must be less than or equal to product in inventory"
                 );
             }
-            productActualQuantity.put(product.id(), productActualQuantity.get(product.id()) - q) ;
+            productActualQuantity.put(product.id(), productActualQuantity.get(product.id()) - q);
 
             BigDecimal variantPrice = variant.totalPrice().multiply(BigDecimal.valueOf(oi.quantity()));
 
@@ -439,7 +434,7 @@ public class OrderServiceImpl implements IOrderService {
             NumberFormat numberFormat = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
 
             // send email order
-            producer.publish(SendEmailRequest.builder()
+            kafkaProducer.sendMail(order.getId().toString(), SendEmailRequest.builder()
                     .event(EmailEvent.ORDER_CONFIRMATION)
                     .email(user.email())
                     .payload(Map.of(
@@ -451,11 +446,10 @@ public class OrderServiceImpl implements IOrderService {
                             "paymentMethod", order.getTransaction().getPaymentMethod(),
                             "address", addressDetail
                     ))
-                    .build(), rabbitMQProperties.internalExchange(), rabbitMQProperties.mailRoutingKey());
+                    .build());
+
         }
-        producer.publish(req,
-                rabbitMQProperties.internalExchange(),
-                rabbitMQProperties.notificationRoutingKey());
+        kafkaProducer.sendNotification(order.getId().toString(), req);
     }
 
     private boolean hasInRole(String role) {
@@ -602,9 +596,7 @@ public class OrderServiceImpl implements IOrderService {
                             .image())
                     .build();
 
-            producer.publish(req,
-                    rabbitMQProperties.internalExchange(),
-                    rabbitMQProperties.notificationRoutingKey());
+            kafkaProducer.sendNotification(order.getId().toString(), req);
         } catch (Exception ignored) {
         }
     }
@@ -646,42 +638,37 @@ public class OrderServiceImpl implements IOrderService {
             NumberFormat numberFormat = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
 
             // send email order
-            producer.publish(SendEmailRequest.builder()
-                            .event(EmailEvent.ORDER_CONFIRMATION)
-                            .email(user.email())
-                            .payload(Map.of(
-                                    "name", user.firstName() + " " + user.lastName(),
-                                    "email", address.email(),
-                                    "receiver", address.receiver(),
-                                    "phone", address.phone(),
-                                    "totalPrice", numberFormat.format(order.getTotalAmount()),
-                                    "paymentMethod", order.getTransaction().getPaymentMethod(),
-                                    "address", addressDetail
-                            ))
-                            .build(),
-                    rabbitMQProperties.internalExchange(),
-                    rabbitMQProperties.mailRoutingKey());
-
+            kafkaProducer.sendMail(order.getId().toString(), SendEmailRequest.builder()
+                    .event(EmailEvent.ORDER_CONFIRMATION)
+                    .email(user.email())
+                    .payload(Map.of(
+                            "name", user.firstName() + " " + user.lastName(),
+                            "email", address.email(),
+                            "receiver", address.receiver(),
+                            "phone", address.phone(),
+                            "totalPrice", numberFormat.format(order.getTotalAmount()),
+                            "paymentMethod", order.getTransaction().getPaymentMethod(),
+                            "address", addressDetail
+                    ))
+                    .build());
             GetOneProductResponse productResponse = productServiceClient.getOneProductByVariant(
                     Objects.requireNonNull(order.getOrderItems().stream()
                                     .findFirst()
                                     .orElse(null))
                             .getVariantId()).data();
 
-            producer.publish(CreateNotificationRequest.builder()
-                            .userId(order.getUserId())
-                            .type(NotificationType.ORDER)
-                            .content(String.format("Đơn hàng #%s của bạn đã thanh toán thành công và đang được chúng tôi xử lý",
-                                    order.getCode()))
-                            .title("Thanh toán thành công")
-                            .anchor("/user/order/" + order.getCode())
-                            .image(Objects.requireNonNull(productResponse.images().stream()
-                                            .findFirst()
-                                            .orElse(null))
-                                    .image())
-                            .build(),
-                    rabbitMQProperties.internalExchange(),
-                    rabbitMQProperties.notificationRoutingKey());
+            kafkaProducer.sendNotification(order.getId().toString(), CreateNotificationRequest.builder()
+                    .userId(order.getUserId())
+                    .type(NotificationType.ORDER)
+                    .content(String.format("Đơn hàng #%s của bạn đã thanh toán thành công và đang được chúng tôi xử lý",
+                            order.getCode()))
+                    .title("Thanh toán thành công")
+                    .anchor("/user/order/" + order.getCode())
+                    .image(Objects.requireNonNull(productResponse.images().stream()
+                                    .findFirst()
+                                    .orElse(null))
+                            .image())
+                    .build());
         } catch (Exception ignored) {
         }
     }
