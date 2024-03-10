@@ -2,6 +2,7 @@ package vn.com.greencraze.user.service;
 
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.domain.aggreate.CreateOrderAggregate;
 import vn.com.greencraze.user.dto.request.cart.CreateCartItemRequest;
 import vn.com.greencraze.user.dto.request.cart.UpdateCartItemRequest;
 import vn.com.greencraze.user.dto.request.cart.UpdateUserCartRequest;
@@ -26,6 +27,9 @@ public interface ICartService {
     void deleteListCartItem(List<Long> ids);
 
     //call from another service
+    @Deprecated
     void updateUserCart(UpdateUserCartRequest request);
+
+    void clearCart(CreateOrderAggregate aggregate);
 
 }

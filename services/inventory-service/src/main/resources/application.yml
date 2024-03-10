@@ -32,6 +32,16 @@ spring:
         config:
           default:
             logger-level: full
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      retries: 1000
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
 
 management:
   tracing:
@@ -82,6 +92,8 @@ spring:
     url: jdbc:mysql://localhost:3306/core_inventory
     username: root
     password: 1234
+  kafka:
+    bootstrap-servers: localhost:29092
 
 eureka:
   client:

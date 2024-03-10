@@ -1,4 +1,4 @@
-package vn.com.greencraze.order.enumeration;
+package vn.com.greencraze.commons.enumeration;
 
 import java.util.Arrays;
 import java.util.List;

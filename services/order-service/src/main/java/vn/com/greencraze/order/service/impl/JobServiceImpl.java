@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.domain.dto.CreateNotificationRequest;
 import vn.com.greencraze.commons.enumeration.NotificationType;
+import vn.com.greencraze.commons.enumeration.OrderStatus;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.order.client.inventory.InventoryServiceClient;
 import vn.com.greencraze.order.client.inventory.dto.request.CreateDocketRequest;
@@ -15,7 +16,6 @@ import vn.com.greencraze.order.client.product.dto.response.GetOneProductResponse
 import vn.com.greencraze.order.client.product.dto.response.GetOneVariantResponse;
 import vn.com.greencraze.order.dto.request.order.CreateOrderItemRequest;
 import vn.com.greencraze.order.entity.Order;
-import vn.com.greencraze.order.enumeration.OrderStatus;
 import vn.com.greencraze.order.enumeration.PaymentCode;
 import vn.com.greencraze.order.mapper.OrderItemMapper;
 import vn.com.greencraze.order.producer.KafkaProducer;

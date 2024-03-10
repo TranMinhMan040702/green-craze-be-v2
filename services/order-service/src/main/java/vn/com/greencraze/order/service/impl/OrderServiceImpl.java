@@ -10,10 +10,12 @@ import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.auth.AuthFacade;
+import vn.com.greencraze.commons.domain.aggreate.CreateOrderAggregate;
 import vn.com.greencraze.commons.domain.dto.CreateNotificationRequest;
 import vn.com.greencraze.commons.domain.dto.SendEmailRequest;
 import vn.com.greencraze.commons.enumeration.EmailEvent;
 import vn.com.greencraze.commons.enumeration.NotificationType;
+import vn.com.greencraze.commons.enumeration.OrderStatus;
 import vn.com.greencraze.commons.exception.InvalidRequestException;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.order.client.address.AddressServiceClient;
@@ -46,7 +48,6 @@ import vn.com.greencraze.order.entity.OrderItem;
 import vn.com.greencraze.order.entity.PaymentMethod;
 import vn.com.greencraze.order.entity.Transaction;
 import vn.com.greencraze.order.entity.query.OrderItemQuery;
-import vn.com.greencraze.order.enumeration.OrderStatus;
 import vn.com.greencraze.order.enumeration.PaymentCode;
 import vn.com.greencraze.order.mapper.OrderItemMapper;
 import vn.com.greencraze.order.mapper.OrderMapper;
@@ -58,6 +59,7 @@ import vn.com.greencraze.order.repository.OrderRepository;
 import vn.com.greencraze.order.repository.PaymentMethodRepository;
 import vn.com.greencraze.order.repository.TransactionRepository;
 import vn.com.greencraze.order.repository.specification.OrderSpecification;
+import vn.com.greencraze.order.saga.createorder.CreateOrderSagaStateMachineManager;
 import vn.com.greencraze.order.service.IOrderService;
 
 import java.math.BigDecimal;
@@ -97,6 +99,8 @@ public class OrderServiceImpl implements IOrderService {
     private final AuthFacade authFacade;
 
     private final JobManager jobManager;
+
+    private final CreateOrderSagaStateMachineManager stateMachineManager;
 
     private static final String RESOURCE_NAME = "Order";
     private static final List<String> SEARCH_FIELDS = List.of("code");
@@ -286,8 +290,6 @@ public class OrderServiceImpl implements IOrderService {
                 .paymentStatus(false)
                 .build();
 
-        HashMap<Long, Long> productActualQuantity = new HashMap<>();
-
         for (CreateOrderItemRequest oi : request.items()) {
             // get variant from product service
             RestResponse<GetOneVariantResponse> variantResp = productServiceClient.getOneVariant(oi.variantId());
@@ -295,24 +297,6 @@ public class OrderServiceImpl implements IOrderService {
                 throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", oi.variantId());
             }
             GetOneVariantResponse variant = variantResp.data();
-
-            RestResponse<GetOneProductResponse> productResp = productServiceClient.getOneProduct(variant.productId());
-            if (productResp == null) {
-                throw new ResourceNotFoundException(RESOURCE_NAME, "productId", variant.productId());
-            }
-            GetOneProductResponse product = productResp.data();
-
-            if (!productActualQuantity.containsKey(product.id())) {
-                productActualQuantity.put(product.id(), product.actualInventory());
-            }
-
-            long q = (long) variant.quantity() * oi.quantity();
-            if (q > productActualQuantity.get(product.id())) {
-                throw new InvalidRequestException(
-                        "Unexpected quantity, it must be less than or equal to product in inventory"
-                );
-            }
-            productActualQuantity.put(product.id(), productActualQuantity.get(product.id()) - q);
 
             BigDecimal variantPrice = variant.totalPrice().multiply(BigDecimal.valueOf(oi.quantity()));
 
@@ -342,6 +326,7 @@ public class OrderServiceImpl implements IOrderService {
         return order;
     }
 
+    @Deprecated
     private void updateProduct(List<CreateOrderItemRequest> items) {
         UpdateListProductQuantityRequest request = new UpdateListProductQuantityRequest(new ArrayList<>());
 
@@ -359,6 +344,7 @@ public class OrderServiceImpl implements IOrderService {
         productServiceClient.updateProductQuantity(request);
     }
 
+    @Deprecated
     private void updateUserCart(List<CreateOrderItemRequest> items) {
         String userId = authFacade.getUserId();
 
@@ -372,6 +358,7 @@ public class OrderServiceImpl implements IOrderService {
         userServiceClient.updateUserCart(request);
     }
 
+    @Deprecated
     private void createDocket(List<CreateOrderItemRequest> items, Long orderId, String type) {
         CreateDocketRequest request = new CreateDocketRequest(orderId, type, new ArrayList<>());
 
@@ -462,22 +449,29 @@ public class OrderServiceImpl implements IOrderService {
     public RestResponse<CreateOrderResponse> createOrder(CreateOrderRequest request) {
         Order order = initOrder(request);
 
-        // update product in product service
-        updateProduct(request.items());
+        // map order to createOrderAggregate
+        CreateOrderAggregate aggregate = CreateOrderAggregate.builder()
+                .id(order.getId())
+                .userId(order.getUserId())
+                .totalAmount(order.getTotalAmount())
+                .status(order.getStatus())
+                .items(order.getOrderItems().stream().map(item -> CreateOrderAggregate.OrderItemAggregate.builder()
+                                .id(item.getId())
+                                .variantId(item.getVariantId())
+                                .quantity(item.getQuantity())
+                                .build())
+                        .toList())
+                .build();
 
-        // update user's cart in user service
-        updateUserCart(request.items());
-
-        // create docket in inventory service
-        createDocket(request.items(), order.getId(), "EXPORT");
+        // create statemachine
+        stateMachineManager.putSaga(aggregate);
 
         try {
-            // pub message to notify in infrastructure service
             createNotify(order);
         } catch (Exception ignored) {
         }
 
-        // auto Hủy đơn sau 10p
+        // auto cancel order after 10p
         jobManager.execute(order.getId());
 
         return RestResponse.ok(orderMapper.orderToCreateOrderResponse(order));
@@ -548,7 +542,7 @@ public class OrderServiceImpl implements IOrderService {
                     .stream().map(x -> x.withQuantity(x.quantity() * -1)).toList();
             updateProduct(items);
 
-            // create docket when cancelling order
+            // TODO: create docket when cancelling order
             createDocket(orderItemMapper.orderItemToCreateOrderItemRequest(
                     order.getOrderItems()), order.getId(), "IMPORT");
         } else {
@@ -719,6 +713,14 @@ public class OrderServiceImpl implements IOrderService {
                         OrderStatus::name,
                         status -> orderRepository.countByStatusAndCreatedAtBetween(status, startDate, endDate)
                 ));
+    }
+
+    @Override
+    public void cancelOrderSaga(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
+        order.setStatus(OrderStatus.CANCELLED);
+        orderRepository.save(order);
     }
 
 }

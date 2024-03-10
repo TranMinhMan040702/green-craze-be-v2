@@ -3,11 +3,14 @@ package vn.com.greencraze.inventory.client.product;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.inventory.client.product.dto.request.ExportProductRequest;
 import vn.com.greencraze.inventory.client.product.dto.request.ImportProductRequest;
+import vn.com.greencraze.inventory.client.product.dto.response.GetOneVariantResponse;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -26,5 +29,8 @@ public interface ProductServiceClient {
 
     @GetMapping(BASE + "/products/cost")
     Map<Long, BigDecimal> getListProductCost(@RequestParam Set<Long> ids);
+
+    @GetMapping(BASE + "/variants/other/{id}")
+    RestResponse<GetOneVariantResponse> getOneVariant(@PathVariable Long id);
 
 }
