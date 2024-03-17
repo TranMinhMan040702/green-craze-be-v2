@@ -2,10 +2,9 @@ package vn.com.greencraze.product.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import vn.com.greencraze.amqp.RabbitMQMessageProducer;
+import vn.com.greencraze.commons.domain.dto.CreateNotificationRequest;
 import vn.com.greencraze.commons.enumeration.NotificationType;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
-import vn.com.greencraze.product.config.property.RabbitMQProperties;
 import vn.com.greencraze.product.entity.Product;
 import vn.com.greencraze.product.entity.ProductCategory;
 import vn.com.greencraze.product.entity.Sale;
@@ -15,7 +14,7 @@ import vn.com.greencraze.product.exception.SaleActiveException;
 import vn.com.greencraze.product.exception.SaleDateException;
 import vn.com.greencraze.product.exception.SaleExpiredException;
 import vn.com.greencraze.product.exception.SaleInactiveException;
-import vn.com.greencraze.product.rabbitmq.dto.request.CreateNotificationRequest;
+import vn.com.greencraze.product.producer.KafkaProducer;
 import vn.com.greencraze.product.repository.SaleRepository;
 import vn.com.greencraze.product.service.ISaleJobService;
 
@@ -28,10 +27,7 @@ public class SaleJobServiceImpl implements ISaleJobService {
 
     private final SaleRepository saleRepository;
 
-    private final RabbitMQMessageProducer producer;
-
-    private final RabbitMQProperties rabbitMQProperties;
-
+    private final KafkaProducer kafkaProducer;
 
     private static final String RESOURCE_NAME = "Sale";
 
@@ -61,16 +57,14 @@ public class SaleJobServiceImpl implements ISaleJobService {
         sale.setStatus(SaleStatus.ACTIVE);
         saleRepository.save(sale);
 
-        producer.publish(CreateNotificationRequest.builder()
-                        .type(NotificationType.SALE)
-                        .content(String.format("Đợt khuyến mãi hiện đang có mặt tại cửa hàng, giảm giá lên tới %.1f",
-                                sale.getPromotionalPercent()))
-                        .title(sale.getName())
-                        .anchor("#")
-                        .image(sale.getImage())
-                        .build(),
-                rabbitMQProperties.internalExchange(),
-                rabbitMQProperties.notificationRoutingKey());
+        kafkaProducer.sendNotification(sale.getId().toString(), CreateNotificationRequest.builder()
+                .type(NotificationType.SALE)
+                .content(String.format("Đợt khuyến mãi hiện đang có mặt tại cửa hàng, giảm giá lên tới %.1f",
+                        sale.getPromotionalPercent()))
+                .title(sale.getName())
+                .anchor("#")
+                .image(sale.getImage())
+                .build());
     }
 
     @Override
