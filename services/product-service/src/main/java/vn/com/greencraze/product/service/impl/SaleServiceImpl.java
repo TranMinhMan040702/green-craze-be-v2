@@ -10,10 +10,6 @@ import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.product.backgroundjob.JobManager;
-import vn.com.greencraze.product.config.property.RabbitMQProperties;
-import vn.com.greencraze.commons.domain.dto.CreateNotificationRequest;
-import vn.com.greencraze.commons.enumeration.NotificationType;
-import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.product.dto.request.sale.CreateSaleRequest;
 import vn.com.greencraze.product.dto.request.sale.UpdateSaleRequest;
 import vn.com.greencraze.product.dto.response.sale.CreateSaleResponse;
@@ -47,21 +43,18 @@ public class SaleServiceImpl extends SaleJobServiceImpl implements ISaleService 
     private final SaleMapper saleMapper;
 
     private final JobManager jobManager;
-  
-    private final KafkaProducer kafkaProducer;
 
     private static final String RESOURCE_NAME = "Sale";
     private static final List<String> SEARCH_FIELDS = List.of("name");
 
     public SaleServiceImpl(SaleRepository saleRepository,
-                           RabbitMQMessageProducer producer,
-                           RabbitMQProperties rabbitMQProperties,
+                           KafkaProducer kafkaProducer,
                            SaleRepository saleRepository1,
                            ProductCategoryRepository productCategoryRepository,
                            IUploadService uploadService,
                            SaleMapper saleMapper,
                            JobManager jobManager) {
-        super(saleRepository, producer, rabbitMQProperties);
+        super(saleRepository, kafkaProducer);
         this.saleRepository = saleRepository1;
         this.productCategoryRepository = productCategoryRepository;
         this.uploadService = uploadService;
