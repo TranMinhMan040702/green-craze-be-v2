@@ -1,36 +1,31 @@
 package vn.com.greencraze.product.backgroundjob;
 
-import com.netflix.discovery.converters.Auto;
 import lombok.Builder;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import vn.com.greencraze.commons.api.RestResponse;
-import vn.com.greencraze.product.dto.response.sale.GetOneSaleResponse;
+import vn.com.greencraze.commons.exception.ResourceNotFoundException;
+import vn.com.greencraze.product.entity.Sale;
 import vn.com.greencraze.product.enumeration.SaleStatus;
-import vn.com.greencraze.product.service.ISaleService;
+import vn.com.greencraze.product.repository.SaleRepository;
+import vn.com.greencraze.product.service.ISaleJobService;
 
 import java.time.Instant;
 
-@Component
-public class  CancelSaleJob implements Runnable {
+@Builder
+public class CancelSaleJob implements Runnable {
 
     private Long saleId;
-    public void setSaleId(Long saleId) {
-        this.saleId = saleId;
-    }
-    @Autowired
-    private  ISaleService saleService;
+    private final ISaleJobService saleJobService;
+    private final SaleRepository saleRepository;
 
     @Override
     public void run() {
-        RestResponse<GetOneSaleResponse> sale = saleService.getOneSale(saleId);
+        Sale sale = saleRepository.findById(saleId)
+                .orElseThrow(() -> new ResourceNotFoundException("Sale", "id", saleId));
 
-        if(Instant.now().isAfter(sale.data().endDate())
-            || sale.data().status() == SaleStatus.INACTIVE)
+
+        if (Instant.now().isAfter(sale.getEndDate()) || sale.getStatus() == SaleStatus.INACTIVE) {
             return;
-
-        saleService.cancelSale(saleId);
+        }
+        saleJobService.cancelSale(saleId);
     }
 
 }
