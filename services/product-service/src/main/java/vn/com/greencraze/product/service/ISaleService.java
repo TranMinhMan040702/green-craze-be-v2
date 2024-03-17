@@ -11,7 +11,7 @@ import vn.com.greencraze.product.dto.response.sale.GetSaleLatestResponse;
 
 import java.util.List;
 
-public interface ISaleService {
+public interface ISaleService extends ISaleJobService {
 
     RestResponse<ListResponse<GetListSaleResponse>> getListSale(
             Integer page, Integer size, Boolean isSortAscending, String columnName, String search, Boolean all);
@@ -25,10 +25,6 @@ public interface ISaleService {
     void deleteOneSale(Long id);
 
     void deleteListSale(List<Long> ids);
-
-    void applySale(Long id);
-
-    void cancelSale(Long id);
 
     GetSaleLatestResponse getSaleLatest();
 

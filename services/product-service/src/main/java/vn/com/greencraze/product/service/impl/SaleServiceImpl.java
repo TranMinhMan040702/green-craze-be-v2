@@ -1,7 +1,6 @@
 package vn.com.greencraze.product.service.impl;
 
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +8,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.exception.ResourceNotFoundException;
+import vn.com.greencraze.product.backgroundjob.JobManager;
+import vn.com.greencraze.product.config.property.RabbitMQProperties;
 import vn.com.greencraze.commons.domain.dto.CreateNotificationRequest;
 import vn.com.greencraze.commons.enumeration.NotificationType;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
@@ -18,15 +20,10 @@ import vn.com.greencraze.product.dto.response.sale.CreateSaleResponse;
 import vn.com.greencraze.product.dto.response.sale.GetListSaleResponse;
 import vn.com.greencraze.product.dto.response.sale.GetOneSaleResponse;
 import vn.com.greencraze.product.dto.response.sale.GetSaleLatestResponse;
-import vn.com.greencraze.product.entity.Product;
 import vn.com.greencraze.product.entity.ProductCategory;
 import vn.com.greencraze.product.entity.Sale;
-import vn.com.greencraze.product.entity.Variant;
 import vn.com.greencraze.product.enumeration.SaleStatus;
-import vn.com.greencraze.product.exception.SaleActiveException;
 import vn.com.greencraze.product.exception.SaleDateException;
-import vn.com.greencraze.product.exception.SaleExpiredException;
-import vn.com.greencraze.product.exception.SaleInactiveException;
 import vn.com.greencraze.product.mapper.SaleMapper;
 import vn.com.greencraze.product.producer.KafkaProducer;
 import vn.com.greencraze.product.repository.ProductCategoryRepository;
@@ -35,15 +32,12 @@ import vn.com.greencraze.product.repository.specification.SaleSpecification;
 import vn.com.greencraze.product.service.ISaleService;
 import vn.com.greencraze.product.service.IUploadService;
 
-import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
-public class SaleServiceImpl implements ISaleService {
+public class SaleServiceImpl extends SaleJobServiceImpl implements ISaleService {
 
     private final SaleRepository saleRepository;
     private final ProductCategoryRepository productCategoryRepository;
@@ -52,10 +46,28 @@ public class SaleServiceImpl implements ISaleService {
 
     private final SaleMapper saleMapper;
 
+    private final JobManager jobManager;
+  
     private final KafkaProducer kafkaProducer;
 
     private static final String RESOURCE_NAME = "Sale";
     private static final List<String> SEARCH_FIELDS = List.of("name");
+
+    public SaleServiceImpl(SaleRepository saleRepository,
+                           RabbitMQMessageProducer producer,
+                           RabbitMQProperties rabbitMQProperties,
+                           SaleRepository saleRepository1,
+                           ProductCategoryRepository productCategoryRepository,
+                           IUploadService uploadService,
+                           SaleMapper saleMapper,
+                           JobManager jobManager) {
+        super(saleRepository, producer, rabbitMQProperties);
+        this.saleRepository = saleRepository1;
+        this.productCategoryRepository = productCategoryRepository;
+        this.uploadService = uploadService;
+        this.saleMapper = saleMapper;
+        this.jobManager = jobManager;
+    }
 
     @Override
     public RestResponse<ListResponse<GetListSaleResponse>> getListSale(
@@ -94,6 +106,9 @@ public class SaleServiceImpl implements ISaleService {
         sale.setProductCategories(new HashSet<>(productCategories));
         sale.setImage(uploadService.uploadFile(request.image()));
         saleRepository.save(sale);
+
+        jobManager.handleSaleJobExecution(sale.getId());
+
         return RestResponse.created(saleMapper.saleToCreateSaleResponse(sale));
     }
 
@@ -104,8 +119,12 @@ public class SaleServiceImpl implements ISaleService {
         }
 
         Sale sale = saleRepository.findById(id)
-                .map(s -> saleMapper.updateSaleFromUpdateSaleRequest(s, request))
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
+
+        boolean isStartDateChanged = sale.getStartDate().compareTo(request.startDate()) != 0;
+        boolean isEndDateChanged = sale.getEndDate().compareTo(request.endDate()) != 0;
+
+        sale = saleMapper.updateSaleFromUpdateSaleRequest(sale, request);
 
         if (request.image() != null) {
             sale.setImage(uploadService.uploadFile(request.image()));
@@ -119,6 +138,14 @@ public class SaleServiceImpl implements ISaleService {
                         .toList();
         sale.setProductCategories(new HashSet<>(productCategories));
         saleRepository.save(sale);
+
+        if (isStartDateChanged) {
+            jobManager.applySaleJobExecution(sale.getId(), request.startDate());
+        }
+
+        if (isEndDateChanged) {
+            jobManager.cancelSaleJobExecution(sale.getId(), request.endDate());
+        }
     }
 
     @Override
@@ -138,66 +165,6 @@ public class SaleServiceImpl implements ISaleService {
             sale.setStatus(SaleStatus.INACTIVE);
             saleRepository.save(sale);
         }
-    }
-
-    @Override
-    public void applySale(Long id) {
-        if (saleRepository.existsByStatus(SaleStatus.ACTIVE)) {
-            throw new SaleActiveException("There is a sale going on");
-        }
-
-        Sale sale = saleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
-
-        if (sale.getStartDate().compareTo(Instant.now()) > 0 || Instant.now().compareTo(sale.getEndDate()) > 0) {
-            throw new SaleDateException("Sale period invalid");
-        }
-
-        for (ProductCategory productCategory : sale.getProductCategories()) {
-            for (Product product : productCategory.getProducts()) {
-                for (Variant variant : product.getVariants()) {
-                    variant.setPromotionalItemPrice(variant.getItemPrice().subtract(
-                            variant.getItemPrice().multiply(BigDecimal.valueOf(sale.getPromotionalPercent() / 100))));
-                    variant.setTotalPromotionalPrice(variant.getPromotionalItemPrice().multiply(
-                            BigDecimal.valueOf(variant.getQuantity())));
-                }
-            }
-        }
-        sale.setStatus(SaleStatus.ACTIVE);
-        saleRepository.save(sale);
-
-        // send notification
-        kafkaProducer.sendNotification(sale.getId().toString(), CreateNotificationRequest.builder()
-                .type(NotificationType.SALE)
-                .content(String.format("Đợt khuyến mãi hiện đang có mặt tại cửa hàng, giảm giá lên tới %.1f",
-                        sale.getPromotionalPercent()))
-                .title(sale.getName())
-                .anchor("#")
-                .image(sale.getImage())
-                .build());
-    }
-
-    @Override
-    public void cancelSale(Long id) {
-        Sale sale = saleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", id));
-
-        switch (sale.getStatus()) {
-            case INACTIVE -> throw new SaleInactiveException();
-            case EXPIRED -> throw new SaleExpiredException();
-        }
-
-        for (ProductCategory productCategory : sale.getProductCategories()) {
-            for (Product product : productCategory.getProducts()) {
-                for (Variant variant : product.getVariants()) {
-                    variant.setPromotionalItemPrice(null);
-                    variant.setTotalPromotionalPrice(null);
-                }
-            }
-        }
-
-        sale.setStatus(SaleStatus.INACTIVE);
-        saleRepository.save(sale);
     }
 
     @Override
