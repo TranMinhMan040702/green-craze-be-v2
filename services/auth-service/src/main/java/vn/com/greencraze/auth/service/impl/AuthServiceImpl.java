@@ -9,11 +9,9 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import vn.com.greencraze.amqp.RabbitMQMessageProducer;
 import vn.com.greencraze.auth.client.user.UserServiceClient;
 import vn.com.greencraze.auth.client.user.dto.CreateUserRequest;
 import vn.com.greencraze.auth.config.property.AppProperties;
-import vn.com.greencraze.auth.config.property.RabbitMQProperties;
 import vn.com.greencraze.auth.config.security.JwtManager;
 import vn.com.greencraze.auth.dto.request.auth.AuthenticateRequest;
 import vn.com.greencraze.auth.dto.request.auth.ForgotPasswordRequest;
@@ -46,7 +44,7 @@ import vn.com.greencraze.auth.exception.InactivatedUserException;
 import vn.com.greencraze.auth.exception.InvalidPasswordException;
 import vn.com.greencraze.auth.exception.TokenValidationException;
 import vn.com.greencraze.auth.exception.UnconfirmedUserException;
-import vn.com.greencraze.auth.rabbitmq.dto.request.SendEmailRequest;
+import vn.com.greencraze.auth.producer.KafkaProducer;
 import vn.com.greencraze.auth.repository.IdentityRepository;
 import vn.com.greencraze.auth.repository.RoleRepository;
 import vn.com.greencraze.auth.repository.view.UserProfileViewRepository;
@@ -54,6 +52,7 @@ import vn.com.greencraze.auth.service.IAuthService;
 import vn.com.greencraze.auth.util.OtpHelper;
 import vn.com.greencraze.auth.util.RefreshTokenHelper;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.domain.dto.SendEmailRequest;
 import vn.com.greencraze.commons.enumeration.EmailEvent;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 
@@ -80,11 +79,10 @@ public class AuthServiceImpl implements IAuthService {
     private final PasswordEncoder passwordEncoder;
 
     private final AppProperties appProperties;
-    private final RabbitMQProperties rabbitMQProperties;
 
     private final UserServiceClient userServiceClient;
 
-    private final RabbitMQMessageProducer producer;
+    private final KafkaProducer kafkaProducer;
 
     @Builder
     private record GenerateAuthCredentialDto(
@@ -266,17 +264,15 @@ public class AuthServiceImpl implements IAuthService {
                     .email(identity.getUsername())
                     .build());
             // send email otp
-            producer.publish(SendEmailRequest.builder()
-                            .event(EmailEvent.CONFIRM_REGISTRATION)
-                            .email(identity.getUsername())
-                            .payload(Map.of(
-                                    "name", identity.getUsername(),
-                                    "email", identity.getUsername(),
-                                    "OTP", otp
-                            ))
-                            .build(),
-                    rabbitMQProperties.internalExchange(),
-                    rabbitMQProperties.mailRoutingKey());
+            kafkaProducer.sendMail(identity.getId(), SendEmailRequest.builder()
+                    .event(EmailEvent.CONFIRM_REGISTRATION)
+                    .email(identity.getUsername())
+                    .payload(Map.of(
+                            "name", identity.getUsername(),
+                            "email", identity.getUsername(),
+                            "OTP", otp
+                    ))
+                    .build());
         }
 
         return RestResponse.ok(RegisterResponse.builder()
@@ -390,17 +386,15 @@ public class AuthServiceImpl implements IAuthService {
         identityRepository.save(identity);
 
         // Step 5: send email for user
-        producer.publish(SendEmailRequest.builder()
-                        .event(EmailEvent.CONFIRM_REGISTRATION)
-                        .email(identity.getUsername())
-                        .payload(Map.of(
-                                "name", identity.getUsername(),
-                                "email", identity.getUsername(),
-                                "OTP", otp
-                        ))
-                        .build(),
-                rabbitMQProperties.internalExchange(),
-                rabbitMQProperties.mailRoutingKey());
+        kafkaProducer.sendMail(identity.getId(), SendEmailRequest.builder()
+                .event(EmailEvent.CONFIRM_REGISTRATION)
+                .email(identity.getUsername())
+                .payload(Map.of(
+                        "name", identity.getUsername(),
+                        "email", identity.getUsername(),
+                        "OTP", otp
+                ))
+                .build());
 
         return RestResponse.ok(ResendOTPResponse.builder()
                 .isSuccess(true)
@@ -441,17 +435,15 @@ public class AuthServiceImpl implements IAuthService {
         identityRepository.save(identity);
 
         // Step 3: send email
-        producer.publish(SendEmailRequest.builder()
-                        .event(EmailEvent.FORGOT_PASSWORD)
-                        .email(identity.getUsername())
-                        .payload(Map.of(
-                                "name", identity.getUsername(),
-                                "email", identity.getUsername(),
-                                "OTP", otp
-                        ))
-                        .build(),
-                rabbitMQProperties.internalExchange(),
-                rabbitMQProperties.mailRoutingKey());
+        kafkaProducer.sendMail(identity.getId(), SendEmailRequest.builder()
+                .event(EmailEvent.FORGOT_PASSWORD)
+                .email(identity.getUsername())
+                .payload(Map.of(
+                        "name", identity.getUsername(),
+                        "email", identity.getUsername(),
+                        "OTP", otp
+                ))
+                .build());
 
         return RestResponse.ok(ForgotPasswordResponse.builder()
                 .isSuccess(true)

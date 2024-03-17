@@ -9,7 +9,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import vn.com.greencraze.infrastructure.dto.request.SendEmailRequest;
+import vn.com.greencraze.commons.domain.dto.SendEmailRequest;
 import vn.com.greencraze.infrastructure.exception.SendEmailException;
 import vn.com.greencraze.infrastructure.service.IMailService;
 

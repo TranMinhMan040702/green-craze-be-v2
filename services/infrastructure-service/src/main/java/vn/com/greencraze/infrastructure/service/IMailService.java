@@ -1,6 +1,6 @@
 package vn.com.greencraze.infrastructure.service;
 
-import vn.com.greencraze.infrastructure.dto.request.SendEmailRequest;
+import vn.com.greencraze.commons.domain.dto.SendEmailRequest;
 
 public interface IMailService {
 

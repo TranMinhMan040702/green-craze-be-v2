@@ -2,6 +2,7 @@ package vn.com.greencraze.product.service;
 
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.domain.aggreate.CreateOrderAggregate;
 import vn.com.greencraze.product.dto.request.product.CreateProductRequest;
 import vn.com.greencraze.product.dto.request.product.ExportProductRequest;
 import vn.com.greencraze.product.dto.request.product.FilterProductRequest;
@@ -68,5 +69,9 @@ public interface IProductService {
     Map<String, List<Long>> getListProductWithVariant();
 
     RestResponse<GetOneProductResponse> getOneProductByVariant(Long variantId);
+
+    void reduceStock(CreateOrderAggregate aggregate);
+
+    void revertStock(CreateOrderAggregate aggregate);
 
 }

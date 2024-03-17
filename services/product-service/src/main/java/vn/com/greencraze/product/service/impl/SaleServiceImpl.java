@@ -6,12 +6,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import vn.com.greencraze.amqp.RabbitMQMessageProducer;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.product.backgroundjob.JobManager;
 import vn.com.greencraze.product.config.property.RabbitMQProperties;
+import vn.com.greencraze.commons.domain.dto.CreateNotificationRequest;
+import vn.com.greencraze.commons.enumeration.NotificationType;
+import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.product.dto.request.sale.CreateSaleRequest;
 import vn.com.greencraze.product.dto.request.sale.UpdateSaleRequest;
 import vn.com.greencraze.product.dto.response.sale.CreateSaleResponse;
@@ -23,6 +25,7 @@ import vn.com.greencraze.product.entity.Sale;
 import vn.com.greencraze.product.enumeration.SaleStatus;
 import vn.com.greencraze.product.exception.SaleDateException;
 import vn.com.greencraze.product.mapper.SaleMapper;
+import vn.com.greencraze.product.producer.KafkaProducer;
 import vn.com.greencraze.product.repository.ProductCategoryRepository;
 import vn.com.greencraze.product.repository.SaleRepository;
 import vn.com.greencraze.product.repository.specification.SaleSpecification;
@@ -44,6 +47,8 @@ public class SaleServiceImpl extends SaleJobServiceImpl implements ISaleService 
     private final SaleMapper saleMapper;
 
     private final JobManager jobManager;
+  
+    private final KafkaProducer kafkaProducer;
 
     private static final String RESOURCE_NAME = "Sale";
     private static final List<String> SEARCH_FIELDS = List.of("name");

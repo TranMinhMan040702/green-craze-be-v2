@@ -2,8 +2,8 @@ package vn.com.greencraze.order.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import vn.com.greencraze.commons.enumeration.OrderStatus;
 import vn.com.greencraze.order.entity.Order;
-import vn.com.greencraze.order.enumeration.OrderStatus;
 
 import java.time.Instant;
 import java.util.Optional;
