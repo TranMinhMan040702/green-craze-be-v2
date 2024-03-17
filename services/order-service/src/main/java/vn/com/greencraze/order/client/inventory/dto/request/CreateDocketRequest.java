@@ -21,8 +21,6 @@ public record CreateDocketRequest(
             Long productId,
             @NotNull
             Integer quantity
-    ) {
-
-    }
+    ) {}
 
 }

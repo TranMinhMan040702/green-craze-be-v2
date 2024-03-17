@@ -129,6 +129,17 @@
             <artifactId>amqp</artifactId>
             <version>${amqp.version}</version>
         </dependency>
+
+        <!-- Kafka -->
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>vn.com.greencraze</groupId>
             <artifactId>commons</artifactId>

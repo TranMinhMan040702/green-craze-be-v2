@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
 import vn.com.greencraze.commons.auth.AuthFacade;
+import vn.com.greencraze.commons.domain.aggreate.CreateOrderAggregate;
 import vn.com.greencraze.commons.exception.InvalidRequestException;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.user.client.product.ProductServiceClient;
@@ -41,8 +42,11 @@ public class CartServiceImpl implements ICartService {
     private final CartItemRepository cartItemRepository;
     private final CartRepository cartRepository;
     private final UserProfileRepository userProfileRepository;
+
     private final CartMapper cartMapper;
+
     private final ProductServiceClient productServiceClient;
+
     private final AuthFacade authFacade;
     private static final String RESOURCE_NAME = "Cart";
 
@@ -205,13 +209,13 @@ public class CartServiceImpl implements ICartService {
         cartItem.setQuantity(request.quantity());
 
         long quantity = product.actualInventory();
-        if (quantity < (request.quantity() * variant.quantity().longValue())){
-//            cartItem.setQuantity((int) (quantity / variant.quantity()));
-//            if(cartItem.getQuantity() > 0){
-//                cartItemRepository.save(cartItem);
-//            }else{
-//                cartItemRepository.deleteById(id);
-//            }
+        if (quantity < (request.quantity() * variant.quantity().longValue())) {
+            //            cartItem.setQuantity((int) (quantity / variant.quantity()));
+            //            if(cartItem.getQuantity() > 0){
+            //                cartItemRepository.save(cartItem);
+            //            }else{
+            //                cartItemRepository.deleteById(id);
+            //            }
             throw new InvalidRequestException(
                     "Unexpected quantity, it must be less than or equal to product in inventory"
             );
@@ -249,6 +253,7 @@ public class CartServiceImpl implements ICartService {
 
     }
 
+    @Deprecated
     @Override
     @Transactional(rollbackOn = {Exception.class})
     public void updateUserCart(UpdateUserCartRequest request) {
@@ -261,6 +266,21 @@ public class CartServiceImpl implements ICartService {
 
         for (Long id : request.variantItemIds()) {
             cartItemRepository.deleteByCartAndVariantId(cart, id);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackOn = {Exception.class})
+    public void clearCart(CreateOrderAggregate aggregate) {
+        UserProfile user = userProfileRepository
+                .findById(aggregate.userId())
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "user", aggregate.userId()));
+
+        Cart cart = cartRepository.findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "cart", aggregate.userId()));
+
+        for (CreateOrderAggregate.OrderItemAggregate oi : aggregate.items()) {
+            cartItemRepository.deleteByCartAndVariantId(cart, oi.variantId());
         }
     }
 

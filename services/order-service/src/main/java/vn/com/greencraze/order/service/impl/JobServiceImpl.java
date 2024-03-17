@@ -3,9 +3,10 @@ package vn.com.greencraze.order.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import vn.com.greencraze.amqp.RabbitMQMessageProducer;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.domain.dto.CreateNotificationRequest;
 import vn.com.greencraze.commons.enumeration.NotificationType;
+import vn.com.greencraze.commons.enumeration.OrderStatus;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.order.client.inventory.InventoryServiceClient;
 import vn.com.greencraze.order.client.inventory.dto.request.CreateDocketRequest;
@@ -13,13 +14,11 @@ import vn.com.greencraze.order.client.product.ProductServiceClient;
 import vn.com.greencraze.order.client.product.dto.request.UpdateListProductQuantityRequest;
 import vn.com.greencraze.order.client.product.dto.response.GetOneProductResponse;
 import vn.com.greencraze.order.client.product.dto.response.GetOneVariantResponse;
-import vn.com.greencraze.order.config.property.RabbitMQProperties;
 import vn.com.greencraze.order.dto.request.order.CreateOrderItemRequest;
 import vn.com.greencraze.order.entity.Order;
-import vn.com.greencraze.order.enumeration.OrderStatus;
 import vn.com.greencraze.order.enumeration.PaymentCode;
 import vn.com.greencraze.order.mapper.OrderItemMapper;
-import vn.com.greencraze.order.rabbitmq.dto.request.CreateNotificationRequest;
+import vn.com.greencraze.order.producer.KafkaProducer;
 import vn.com.greencraze.order.repository.OrderRepository;
 import vn.com.greencraze.order.service.IJobService;
 
@@ -38,9 +37,7 @@ public class JobServiceImpl implements IJobService {
     private final ProductServiceClient productServiceClient;
     private final InventoryServiceClient inventoryServiceClient;
 
-    private final RabbitMQProperties rabbitMQProperties;
-
-    private final RabbitMQMessageProducer producer;
+    private final KafkaProducer kafkaProducer;
 
 
     @Transactional(rollbackOn = {ResourceNotFoundException.class})
@@ -72,20 +69,18 @@ public class JobServiceImpl implements IJobService {
                                         .orElse(null))
                                 .getVariantId()).data();
 
-                producer.publish(CreateNotificationRequest.builder()
-                                .userId(order.getUserId())
-                                .type(NotificationType.ORDER)
-                                .content(String.format("Đơn hàng #%s của bạn đã bị hủy do quá thời gian thanh toán",
-                                        order.getCode()))
-                                .title("Hủy đơn hàng")
-                                .anchor("/user/order/" + order.getCode())
-                                .image(Objects.requireNonNull(productResponse.images().stream()
-                                                .findFirst()
-                                                .orElse(null))
-                                        .image())
-                                .build(),
-                        rabbitMQProperties.internalExchange(),
-                        rabbitMQProperties.notificationRoutingKey());
+                kafkaProducer.sendNotification(order.getId().toString(), CreateNotificationRequest.builder()
+                        .userId(order.getUserId())
+                        .type(NotificationType.ORDER)
+                        .content(String.format("Đơn hàng #%s của bạn đã bị hủy do quá thời gian thanh toán",
+                                order.getCode()))
+                        .title("Hủy đơn hàng")
+                        .anchor("/user/order/" + order.getCode())
+                        .image(Objects.requireNonNull(productResponse.images().stream()
+                                        .findFirst()
+                                        .orElse(null))
+                                .image())
+                        .build());
             } catch (Exception ignored) {
             }
         }

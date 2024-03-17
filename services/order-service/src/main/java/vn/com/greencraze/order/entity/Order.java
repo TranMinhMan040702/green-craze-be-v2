@@ -25,7 +25,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import vn.com.greencraze.order.enumeration.OrderStatus;
+import vn.com.greencraze.commons.enumeration.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;

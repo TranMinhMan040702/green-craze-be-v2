@@ -29,7 +29,9 @@ import java.util.List;
 public class PaymentMethodServiceImpl implements IPaymentMethodService {
 
     private final PaymentMethodRepository paymentMethodRepository;
+
     private final PaymentMethodMapper paymentMethodMapper;
+
     private final IUploadService uploadService;
 
     private static final String RESOURCE_NAME = "PaymentMethod";

@@ -28,6 +28,7 @@ import java.util.List;
 public class OrderCancelReasonServiceImpl implements IOrderCancelReasonService {
 
     private final OrderCancelReasonRepository orderCancelReasonRepository;
+
     private final OrderCancelReasonMapper orderCancelReasonMapper;
 
     private static final String RESOURCE_NAME = "OrderCancelReason";

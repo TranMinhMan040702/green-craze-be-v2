@@ -2,6 +2,7 @@ package vn.com.greencraze.order.service;
 
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.enumeration.OrderStatus;
 import vn.com.greencraze.order.dto.request.order.CompletePaypalOrderRequest;
 import vn.com.greencraze.order.dto.request.order.CreateOrderRequest;
 import vn.com.greencraze.order.dto.request.order.UpdateOrderRequest;
@@ -10,7 +11,6 @@ import vn.com.greencraze.order.dto.response.order.GetListOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderItemResponse;
 import vn.com.greencraze.order.dto.response.order.GetOneOrderResponse;
 import vn.com.greencraze.order.dto.response.order.GetTop5OrderLatestResponse;
-import vn.com.greencraze.order.enumeration.OrderStatus;
 
 import java.time.Instant;
 import java.util.List;
@@ -46,5 +46,7 @@ public interface IOrderService {
     Map<String, Long> getTopSellingProduct(Instant startDate, Instant endDate);
 
     Map<String, Long> getOrderTotalByStatus(Instant startDate, Instant endDate);
+
+    void cancelOrderSaga(Long id);
 
 }

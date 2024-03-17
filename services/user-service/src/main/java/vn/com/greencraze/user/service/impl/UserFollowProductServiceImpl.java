@@ -27,8 +27,11 @@ public class UserFollowProductServiceImpl implements IUserFollowProductService {
 
     private final UserFollowProductRepository userFollowProductRepository;
     private final UserProfileRepository userProfileRepository;
+
     private final UserFollowProductMapper userFollowProductMapper;
+
     private final ProductServiceClient productServiceClient;
+
     private final AuthFacade authFacade;
     private static final String RESOURCE_NAME = "UserFollowProduct";
 

@@ -10,6 +10,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.domain.aggreate.CreateOrderAggregate;
 import vn.com.greencraze.commons.exception.InvalidRequestException;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.product.dto.request.product.CreateProductRequest;
@@ -30,6 +31,7 @@ import vn.com.greencraze.product.entity.Product;
 import vn.com.greencraze.product.entity.ProductImage;
 import vn.com.greencraze.product.entity.Variant;
 import vn.com.greencraze.product.enumeration.ProductStatus;
+import vn.com.greencraze.product.exception.ReduceStockException;
 import vn.com.greencraze.product.mapper.ProductMapper;
 import vn.com.greencraze.product.repository.BrandRepository;
 import vn.com.greencraze.product.repository.ProductCategoryRepository;
@@ -41,6 +43,7 @@ import vn.com.greencraze.product.service.IProductService;
 import vn.com.greencraze.product.service.IUploadService;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -304,6 +307,53 @@ public class ProductServiceImpl implements IProductService {
                 .map(productMapper::productToGetOneProductResponse)
                 .map(RestResponse::ok)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "productId", variant.getProduct().getId()));
+    }
+
+    @Override
+    public void reduceStock(CreateOrderAggregate aggregate) {
+        List<Product> productsToUpdate = new ArrayList<>();
+        HashMap<Long, Long> productActualQuantity = new HashMap<>();
+        for (CreateOrderAggregate.OrderItemAggregate oi : aggregate.items()) {
+            Variant variant = variantRepository.findById(oi.variantId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Variant", "id", oi.variantId()));
+
+            Product product = variant.getProduct();
+
+            if (!productActualQuantity.containsKey(product.getId())) {
+                productActualQuantity.put(product.getId(), product.getActualInventory());
+            }
+
+            long quantityCurrent = (long) variant.getQuantity() * oi.quantity();
+            if (quantityCurrent > productActualQuantity.get(product.getId())) {
+                throw new ReduceStockException("Unexpected quantity, it must be less than or equal to product in inventory");
+            }
+            productActualQuantity.put(product.getId(), productActualQuantity.get(product.getId()) - quantityCurrent);
+
+            product.setQuantity(product.getQuantity() - quantityCurrent);
+            product.setActualInventory(product.getActualInventory() - quantityCurrent);
+            product.setSold(product.getSold() + quantityCurrent);
+            productsToUpdate.add(product);
+        }
+        productRepository.saveAll(productsToUpdate);
+    }
+
+    @Override
+    public void revertStock(CreateOrderAggregate aggregate) {
+        List<Product> productsToUpdate = new ArrayList<>();
+        for (CreateOrderAggregate.OrderItemAggregate oi : aggregate.items()) {
+            Variant variant = variantRepository.findById(oi.variantId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Variant", "id", oi.variantId()));
+
+            Product product = variant.getProduct();
+
+            long quantityCurrent = (long) variant.getQuantity() * oi.quantity();
+
+            product.setQuantity(product.getQuantity() + quantityCurrent);
+            product.setActualInventory(product.getActualInventory() + quantityCurrent);
+            product.setSold(product.getSold() - quantityCurrent);
+            productsToUpdate.add(product);
+        }
+        productRepository.saveAll(productsToUpdate);
     }
 
 }

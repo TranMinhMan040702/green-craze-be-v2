@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import vn.com.greencraze.commons.advice.CommonControllerAdvice;
 import vn.com.greencraze.commons.advice.RestError;
+import vn.com.greencraze.product.exception.ReduceStockException;
 import vn.com.greencraze.product.exception.SaleActiveException;
 import vn.com.greencraze.product.exception.SaleDateException;
 import vn.com.greencraze.product.exception.SaleExpiredException;
@@ -72,6 +73,20 @@ public class AppControllerAdvice implements CommonControllerAdvice {
                 .detail(e.getMessage())
                 .instance(URI.create(request.getRequestURI()))
                 .code("SALE_EXPIRED")
+                .build();
+    }
+
+    @ExceptionHandler(ReduceStockException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public RestError reduceStockExceptionHandler(ReduceStockException e, HttpServletRequest request) {
+        return RestError.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .type(URI.create("https://problems.greencraze.com.vn/reduce-stock"))
+                .title("Reduce Stock")
+                .detail(e.getMessage())
+                .instance(URI.create(request.getRequestURI()))
+                .code("REDUCE_STOCK")
                 .build();
     }
 

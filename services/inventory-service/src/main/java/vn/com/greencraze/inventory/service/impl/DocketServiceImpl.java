@@ -3,9 +3,12 @@ package vn.com.greencraze.inventory.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.domain.aggreate.CreateOrderAggregate;
+import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.inventory.client.product.ProductServiceClient;
 import vn.com.greencraze.inventory.client.product.dto.request.ExportProductRequest;
 import vn.com.greencraze.inventory.client.product.dto.request.ImportProductRequest;
+import vn.com.greencraze.inventory.client.product.dto.response.GetOneVariantResponse;
 import vn.com.greencraze.inventory.dto.request.CreateDocketRequest;
 import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeExportRequest;
 import vn.com.greencraze.inventory.dto.request.CreateDocketWithTypeImportRequest;
@@ -18,6 +21,7 @@ import vn.com.greencraze.inventory.service.IDocketService;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,6 +84,7 @@ public class DocketServiceImpl implements IDocketService {
         return RestResponse.ok(responses);
     }
 
+    @Deprecated
     @Override
     public void createDocket(CreateDocketRequest request) {
         for (CreateDocketRequest.ProductDocket productDocket : request.productDockets()) {
@@ -92,6 +97,45 @@ public class DocketServiceImpl implements IDocketService {
                     .build();
             docketRepository.save(docket);
         }
+    }
+
+    @Override
+    public void createDocket(CreateOrderAggregate aggregate) {
+        List<Docket> docketsToSave = new ArrayList<>();
+        for (CreateOrderAggregate.OrderItemAggregate oi : aggregate.items()) {
+            RestResponse<GetOneVariantResponse> variantResp = productServiceClient.getOneVariant(oi.variantId());
+            if (variantResp == null) {
+                throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", oi.variantId());
+            }
+            docketsToSave.add(Docket.builder()
+                    .orderId(aggregate.id())
+                    .productId(variantResp.data().productId())
+                    .quantity(((long) variantResp.data().quantity() * oi.quantity()))
+                    .type(DocketType.EXPORT)
+                    .code(UUID.randomUUID().toString()) // TODO
+                    .build());
+        }
+        docketRepository.saveAll(docketsToSave);
+    }
+
+    @Override
+    public void revertDocket(CreateOrderAggregate aggregate) {
+        List<Docket> docketsToSave = new ArrayList<>();
+        for (CreateOrderAggregate.OrderItemAggregate oi : aggregate.items()) {
+            RestResponse<GetOneVariantResponse> variantResp = productServiceClient.getOneVariant(oi.variantId());
+            if (variantResp == null) {
+                throw new ResourceNotFoundException(RESOURCE_NAME, "variantId", oi.variantId());
+            }
+            docketsToSave.add(Docket.builder()
+                    .orderId(aggregate.id())
+                    .productId(variantResp.data().productId())
+                    .quantity(((long) variantResp.data().quantity() * oi.quantity()))
+                    .type(DocketType.IMPORT)
+                    .note("Order failed")
+                    .code(UUID.randomUUID().toString()) // TODO
+                    .build());
+        }
+        docketRepository.saveAll(docketsToSave);
     }
 
     @Override
