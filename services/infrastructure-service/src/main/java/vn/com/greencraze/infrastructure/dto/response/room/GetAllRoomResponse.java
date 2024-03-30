@@ -1,12 +1,11 @@
-package vn.com.greencraze.infrastructure.dto.response;
+package vn.com.greencraze.infrastructure.dto.response.room;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.lang.Nullable;
-import vn.com.greencraze.commons.enumeration.NotificationType;
 
 import java.time.Instant;
 
-public record GetListNotificationResponse(
+public record GetAllRoomResponse(
         Long id,
         Instant createdAt,
         Instant updatedAt,
@@ -16,10 +15,6 @@ public record GetListNotificationResponse(
         @Nullable
         @Schema(nullable = true)
         String updatedBy,
-        NotificationType type,
-        String content,
-        String title,
-        String anchor,
-        String image,
-        Boolean status
+        String userId,
+        String name
 ) {}
