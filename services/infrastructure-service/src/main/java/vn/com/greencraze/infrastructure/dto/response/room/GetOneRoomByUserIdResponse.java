@@ -23,6 +23,7 @@ public record GetOneRoomByUserIdResponse(
 
     public record MessageResponse(
             Long id,
+            String userId,
             String image,
             Boolean status,
             String content
