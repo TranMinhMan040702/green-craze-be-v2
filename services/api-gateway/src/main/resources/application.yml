@@ -1117,25 +1117,23 @@ spring:
           uri: lb://infrastructure-service
           predicates:
             - Method=GET
-            - Path=/api/chat/room
+            - Path=/api/chat/rooms
           filters:
-            - SetPath=/core/infrastructure/chat/room
+            - SetPath=/core/infrastructure/chat/rooms
         - id: private::infrastructure::getOneRoomByUserId
           uri: lb://infrastructure-service
           predicates:
             - Method=GET
-            - Path=/api/chat/room/{userId}
+            - Path=/api/chat/rooms/{userId}
           filters:
-            - SetPath=/core/infrastructure/chat/room/{userId}
+            - SetPath=/core/infrastructure/chat/rooms/{userId}
         - id: private::infrastructure::createRoom
           uri: lb://infrastructure-service
           predicates:
             - Method=POST
-            - Path=/api/chat/room
+            - Path=/api/chat/rooms
           filters:
-            - SetPath=/core/infrastructure/chat/room
-
-
+            - SetPath=/core/infrastructure/chat/rooms
 
 management:
   tracing:
