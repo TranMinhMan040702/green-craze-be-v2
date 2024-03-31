@@ -12,6 +12,7 @@ import vn.com.greencraze.infrastructure.mapper.ChatMapper;
 import vn.com.greencraze.infrastructure.repository.MessageRepository;
 import vn.com.greencraze.infrastructure.repository.RoomRepository;
 import vn.com.greencraze.infrastructure.service.IMessageService;
+import vn.com.greencraze.infrastructure.service.IUploadService;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class MessageServiceImpl implements IMessageService {
 
     private final MessageRepository messageRepository;
     private final RoomRepository roomRepository;
+    private final IUploadService uploadService;
 
     private final ChatMapper chatMapper;
 
@@ -45,12 +47,24 @@ public class MessageServiceImpl implements IMessageService {
 
     @Override
     public void sendMessage(String destination, MessageRequest request) {
-        simpMessagingTemplate.convertAndSend("/chat/receive/" + destination, request);
+        // create message
+        Message message = chatMapper.mesageRequestToMessage(request);
+        if (request.image() != null) {
+            message.setImage(uploadService.uploadFile(request.image()));
+        }
+        message = messageRepository.save(message);
+        // send message
+        simpMessagingTemplate.convertAndSend("/chat/receive/" + destination,
+                chatMapper.messageToMessageResponse(message));
     }
 
+    @Deprecated
     @Override
     public void createMessage(MessageRequest request) {
         Message message = chatMapper.mesageRequestToMessage(request);
+        if (request.image() != null) {
+            message.setImage(uploadService.uploadFile(request.image()));
+        }
         messageRepository.save(message);
     }
 

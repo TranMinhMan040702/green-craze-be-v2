@@ -14,6 +14,7 @@ public interface IMessageService {
 
     void sendMessage(String destination, MessageRequest request);
 
+    @Deprecated
     void createMessage(MessageRequest request);
 
 }

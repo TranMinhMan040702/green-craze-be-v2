@@ -7,12 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -39,11 +39,20 @@ public class ChatController {
     private final IMessageService messageService;
     private final IRoomService roomService;
 
-    // destination = userId of user
-    @MessageMapping("/send/{destination}")
-    public void sendMessage(@DestinationVariable String destination, @Payload MessageRequest messageRequest) {
-        messageService.createMessage(messageRequest);
-        messageService.sendMessage(destination, messageRequest);
+    @MessageMapping("/send/message")
+    public void sendMessage(@Payload MessageRequest request) {
+        messageService.sendMessage(request.destination(), request);
+    }
+
+    @PostMapping(
+            value = "/send/message",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Send message with image")
+    public void sendMessageWithImage(@Valid MessageRequest request) {
+        messageService.sendMessage(request.destination(), request);
     }
 
     //TODO: Role Admin
@@ -61,17 +70,19 @@ public class ChatController {
         return ResponseEntity.ok(roomService.getOneRoomByUserId(userId));
     }
 
-    @PostMapping(value = "/rooms",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @Deprecated
+    @PostMapping(
+            value = "/rooms",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a room")
-    public ResponseEntity<RestResponse<CreateRoomResponse>> createRoom(@Valid CreateRoomRequest request) {
+    public ResponseEntity<RestResponse<CreateRoomResponse>> createRoom(@RequestBody @Valid CreateRoomRequest request) {
         RestResponse<CreateRoomResponse> response = roomService.createRoom(request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(response.data().id()).toUri();
 
-        // send default message
         MessageRequest messageRequest = MessageRequest.builder()
                 .userId("ADMIN")    // TODO
                 .roomId(response.data().id())

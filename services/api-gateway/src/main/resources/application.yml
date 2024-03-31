@@ -1083,6 +1083,10 @@ spring:
           uri: lb:ws://infrastructure-service
           predicates:
             - Path=/core/infrastructure/**
+        - id: public::infrastructure::connectWebSocket
+          uri: lb:ws://infrastructure-service
+          predicates:
+            - Path=/app/send/**
         # > > Notification
         - id: private::infrastructure::getListNotification
           uri: lb://infrastructure-service
@@ -1134,6 +1138,13 @@ spring:
             - Path=/api/chat/rooms
           filters:
             - SetPath=/core/infrastructure/chat/rooms
+        - id: private::infrastructure::sendMessageWithImage
+          uri: lb://infrastructure-service
+          predicates:
+            - Method=POST
+            - Path=/api/chat/send/message
+          filters:
+            - SetPath=/core/infrastructure/chat/send/message
 
 management:
   tracing:

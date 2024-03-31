@@ -1,14 +1,13 @@
-package vn.com.greencraze.infrastructure.dto.response.room;
+package vn.com.greencraze.infrastructure.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import org.springframework.lang.Nullable;
-import vn.com.greencraze.infrastructure.dto.request.MessageResponse;
 
 import java.time.Instant;
 
 @Builder
-public record GetAllRoomResponse(
+public record MessageResponse(
         Long id,
         Instant createdAt,
         Instant updatedAt,
@@ -19,6 +18,8 @@ public record GetAllRoomResponse(
         @Schema(nullable = true)
         String updatedBy,
         String userId,
-        String name,
-        MessageResponse message
+        Long roomId,
+        String image,
+        Boolean status,
+        String content
 ) {}

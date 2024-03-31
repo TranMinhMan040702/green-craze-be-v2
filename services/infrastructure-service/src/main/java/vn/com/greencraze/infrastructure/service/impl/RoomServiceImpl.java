@@ -1,13 +1,15 @@
 package vn.com.greencraze.infrastructure.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.RestResponse;
-import vn.com.greencraze.commons.exception.ResourceNotFoundException;
+import vn.com.greencraze.infrastructure.client.user.UserServiceClient;
 import vn.com.greencraze.infrastructure.dto.request.CreateRoomRequest;
 import vn.com.greencraze.infrastructure.dto.response.room.CreateRoomResponse;
 import vn.com.greencraze.infrastructure.dto.response.room.GetAllRoomResponse;
 import vn.com.greencraze.infrastructure.dto.response.room.GetOneRoomByUserIdResponse;
+import vn.com.greencraze.infrastructure.entity.Message;
 import vn.com.greencraze.infrastructure.entity.Room;
 import vn.com.greencraze.infrastructure.mapper.ChatMapper;
 import vn.com.greencraze.infrastructure.repository.RoomRepository;
@@ -23,10 +25,15 @@ public class RoomServiceImpl implements IRoomService {
 
     private final ChatMapper chatMapper;
 
+    private final UserServiceClient userServiceClient;
+
+    private final SimpMessagingTemplate simpMessagingTemplate;
+
     private static final String RESOURCE_NAME = "Room";
 
     @Override
     public RestResponse<List<GetAllRoomResponse>> getAllRoom() {
+        List<Room> rooms = roomRepository.findAll();
         List<GetAllRoomResponse> responses = roomRepository.findAll().stream()
                 .map(chatMapper::roomToGetAllRoomResponse).toList();
         return RestResponse.ok(responses);
@@ -37,7 +44,23 @@ public class RoomServiceImpl implements IRoomService {
         // check room exist
         Room room = roomRepository.findByUserId(userId);
         if (room == null) {
-            throw new ResourceNotFoundException(RESOURCE_NAME, "userId", userId);
+            String username = userServiceClient.getUsername(userId);
+            room = Room.builder()
+                    .userId(userId)
+                    .name(username)
+                    .build();
+
+            Message message = Message.builder()
+                    .userId("ADMIN")    // TODO
+                    .room(room)
+                    .image(null)
+                    .status(true)
+                    .content("Cảm ơn bạn đã quan tâm đến Shop. Bạn có câu hỏi gì cho chúng tôi.")
+                    .build();
+
+            room.setMessages(List.of(message));
+            roomRepository.save(room);
+            simpMessagingTemplate.convertAndSend("/chat/receive/" + userId, message);
         }
 
         return RestResponse.ok(chatMapper.roomToGetOneRoomByUserIdResponse(room));

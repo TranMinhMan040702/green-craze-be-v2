@@ -350,4 +350,11 @@ public class UserProfileServiceImpl implements IUserProfileService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public String getUsername(String userId) {
+        UserProfile userProfile = userProfileRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "id", userId));
+        return userProfile.getFirstName().concat(" ").concat(userProfile.getLastName());
+    }
+
 }

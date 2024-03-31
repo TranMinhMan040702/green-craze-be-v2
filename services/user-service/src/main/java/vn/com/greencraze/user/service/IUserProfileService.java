@@ -58,4 +58,6 @@ public interface IUserProfileService {
 
     List<String> getAllUserId();
 
+    String getUsername(String userId);
+
 }
