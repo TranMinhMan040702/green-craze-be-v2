@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.RestResponse;
+import vn.com.greencraze.commons.auth.AuthFacade;
 import vn.com.greencraze.commons.exception.ResourceNotFoundException;
 import vn.com.greencraze.infrastructure.dto.request.MessageRequest;
 import vn.com.greencraze.infrastructure.dto.response.message.GetAllMessageByRoomIdResponse;
@@ -22,9 +23,12 @@ public class MessageServiceImpl implements IMessageService {
 
     private final MessageRepository messageRepository;
     private final RoomRepository roomRepository;
+
     private final IUploadService uploadService;
 
     private final ChatMapper chatMapper;
+
+    private final AuthFacade authFacade;
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
@@ -43,6 +47,21 @@ public class MessageServiceImpl implements IMessageService {
                 .toList();
 
         return RestResponse.ok(responses);
+    }
+
+    @Override
+    public void updateStatusMessage(Long roomId) {
+        List<Message> messages;
+        if (authFacade.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
+            messages = messageRepository.findByRoomIdAndUserIdNotLike(roomId, "ADMIN");
+        } else {
+            messages = messageRepository.findByRoomIdAndUserIdLike(roomId, "ADMIN");
+        }
+
+        for (Message message : messages) {
+            message.setStatus(true);
+            messageRepository.save(message);
+        }
     }
 
     @Override

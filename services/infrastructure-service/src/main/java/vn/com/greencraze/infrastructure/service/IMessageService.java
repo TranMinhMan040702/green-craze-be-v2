@@ -7,10 +7,10 @@ import vn.com.greencraze.infrastructure.dto.response.message.GetAllMessageByRoom
 import java.util.List;
 
 public interface IMessageService {
-    // TODO: GetListMessageByRoomID
     RestResponse<List<GetAllMessageByRoomIdResponse>> getAllMessageByRoomId(Long roomId);
 
     // TODO: UpdateStatusMessage
+    void updateStatusMessage(Long roomId);
 
     void sendMessage(String destination, MessageRequest request);
 

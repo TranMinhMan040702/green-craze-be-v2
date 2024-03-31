@@ -1,6 +1,7 @@
 package vn.com.greencraze.infrastructure.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.api.RestResponse;
@@ -13,6 +14,7 @@ import vn.com.greencraze.infrastructure.entity.Message;
 import vn.com.greencraze.infrastructure.entity.Room;
 import vn.com.greencraze.infrastructure.mapper.ChatMapper;
 import vn.com.greencraze.infrastructure.repository.RoomRepository;
+import vn.com.greencraze.infrastructure.repository.specification.RoomSpecification;
 import vn.com.greencraze.infrastructure.service.IRoomService;
 
 import java.util.List;
@@ -25,6 +27,8 @@ public class RoomServiceImpl implements IRoomService {
 
     private final ChatMapper chatMapper;
 
+    private final RoomSpecification roomSpecification;
+
     private final UserServiceClient userServiceClient;
 
     private final SimpMessagingTemplate simpMessagingTemplate;
@@ -33,8 +37,8 @@ public class RoomServiceImpl implements IRoomService {
 
     @Override
     public RestResponse<List<GetAllRoomResponse>> getAllRoom() {
-        List<Room> rooms = roomRepository.findAll();
-        List<GetAllRoomResponse> responses = roomRepository.findAll().stream()
+        Specification<Room> sortable = roomSpecification.orderByLatestMessageUpdatedAt();
+        List<GetAllRoomResponse> responses = roomRepository.findAll(sortable).stream()
                 .map(chatMapper::roomToGetAllRoomResponse).toList();
         return RestResponse.ok(responses);
     }

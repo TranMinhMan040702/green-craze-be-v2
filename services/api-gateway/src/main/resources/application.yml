@@ -1145,6 +1145,20 @@ spring:
             - Path=/api/chat/send/message
           filters:
             - SetPath=/core/infrastructure/chat/send/message
+        - id: private::infrastructure::getAllMessageByRoomId
+          uri: lb://infrastructure-service
+          predicates:
+            - Method=GET
+            - Path=/api/chat/messages/{roomId}
+          filters:
+            - SetPath=/core/infrastructure/chat/messages/{roomId}
+        - id: private::infrastructure::updateStatusMessage
+          uri: lb://infrastructure-service
+          predicates:
+            - Method=PUT
+            - Path=/api/chat/messages/{roomId}
+          filters:
+            - SetPath=/core/infrastructure/chat/messages/{roomId}
 
 management:
   tracing:

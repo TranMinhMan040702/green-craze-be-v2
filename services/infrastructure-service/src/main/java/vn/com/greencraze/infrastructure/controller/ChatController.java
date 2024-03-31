@@ -12,6 +12,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -101,6 +102,14 @@ public class ChatController {
     public ResponseEntity<RestResponse<List<GetAllMessageByRoomIdResponse>>> getAllMessageByRoomId(
             @PathVariable Long roomId) {
         return ResponseEntity.ok(messageService.getAllMessageByRoomId(roomId));
+    }
+
+    @PutMapping("/messages/{roomId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Update status message")
+    public ResponseEntity<Void> updateStatusMessage(@PathVariable Long roomId) {
+        messageService.updateStatusMessage(roomId);
+        return ResponseEntity.noContent().build();
     }
 
 }
