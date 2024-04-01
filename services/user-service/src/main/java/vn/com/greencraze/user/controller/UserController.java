@@ -146,4 +146,12 @@ public class UserController {
         return ResponseEntity.ok(userProfileService.getAllUserId());
     }
 
+    @InternalApi(Microservice.INFRASTRUCTURE)
+    @GetMapping("/get-username/{userId}")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "Get username of user")
+    public ResponseEntity<String> getUsername(@PathVariable String userId) {
+        return ResponseEntity.ok(userProfileService.getUsername(userId));
+    }
+
 }

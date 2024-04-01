@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import vn.com.greencraze.commons.api.ListResponse;
 import vn.com.greencraze.commons.api.RestResponse;
-import vn.com.greencraze.infrastructure.dto.response.GetCountNotificationResponse;
-import vn.com.greencraze.infrastructure.dto.response.GetListNotificationResponse;
+import vn.com.greencraze.infrastructure.dto.response.notification.GetCountNotificationResponse;
+import vn.com.greencraze.infrastructure.dto.response.notification.GetListNotificationResponse;
 import vn.com.greencraze.infrastructure.service.INotificationService;
 
 @RestController

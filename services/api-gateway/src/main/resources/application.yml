@@ -1083,6 +1083,10 @@ spring:
           uri: lb:ws://infrastructure-service
           predicates:
             - Path=/core/infrastructure/**
+        - id: public::infrastructure::connectWebSocket
+          uri: lb:ws://infrastructure-service
+          predicates:
+            - Path=/app/send/**
         # > > Notification
         - id: private::infrastructure::getListNotification
           uri: lb://infrastructure-service
@@ -1112,7 +1116,49 @@ spring:
             - Path=/api/notifications/all
           filters:
             - SetPath=/core/infrastructure/notifications/all
-
+        # > > Chat
+        - id: private::infrastructure::getAllRoom
+          uri: lb://infrastructure-service
+          predicates:
+            - Method=GET
+            - Path=/api/chat/rooms
+          filters:
+            - SetPath=/core/infrastructure/chat/rooms
+        - id: private::infrastructure::getOneRoomByUserId
+          uri: lb://infrastructure-service
+          predicates:
+            - Method=GET
+            - Path=/api/chat/rooms/{userId}
+          filters:
+            - SetPath=/core/infrastructure/chat/rooms/{userId}
+        - id: private::infrastructure::createRoom
+          uri: lb://infrastructure-service
+          predicates:
+            - Method=POST
+            - Path=/api/chat/rooms
+          filters:
+            - SetPath=/core/infrastructure/chat/rooms
+        - id: private::infrastructure::sendMessageWithImage
+          uri: lb://infrastructure-service
+          predicates:
+            - Method=POST
+            - Path=/api/chat/send/message
+          filters:
+            - SetPath=/core/infrastructure/chat/send/message
+        - id: private::infrastructure::getAllMessageByRoomId
+          uri: lb://infrastructure-service
+          predicates:
+            - Method=GET
+            - Path=/api/chat/messages/{roomId}
+          filters:
+            - SetPath=/core/infrastructure/chat/messages/{roomId}
+        - id: private::infrastructure::updateStatusMessage
+          uri: lb://infrastructure-service
+          predicates:
+            - Method=PUT
+            - Path=/api/chat/messages/{roomId}
+          filters:
+            - SetPath=/core/infrastructure/chat/messages/{roomId}
 
 management:
   tracing:

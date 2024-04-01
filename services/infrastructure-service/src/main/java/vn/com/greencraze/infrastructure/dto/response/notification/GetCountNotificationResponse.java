@@ -1,4 +1,4 @@
-package vn.com.greencraze.infrastructure.dto.response;
+package vn.com.greencraze.infrastructure.dto.response.notification;
 
 import lombok.Builder;
 
