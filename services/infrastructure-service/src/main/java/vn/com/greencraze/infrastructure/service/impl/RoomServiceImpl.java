@@ -58,7 +58,7 @@ public class RoomServiceImpl implements IRoomService {
                     .userId("ADMIN")    // TODO
                     .room(room)
                     .image(null)
-                    .status(true)
+                    .status(false)
                     .content("Cảm ơn bạn đã quan tâm đến Shop. Bạn có câu hỏi gì cho chúng tôi.")
                     .build();
 
