@@ -210,6 +210,27 @@ services:
     networks:
       - green-craze-network
 
+  green-craze-recommendation-service:
+    container_name: green-craze-recommendation-service
+    image: green-craze-recommendation-service
+    restart: unless-stopped
+    depends_on:
+      - green-craze-eureka-service
+    build:
+      context: ./services/recommendation-service
+      dockerfile: Dockerfile
+      args:
+        SERVICE_NAME: recommendation-service
+    environment:
+      SPRING_PROFILES_ACTIVE: stag
+      # MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
+    ports:
+      - "7258:7258"
+    # volumes:
+    #   - /logs/meta-service-logs:/logs/meta-service-logs
+    networks:
+      - green-craze-network
+
 networks:
   green-craze-network:
     external: true
