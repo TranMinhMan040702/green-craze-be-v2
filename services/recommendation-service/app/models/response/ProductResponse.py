@@ -1,7 +1,7 @@
 
 
 class ProductResponse:
-    def __init__(self, product, brand, category, unit, product_images):
+    def __init__(self, product, brand, category, unit, product_images, variants):
         self.id = product.id
         self.name = product.name
         self.shortDescription = product.short_description
@@ -18,6 +18,7 @@ class ProductResponse:
         self.brand = BrandResponse(brand).__dict__
         self.productCategory = ProductCategoryResponse(category).__dict__
         self.images = [ProductImageResponse(image).__dict__ for image in product_images]
+        self.variants = [VariantResource(variant).__dict__ for variant in variants]
         
 
 class UnitResponse:
@@ -50,3 +51,15 @@ class ProductImageResponse:
         self.image = product_image.image
         self.productId = product_image.product_id
         self.isDefault = product_image.is_default
+
+class VariantResource:
+    def __init__(self, variant):
+        self.id =  variant.id
+        self.name = variant.name
+        self.sku = variant.sku
+        self.quantity = variant.quantity
+        self.itemPrice = variant.item_price
+        self.totalPrice = variant.total_price
+        self.totalPromotionalPrice = variant.promotional_item_price
+        self.promotionalItemPrice = variant.total_promotional_price
+        self.status = variant.status

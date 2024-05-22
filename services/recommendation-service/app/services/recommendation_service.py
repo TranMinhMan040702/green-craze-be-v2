@@ -4,6 +4,7 @@ import app.repositories.product_repository as product_repository
 import app.repositories.product_images_repository as product_images_repository
 import app.repositories.brand_repository as brand_repository
 import app.repositories.unit_repository as unit_repository
+import app.repositories.variant_repository as variant_repository
 
 from app.models.response.ProductResponse import ProductResponse
 
@@ -156,8 +157,9 @@ def get_product_recommendations(productIdList):
         brand = brand_repository.get_brand_by_id(product.brand_id)
         category = product_category_repository.get_product_category_by_id(product.product_category_id)
         unit = unit_repository.get_unit_by_id(product.unit_id)
+        variants = variant_repository.get_variant_by_product_id(product_id)
         
-        productResp = ProductResponse(product, brand, category, unit, images)
+        productResp = ProductResponse(product, brand, category, unit, images, variants)
         productList.append(productResp.__dict__)
         
     return productList
