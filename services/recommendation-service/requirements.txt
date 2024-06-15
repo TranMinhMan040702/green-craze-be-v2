@@ -1,0 +1,11 @@
+flask
+SQLAlchemy
+flask_sqlalchemy
+pandas
+numpy
+scipy
+surprise
+cryptography
+pyjwt
+pymysql
+scikit-learn
