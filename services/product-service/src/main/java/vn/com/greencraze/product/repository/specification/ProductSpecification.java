@@ -4,6 +4,8 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import vn.com.greencraze.commons.specification.BaseSpecification;
@@ -14,6 +16,7 @@ import vn.com.greencraze.product.entity.ProductCategory;
 import vn.com.greencraze.product.entity.Variant;
 import vn.com.greencraze.product.enumeration.ProductStatus;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,9 +86,15 @@ public class ProductSpecification extends BaseSpecification<Product> {
                     wheres.add(isEqualCategorySlug);
                 }
                 if (filter.minPrice() != null && filter.maxPrice() != null) {
+                    Subquery<BigDecimal> subquery = query.subquery(BigDecimal.class);
+                    Root<Variant> variantRoot = subquery.from(Variant.class);
+                    subquery.select(cb.max(variantRoot.get("itemPrice")))
+                            .where(cb.equal(variantRoot.get("product"), root));
+
                     Join<Product, Variant> variant = root.join("variants", JoinType.LEFT);
                     Predicate priceBetween = cb.between(variant.get("itemPrice"), filter.minPrice(), filter.maxPrice());
-                    wheres.add(priceBetween);
+
+                    wheres.add(cb.and(cb.equal(variant.get("itemPrice"), subquery), priceBetween));
                 }
                 if (filter.brandIds() != null && !filter.brandIds().isEmpty()) {
                     List<Predicate> brandPredicates = new ArrayList<>();
