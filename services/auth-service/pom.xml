@@ -137,11 +137,6 @@
             <artifactId>google-http-client-gson</artifactId>
             <version>1.43.3</version>
         </dependency>
-        <dependency>
-            <groupId>vn.com.greencraze.amqp</groupId>
-            <artifactId>amqp</artifactId>
-            <version>${amqp.version}</version>
-        </dependency>
 
         <!-- Kafka -->
         <dependency>

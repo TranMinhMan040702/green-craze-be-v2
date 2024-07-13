@@ -3,15 +3,6 @@ version: "3.8"
 name: green-craze-infra
 
 services:
-  green-craze-rabbitmq:
-    container_name: rabbitmq
-    image: rabbitmq:3.9.11-management-alpine
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    networks:
-      - green-craze-network
-
   green-craze-zipkin:
     container_name: zipkin
     image: openzipkin/zipkin

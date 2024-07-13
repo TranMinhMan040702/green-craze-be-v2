@@ -106,9 +106,11 @@ spring:
     activate:
       on-profile: stag
   datasource:
-    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_inventory
-    username: avnadmin
-    password: AVNS_ICGL1LOHUwComp9Dj2e
+    url: jdbc:mysql://green-craze-mysql:3306/core_inventory
+    username: root
+    password: green-craze-be-v2
+  kafka:
+    bootstrap-servers: green-craze-kafka:29092
 
 eureka:
   client:
@@ -121,9 +123,9 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_inventory
-    username: avnadmin
-    password: AVNS_ICGL1LOHUwComp9Dj2e
+    url: jdbc:mysql://green-craze-mysql:3306/core_inventory
+    username: root
+    password: green-craze-be-v2
 
 eureka:
   client:

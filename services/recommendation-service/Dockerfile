@@ -1,4 +1,7 @@
-FROM python:3.10.0-alpine
+FROM python:3.10
+
+RUN apt-get update
+RUN apt-get install gcc libc-dev g++ libffi-dev libxml2 libffi-dev unixodbc-dev -y
 
 WORKDIR /app
 

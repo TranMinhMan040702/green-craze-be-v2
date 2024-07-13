@@ -124,11 +124,6 @@
             <artifactId>mapstruct</artifactId>
             <version>${org.mapstruct.version}</version>
         </dependency>
-        <dependency>
-            <groupId>vn.com.greencraze.amqp</groupId>
-            <artifactId>amqp</artifactId>
-            <version>${amqp.version}</version>
-        </dependency>
 
         <!-- Kafka -->
         <dependency>
