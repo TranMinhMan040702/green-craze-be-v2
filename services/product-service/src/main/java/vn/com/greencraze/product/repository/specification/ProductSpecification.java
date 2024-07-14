@@ -23,15 +23,18 @@ import java.util.List;
 @Service
 public class ProductSpecification extends BaseSpecification<Product> {
 
-    public Specification<Product> sortablePrice(Boolean isSortAscending, String columnName) {
+    @Override
+    public Specification<Product> sortable(Boolean isSortAscending, String columnName) {
         return (root, query, cb) -> {
             if (isSortAscending != null && columnName != null) {
-                root.join("variants", JoinType.LEFT);
-                Order order = isSortAscending ? cb.asc(root.join("variants").get("itemPrice"))
-                        : cb.desc(root.join("variants").get("itemPrice"));
+                Order order;
+                if (columnName.equals("name")) {
+                    order = isSortAscending ? cb.asc(root.get("name")) : cb.desc(root.get("name"));
+                } else {
+                    return query.getRestriction();
+                }
                 query.orderBy(order);
             }
-
             return cb.conjunction();
         };
     }
@@ -69,47 +72,59 @@ public class ProductSpecification extends BaseSpecification<Product> {
     }
 
     public Specification<Product> filterable(FilterProductRequest filter) {
-        List<Predicate> wheres = new ArrayList<>();
         return (root, query, cb) -> {
+            List<Predicate> wheres = new ArrayList<>();
+
             if (filter != null) {
+                // Join for product category
+                Join<Product, ProductCategory> categoryJoin = root.join("productCategory", JoinType.LEFT);
                 if (filter.categoryIds() != null && !filter.categoryIds().isEmpty()) {
                     List<Predicate> categoryPredicates = new ArrayList<>();
-                    Join<Product, ProductCategory> category = root.join("productCategory");
                     for (Long id : filter.categoryIds()) {
-                        Predicate isEqualCategoryId = cb.equal(category.get("id"), id);
-                        categoryPredicates.add(isEqualCategoryId);
+                        categoryPredicates.add(cb.equal(categoryJoin.get("id"), id));
                     }
                     wheres.add(cb.or(categoryPredicates.toArray(new Predicate[0])));
                 } else if (filter.categorySlug() != null) {
-                    Join<Product, ProductCategory> category = root.join("productCategory");
-                    Predicate isEqualCategorySlug = cb.equal(category.get("slug"), filter.categorySlug());
-                    wheres.add(isEqualCategorySlug);
+                    wheres.add(cb.equal(categoryJoin.get("slug"), filter.categorySlug()));
                 }
+
+                // Handle price filter with subquery
                 if (filter.minPrice() != null && filter.maxPrice() != null) {
+                    // Subquery to get the max item price for each product
                     Subquery<BigDecimal> subquery = query.subquery(BigDecimal.class);
                     Root<Variant> variantRoot = subquery.from(Variant.class);
-                    subquery.select(cb.max(variantRoot.get("itemPrice")))
+                    subquery.select(cb.min(variantRoot.get("itemPrice")))
                             .where(cb.equal(variantRoot.get("product"), root));
 
-                    Join<Product, Variant> variant = root.join("variants", JoinType.LEFT);
-                    Predicate priceBetween = cb.between(variant.get("itemPrice"), filter.minPrice(), filter.maxPrice());
+                    // Join with Variant for the main query
+                    Join<Product, Variant> variantJoin = root.join("variants", JoinType.LEFT);
+                    Predicate priceBetween = cb.between(variantJoin.get("itemPrice"), filter.minPrice(), filter.maxPrice());
+                    Predicate maxPricePredicate = cb.equal(variantJoin.get("itemPrice"), subquery);
 
-                    wheres.add(cb.and(cb.equal(variant.get("itemPrice"), subquery), priceBetween));
+                    if (filter.columnName().equals("price")) {
+                        query.orderBy(filter.isSortAscending() ? cb.asc(variantJoin.get("itemPrice")) :
+                                cb.desc(variantJoin.get("itemPrice")));
+                    }
+
+                    wheres.add(cb.and(maxPricePredicate, priceBetween));
                 }
+
+                // Join for brand
                 if (filter.brandIds() != null && !filter.brandIds().isEmpty()) {
+                    Join<Product, Brand> brandJoin = root.join("brand", JoinType.LEFT);
                     List<Predicate> brandPredicates = new ArrayList<>();
-                    Join<Product, Brand> brand = root.join("brand");
                     for (Long id : filter.brandIds()) {
-                        Predicate isEqualBrandId = cb.equal(brand.get("id"), id);
-                        brandPredicates.add(isEqualBrandId);
+                        brandPredicates.add(cb.equal(brandJoin.get("id"), id));
                     }
                     wheres.add(cb.or(brandPredicates.toArray(new Predicate[0])));
                 }
+
+                // Handle rating filter
                 if (filter.rating() != null) {
-                    Predicate isGreaterThanOrEqualRating = cb.greaterThanOrEqualTo(root.get("rating"), filter.rating());
-                    wheres.add(isGreaterThanOrEqualRating);
+                    wheres.add(cb.greaterThanOrEqualTo(root.get("rating"), filter.rating()));
                 }
             }
+
             return cb.and(wheres.toArray(new Predicate[0]));
         };
     }
