@@ -4,7 +4,7 @@ name: green-craze-infra
 
 services:
   green-craze-zipkin:
-    container_name: zipkin
+    container_name: green-craze-zipkin
     image: openzipkin/zipkin
     restart: unless-stopped
     ports:
@@ -13,7 +13,7 @@ services:
       - green-craze-network
 
   green-craze-prometheus:
-    container_name: prometheus
+    container_name: green-craze-prometheus
     image: prom/prometheus
     restart: unless-stopped
     command:
@@ -26,7 +26,7 @@ services:
       - green-craze-network
 
   green-craze-grafana:
-    container_name: grafana
+    container_name: green-craze-grafana
     image: grafana/grafana
     ports:
       - "3000:3000"
