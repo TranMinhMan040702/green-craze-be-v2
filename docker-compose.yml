@@ -3,6 +3,56 @@ version: "3.8"
 name: green-craze-core
 
 services:
+  green-craze-mysql:
+    container_name: green-craze-mysql
+    image: mysql:8.0.33
+    restart: always
+    command: --lower_case_table_names=1
+    environment:
+      MYSQL_ROOT_PASSWORD: green-craze-be-v2
+      MYSQL_USER: green-craze
+      MYSQL_PASSWORD: green-craze-be-v2
+    networks:
+      - green-craze-network
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./db/backup.sql:/docker-entrypoint-initdb.d/backup.sql
+
+  green-craze-zookeeper:
+    image: confluentinc/cp-zookeeper:5.1.2
+    restart: always
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: "2181"
+      ZOOKEEPER_TICK_TIME: "2000"
+      ZOOKEEPER_SERVERS: "green-craze-zookeeper:22888:23888"
+    ports:
+      - "2181:2181"
+    networks:
+      - green-craze-network
+
+  green-craze-kafka:
+    container_name: green-craze-kafka
+    image: confluentinc/cp-kafka:7.0.0
+    depends_on:
+      - green-craze-zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "green-craze-zookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://green-craze-kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_HOST_NAME: green-craze-kafka
+      KAFKA_BROKER_ID: 1
+      KAFKA_BROKER_RACK: "r1"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - green-craze-network
+
   green-craze-eureka-service:
     container_name: green-craze-eureka-service
     image: green-craze-eureka-service
@@ -16,8 +66,8 @@ services:
       SPRING_PROFILES_ACTIVE: stag
     ports:
       - "7230:7230"
-    # volumes:
-    #   - /logs/eureka-service-logs:/logs/eureka-service-logs
+    volumes:
+      - /logs/eureka-service-logs:/logs/eureka-service-logs
     networks:
       - green-craze-network
 
@@ -37,8 +87,8 @@ services:
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
     ports:
       - "7168:7168"
-    # volumes:
-    #   - /logs/api-gateway-logs:/logs/api-gateway-logs
+    volumes:
+      - /logs/api-gateway-logs:/logs/api-gateway-logs
     networks:
       - green-craze-network
 
@@ -48,6 +98,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
+      - green-craze-mysql
+      - green-craze-kafka
     build:
       context: ./services/auth-service
       dockerfile: Dockerfile
@@ -58,8 +110,8 @@ services:
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
     ports:
       - "7250:7250"
-    # volumes:
-    #   - /logs/auth-service-logs:/logs/auth-service-logs
+    volumes:
+      - /logs/auth-service-logs:/logs/auth-service-logs
     networks:
       - green-craze-network
 
@@ -69,6 +121,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
+      - green-craze-mysql
+      - green-craze-kafka
     build:
       context: ./services/product-service
       dockerfile: Dockerfile
@@ -79,8 +133,8 @@ services:
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
     ports:
       - "7251:7251"
-    # volumes:
-    #   - /logs/product-service-logs:/logs/product-service-logs
+    volumes:
+      - /logs/product-service-logs:/logs/product-service-logs
     networks:
       - green-craze-network
 
@@ -90,6 +144,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
+      - green-craze-mysql
+      - green-craze-kafka
     build:
       context: ./services/order-service
       dockerfile: Dockerfile
@@ -100,8 +156,8 @@ services:
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
     ports:
       - "7252:7252"
-    # volumes:
-    #   - /logs/order-service-logs:/logs/order-service-logs
+    volumes:
+      - /logs/order-service-logs:/logs/order-service-logs
     networks:
       - green-craze-network
 
@@ -111,6 +167,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
+      - green-craze-mysql
+      - green-craze-kafka
     build:
       context: ./services/user-service
       dockerfile: Dockerfile
@@ -121,8 +179,8 @@ services:
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
     ports:
       - "7253:7253"
-    # volumes:
-    #   - /logs/user-service-logs:/logs/user-service-logs
+    volumes:
+      - /logs/user-service-logs:/logs/user-service-logs
     networks:
       - green-craze-network
 
@@ -132,6 +190,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
+      - green-craze-mysql
+      - green-craze-kafka
     build:
       context: ./services/inventory-service
       dockerfile: Dockerfile
@@ -142,8 +202,8 @@ services:
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
     ports:
       - "7254:7254"
-    # volumes:
-    #   - /logs/inventory-service-logs:/logs/inventory-service-logs
+    volumes:
+      - /logs/inventory-service-logs:/logs/inventory-service-logs
     networks:
       - green-craze-network
 
@@ -153,6 +213,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
+      - green-craze-mysql
+      - green-craze-kafka
     build:
       context: ./services/address-service
       dockerfile: Dockerfile
@@ -163,8 +225,8 @@ services:
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
     ports:
       - "7256:7256"
-    # volumes:
-    #   - /logs/address-service-logs:/logs/address-service-logs
+    volumes:
+      - /logs/address-service-logs:/logs/address-service-logs
     networks:
       - green-craze-network
 
@@ -174,6 +236,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
+      - green-craze-mysql
+      - green-craze-kafka
     build:
       context: ./services/infrastructure-service
       dockerfile: Dockerfile
@@ -184,8 +248,8 @@ services:
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
     ports:
       - "7257:7257"
-    # volumes:
-    #   - /logs/infrastructure-service-logs:/logs/infrastructure-service-logs
+    volumes:
+      - /logs/infrastructure-service-logs:/logs/infrastructure-service-logs
     networks:
       - green-craze-network
 
@@ -195,6 +259,8 @@ services:
     restart: unless-stopped
     depends_on:
       - green-craze-eureka-service
+      - green-craze-mysql
+      - green-craze-kafka
     build:
       context: ./services/meta-service
       dockerfile: Dockerfile
@@ -205,8 +271,8 @@ services:
       MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
     ports:
       - "7258:7258"
-    # volumes:
-    #   - /logs/meta-service-logs:/logs/meta-service-logs
+    volumes:
+      - /logs/meta-service-logs:/logs/meta-service-logs
     networks:
       - green-craze-network
 
@@ -215,19 +281,14 @@ services:
     image: green-craze-recommendation-service
     restart: unless-stopped
     depends_on:
-      - green-craze-eureka-service
+      - green-craze-mysql
     build:
       context: ./services/recommendation-service
       dockerfile: Dockerfile
-      args:
-        SERVICE_NAME: recommendation-service
-    environment:
-      SPRING_PROFILES_ACTIVE: stag
-      # MANAGEMENT.ZIPKIN.TRACING.ENDPOINT: http://green-craze-zipkin:9411/api/v2/spans
     ports:
-      - "7258:7258"
-    # volumes:
-    #   - /logs/meta-service-logs:/logs/meta-service-logs
+      - "5000:5000"
+    volumes:
+      - /logs/recommendation-service-logs:/logs/recommendation-service-logs
     networks:
       - green-craze-network
 

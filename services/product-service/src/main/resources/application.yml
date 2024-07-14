@@ -76,10 +76,6 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
 
-rabbitmq:
-  internal-exchange: internal.exchange
-  notification-routing-key: notification.routing_key
-
 springdoc:
   use-fqn: true
   swagger-ui:
@@ -102,11 +98,6 @@ spring:
     url: jdbc:mysql://localhost:3306/core_product
     username: root
     password: 1234
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
   kafka:
     bootstrap-servers: localhost:29092
 
@@ -127,14 +118,11 @@ spring:
     activate:
       on-profile: stag
   datasource:
-    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_product
-    username: avnadmin
-    password: AVNS_ICGL1LOHUwComp9Dj2e
-  rabbitmq:
-    host: green-craze-rabbitmq
-    port: 5672
-    username: guest
-    password: guest
+    url: jdbc:mysql://green-craze-mysql:3306/core_product
+    username: root
+    password: green-craze-be-v2
+  kafka:
+    bootstrap-servers: green-craze-kafka:29092
 
 cloudinary:
   cloud-name: dwoejm4g6
@@ -153,14 +141,9 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:mysql://mysql-ebc761b-mantm040702-6005.a.aivencloud.com:24067/core_product
-    username: avnadmin
-    password: AVNS_ICGL1LOHUwComp9Dj2e
-  rabbitmq:
-    host: green-craze-rabbitmq
-    port: 5672
-    username: guest
-    password: guest
+    url: jdbc:mysql://green-craze-mysql:3306/core_product
+    username: root
+    password: green-craze-be-v2
 
 cloudinary:
   cloud-name: dwoejm4g6

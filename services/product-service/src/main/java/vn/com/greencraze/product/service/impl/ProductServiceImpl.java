@@ -126,14 +126,14 @@ public class ProductServiceImpl implements IProductService {
             Integer page, Integer size, Boolean isSortAscending, String columnName,
             String search, Boolean all, Boolean status, FilterProductRequest filter
     ) {
-        Specification<Product> sortable = productSpecification.sortablePrice(isSortAscending, columnName);
+        Specification<Product> sortable = productSpecification.sortable(isSortAscending, columnName);
         Specification<Product> searchable = productSpecification.searchable(SEARCH_FIELDS, search);
         Specification<Product> filterableByStatus = productSpecification.filterable(status);
         Specification<Product> filterable = productSpecification.filterable(filter);
 
         Pageable pageable = all ? Pageable.unpaged() : PageRequest.of(page - 1, size);
         Page<GetListFilteringProductResponse> responses = productRepository
-                .findAll(sortable.and(searchable).and(filterable).and(filterableByStatus), pageable)
+                .findAll(Specification.where(searchable).and(filterableByStatus).and(filterable).and(sortable), pageable)
                 .map(productMapper::productToGetListFilteringProductResponse);
         return RestResponse.created(ListResponse.of(responses));
     }

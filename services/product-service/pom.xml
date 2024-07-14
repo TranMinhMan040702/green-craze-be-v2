@@ -125,11 +125,7 @@
             <artifactId>cloudinary-http44</artifactId>
             <version>${cloudinary.version}</version>
         </dependency>
-        <dependency>
-            <groupId>vn.com.greencraze.amqp</groupId>
-            <artifactId>amqp</artifactId>
-            <version>${amqp.version}</version>
-        </dependency>
+
         <!-- Kafka -->
         <dependency>
             <groupId>org.springframework.kafka</groupId>

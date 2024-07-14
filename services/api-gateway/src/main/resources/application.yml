@@ -28,13 +28,13 @@ spring:
         # > SERVICE::recommend
         # > > RESOURCE::Recommend // TODO
         - id: public::recommend::getRecommendationsForProduct
-          uri: http://127.0.0.1:5000
+          uri: lb://recommendation-service
           predicates:
             - Method=GET
             - Path=/api/recommendations/product/{id}
 
         - id: public::recommend::getRecommendationsForCurrentUser
-          uri: http://127.0.0.1:5000
+          uri: lb://recommendation-service
           predicates:
             - Method=GET
             - Path=/api/recommendations/user

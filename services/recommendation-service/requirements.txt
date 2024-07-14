@@ -9,3 +9,4 @@ cryptography
 pyjwt
 pymysql
 scikit-learn
+py_eureka_client
