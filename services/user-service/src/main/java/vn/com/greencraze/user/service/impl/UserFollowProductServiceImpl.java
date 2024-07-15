@@ -42,6 +42,10 @@ public class UserFollowProductServiceImpl implements IUserFollowProductService {
                 .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(RESOURCE_NAME, "user", userId));
 
+        if (userFollowProductRepository.findByUserAndProductId(user, request.productId()).isPresent()) {
+            throw new ResourceNotFoundException(RESOURCE_NAME, "user", userId);
+        }
+
         UserFollowProduct userFollowProduct = UserFollowProduct
                 .builder()
                 .user(user)
