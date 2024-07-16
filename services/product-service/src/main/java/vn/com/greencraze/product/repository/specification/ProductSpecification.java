@@ -90,23 +90,47 @@ public class ProductSpecification extends BaseSpecification<Product> {
 
                 // Handle price filter with subquery
                 if (filter.minPrice() != null && filter.maxPrice() != null) {
-                    // Subquery to get the max item price for each product
-                    Subquery<BigDecimal> subquery = query.subquery(BigDecimal.class);
-                    Root<Variant> variantRoot = subquery.from(Variant.class);
-                    subquery.select(cb.min(variantRoot.get("itemPrice")))
-                            .where(cb.equal(variantRoot.get("product"), root));
-
-                    // Join with Variant for the main query
                     Join<Product, Variant> variantJoin = root.join("variants", JoinType.LEFT);
-                    Predicate priceBetween = cb.between(variantJoin.get("itemPrice"), filter.minPrice(), filter.maxPrice());
-                    Predicate maxPricePredicate = cb.equal(variantJoin.get("itemPrice"), subquery);
+
+                    // Subquery to find minimum promotional item price
+                    Subquery<BigDecimal> subqueryPromotionalPrice = query.subquery(BigDecimal.class);
+                    Root<Variant> variantRootPromotionalPrice = subqueryPromotionalPrice.from(Variant.class);
+                    subqueryPromotionalPrice.select(cb.min(variantRootPromotionalPrice.get("promotionalItemPrice")));
+                    subqueryPromotionalPrice.where(
+                            cb.equal(variantRootPromotionalPrice.get("product"), root),
+                            cb.isNotNull(variantRootPromotionalPrice.get("promotionalItemPrice"))
+                    );
+
+                    // Subquery to find minimum item price
+                    Subquery<BigDecimal> subqueryItemPrice = query.subquery(BigDecimal.class);
+                    Root<Variant> variantRootItemPrice = subqueryItemPrice.from(Variant.class);
+                    subqueryItemPrice.select(cb.min(variantRootItemPrice.get("itemPrice")));
+                    subqueryItemPrice.where(cb.equal(variantRootItemPrice.get("product"), root));
+
+                    // Conditions for promotional item price
+                    Predicate promotionalPricePredicate = cb.and(
+                            cb.isNotNull(variantJoin.get("promotionalItemPrice")),
+                            cb.equal(variantJoin.get("promotionalItemPrice"), subqueryPromotionalPrice),
+                            cb.between(variantJoin.get("promotionalItemPrice"), filter.minPrice(), filter.maxPrice())
+                    );
+
+                    // Conditions for item price
+                    Predicate itemPricePredicate = cb.and(
+                            cb.isNull(variantJoin.get("promotionalItemPrice")),
+                            cb.equal(variantJoin.get("itemPrice"), subqueryItemPrice),
+                            cb.between(variantJoin.get("itemPrice"), filter.minPrice(), filter.maxPrice())
+                    );
+
+                    // Combine promotional price and item price conditions
+                    Predicate priceCondition = cb.or(promotionalPricePredicate, itemPricePredicate);
+
 
                     if (filter.columnName().equals("price")) {
                         query.orderBy(filter.isSortAscending() ? cb.asc(variantJoin.get("itemPrice")) :
                                 cb.desc(variantJoin.get("itemPrice")));
                     }
 
-                    wheres.add(cb.and(maxPricePredicate, priceBetween));
+                    wheres.add(priceCondition);
                 }
 
                 // Join for brand
