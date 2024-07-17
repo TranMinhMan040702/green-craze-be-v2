@@ -14,6 +14,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.ErrorResponse;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import vn.com.greencraze.gateway.dto.RestError;
 
@@ -99,6 +100,15 @@ public class GlobalErrorAttributes extends DefaultErrorAttributes {
                             e.getBody().getDetail()))
                     .instance(URI.create(request.path()))
                     .code("COMMON_REQUEST_ERROR")
+                    .build();
+        } else if (exception instanceof WebClientResponseException) {
+            return RestError.builder()
+                    .status(HttpStatus.UNAUTHORIZED.value())
+                    .type(URI.create("https://problems.greencraze.com.vn/unauthorized-error"))
+                    .title("Internal Server Error")
+                    .detail(exception.getMessage())
+                    .instance(URI.create(request.path()))
+                    .code("UNAUTHORIZED_ERROR")
                     .build();
         } else {
             log.error("Stack trace of internal server error", exception);
